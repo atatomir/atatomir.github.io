@@ -47,6 +47,11 @@
       padding: 2rem;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.5);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+    section:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
     }
     h2 {
       margin-top: 0;
@@ -71,9 +76,11 @@
       color: #0ea5e9;
       text-decoration: none;
       font-weight: 500;
+      transition: color 0.2s ease;
     }
     a:hover {
       text-decoration: underline;
+      color: #0284c7;
     }
   </style>
 </head>
@@ -98,7 +105,7 @@
     <section>
       <h2>Careers</h2>
       <p>We’re growing and always looking for talented people to join us. If you’re passionate about building great software and want to work on diverse projects, we’d love to hear from you.</p>
-      <p>Send us your details at <a href="mailto:atatomir@gmail.com">atatomir@gmail.com</a>.</p>
+      <p>Send us your resume at <a href="mailto:atatomir@gmail.com">atatomir@gmail.com</a>.</p>
     </section>
   </main>
 
