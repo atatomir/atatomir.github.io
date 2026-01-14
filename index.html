@@ -1,117 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TATOMIR N. ALEX - Persoană Fizică Autorizată</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #e0e7ff, #f8fafc);
-      color: #1e293b;
-      line-height: 1.6;
-    }
-    header {
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 2.5rem 1rem;
-      text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-      font-weight: 700;
-      color: #111827;
-    }
-    header p {
-      margin-top: 0.5rem;
-      font-size: 1.1rem;
-      font-weight: 300;
-      color: #374151;
-    }
-    main {
-      max-width: 1000px;
-      margin: 3rem auto;
-      padding: 0 1.5rem;
-      display: grid;
-      gap: 2rem;
-    }
-    section {
-      background: rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
-    }
-    section:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
-    }
-    h2 {
-      margin-top: 0;
-      color: #111827;
-      font-size: 1.4rem;
-    }
-    p {
-      margin-bottom: 0.8rem;
-    }
-    footer {
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      text-align: center;
-      padding: 2rem 1rem;
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #374151;
-      border-top: 1px solid rgba(255, 255, 255, 0.4);
-    }
-    a {
-      color: #0ea5e9;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s ease;
-    }
-    a:hover {
-      text-decoration: underline;
-      color: #0284c7;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TATOMIR N. ALEX • Persoană Fizică Autorizată</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark:#0b0d10;
+  --bg-deep:#0f172a;
+  --panel: rgba(255,255,255,0.06);
+  --ink:#f5f7fa;
+  --muted:#9aa3b2;
+  --accent:#4f8cff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  line-height:1.7;
+  background: linear-gradient(180deg, #0b0d10 0%, #0f172a 100%);
+  background-attachment: fixed;
+  background-size: cover;
+  transition: background 0.3s ease-out;
+}
+
+/* NAV */
+nav{
+  position: fixed;
+  top:20px;
+  left:50%;
+  transform: translateX(-50%);
+  z-index:100;
+  backdrop-filter: blur(16px);
+  background: var(--panel);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:999px;
+  padding:10px 22px;
+  display:flex;
+  gap:16px;
+  align-items:center;
+}
+nav a{
+  color: var(--muted);
+  text-decoration: none;
+  font-weight:500;
+  margin:0 10px;
+  font-size:14px;
+}
+nav a:hover{color: var(--accent);}
+#lang-toggle{
+  margin-left:12px;
+  cursor:pointer;
+  background: var(--accent);
+  border:none;
+  border-radius:999px;
+  padding:6px 12px;
+  font-weight:600;
+  color:white;
+  font-size:13px;
+  transition:0.2s;
+}
+#lang-toggle:hover{background:#3570d1;}
+
+/* HERO */
+header{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 24px;
+  text-align:center;
+}
+.hero h1{
+  font-size: clamp(2.6rem,5vw,4.2rem);
+  font-weight:700;
+  letter-spacing:-0.03em;
+}
+.hero h1 span{color: var(--accent);}
+.hero p{
+  margin-top:24px;
+  font-size:1.05rem;
+  color: var(--muted);
+  max-width:640px;
+  margin-inline:auto;
+}
+.hero .cta{
+  margin-top:40px;
+  display:inline-flex;
+  gap:18px;
+}
+.button{
+  padding:14px 26px;
+  border-radius:999px;
+  font-weight:600;
+  font-size:14px;
+  text-decoration:none;
+  transition:0.25s;
+}
+.primary{background: var(--accent); color:white;}
+.primary:hover{transform:translateY(-2px);}
+.secondary{border:1px solid rgba(255,255,255,0.15); color: var(--ink);}
+.secondary:hover{background: rgba(255,255,255,0.05);}
+
+/* SECTIONS */
+section{
+  max-width:1100px;
+  margin:0 auto;
+  padding:120px 24px;
+}
+.section-title{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  color:var(--muted);
+  margin-bottom:18px;
+}
+.section-heading{
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin-bottom:28px;
+}
+.section-text{
+  max-width:700px;
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+/* REVEAL ANIMATION */
+.reveal{
+  opacity:0;
+  transform: translateY(24px);
+  transition:0.8s ease;
+}
+.reveal.visible{
+  opacity:1;
+  transform:none;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:60px 24px 40px;
+  color:var(--muted);
+  font-size:13px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+
+/* RESPONSIVE */
+@media (max-width:768px){
+  .hero h1{font-size:2.6rem;}
+  .section-heading{font-size:2rem;}
+  nav a{font-size:13px; margin:0 8px;}
+}
+</style>
 </head>
 <body>
-  <header>
-    <h1>TATOMIR N. ALEX</h1>
+
+<nav>
+  <a href="#about" data-en="About" data-ro="Despre">About</a>
+  <a href="#clients" data-en="Clients" data-ro="Clienți">Clients</a>
+  <a href="#careers" data-en="Careers" data-ro="Cariere">Careers</a>
+  <a href="#contact" data-en="Contact" data-ro="Contact">Contact</a>
+  <button id="lang-toggle">RO</button>
+</nav>
+
+<header id="hero" class="hero reveal">
+  <div>
+    <h1>TATOMIR <span>N. ALEX</span></h1>
     <p>Persoană Fizică Autorizată</p>
-  </header>
+    <div class="cta">
+      <a href="#contact" class="button primary" data-en="Contact Us" data-ro="Contactează-ne">Contact Us</a>
+    </div>
+  </div>
+</header>
 
-  <main>
-    <section>
-      <h2>About Us</h2>
-      <p>We are a small team of developers creating a wide range of software solutions, from <strong>data analysis</strong> to <strong>content creation tools</strong>.  
-Our focus is on delivering reliable, efficient, and user-friendly products designed to meet diverse needs and help our clients succeed.</p>
-    </section>
+<section id="about" class="reveal">
+  <div class="section-title" data-en="About" data-ro="Despre">About</div>
+  <div class="section-heading" data-en="Who We Are" data-ro="Cine suntem">Who We Are</div>
+  <p class="section-text" data-en="We are a small team of developers creating a wide range of software solutions, from data analysis to content creation tools. Our focus is on delivering reliable, efficient, and user-friendly products designed to meet diverse needs and help our clients succeed."
+  data-ro="Suntem o echipă mică de dezvoltatori care creăm o gamă largă de soluții software, de la analiza datelor la instrumente de creare de conținut. Ne concentrăm pe livrarea de produse fiabile, eficiente și ușor de utilizat, proiectate să satisfacă diverse nevoi și să ajute clienții noștri să reușească.">
+    We are a small team of developers creating a wide range of software solutions, from data analysis to content creation tools. Our focus is on delivering reliable, efficient, and user-friendly products designed to meet diverse needs and help our clients succeed.
+  </p>
+</section>
 
-    <section>
-      <h2>For Clients</h2>
-      <p>If you need custom software or tools to power your projects, we’re here to help. From one-off prototypes to full-scale applications, we’ll deliver solutions designed around your goals.</p>
-      <p>Reach out at <a href="mailto:atatomir@gmail.com">atatomir@gmail.com</a> to discuss your project.</p>
-    </section>
+<section id="clients" class="reveal">
+  <div class="section-title" data-en="For Clients" data-ro="Pentru Clienți">For Clients</div>
+  <div class="section-heading" data-en="Custom Solutions" data-ro="Soluții Personalizate">Custom Solutions</div>
+  <p class="section-text" data-en="If you need custom software or tools to power your projects, we’re here to help. From one-off prototypes to full-scale applications, we’ll deliver solutions designed around your goals."
+  data-ro="Dacă aveți nevoie de software personalizat sau instrumente pentru proiectele dvs., suntem aici să vă ajutăm. De la prototipuri unice la aplicații complete, vom livra soluții proiectate în jurul obiectivelor dvs.">
+    If you need custom software or tools to power your projects, we’re here to help. From one-off prototypes to full-scale applications, we’ll deliver solutions designed around your goals.
+  </p>
+  <a href="mailto:atatomir@gmail.com" class="button primary" data-en="Discuss Your Project" data-ro="Discută Proiectul">Discuss Your Project</a>
+</section>
 
-    <section>
-      <h2>Careers</h2>
-      <p>We’re growing and always looking for talented people to join us. If you’re passionate about building great software and want to work on diverse projects, we’d love to hear from you.</p>
-      <p>Send us your resume at <a href="mailto:atatomir@gmail.com">atatomir@gmail.com</a>.</p>
-    </section>
-  </main>
+<section id="careers" class="reveal">
+  <div class="section-title" data-en="Careers" data-ro="Cariere">Careers</div>
+  <div class="section-heading" data-en="Join the Team" data-ro="Alătură-te Echipei">Join the Team</div>
+  <p class="section-text" data-en="We’re growing and always looking for talented people to join us. If you’re passionate about building great software and want to work on diverse projects, we’d love to hear from you."
+  data-ro="Ne extindem și căutăm întotdeauna oameni talentați să ni se alăture. Dacă ești pasionat de crearea de software de calitate și vrei să lucrezi la proiecte diverse, ne-ar plăcea să te auzim.">
+    We’re growing and always looking for talented people to join us. If you’re passionate about building great software and want to work on diverse projects, we’d love to hear from you.
+  </p>
+  <a href="mailto:atatomir@gmail.com" class="button primary" data-en="Send Your Resume" data-ro="Trimite CV-ul">Send Your Resume</a>
+</section>
 
-  <footer>
-    <p>&copy; 2025 TATOMIR N. ALEX PFA. All rights reserved.</p>
-  </footer>
+<section id="contact" class="reveal">
+  <div class="section-title" data-en="Contact" data-ro="Contact">Contact</div>
+  <div class="section-heading" data-en="Get in Touch" data-ro="Ia Legătura">Get in Touch</div>
+  <p class="section-text" data-en="Reach out at atatomir@gmail.com to discuss your project or opportunities." data-ro="Contactați-ne la atatomir@gmail.com pentru a discuta despre proiectul sau oportunitățile dvs.">
+    Reach out at <strong>atatomir@gmail.com</strong> to discuss your project or opportunities.
+  </p>
+</section>
+
+<footer class="reveal">
+  © 2025 TATOMIR N. ALEX PFA. All rights reserved.
+</footer>
+
+<script>
+// Reveal animations
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add("visible");
+  });
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Language toggle
+const toggle = document.getElementById('lang-toggle');
+let lang = 'en';
+toggle.addEventListener('click', ()=>{
+  lang = lang === 'en' ? 'ro' : 'en';
+  toggle.textContent = lang === 'en' ? 'RO' : 'EN';
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    el.textContent = el.getAttribute(`data-${lang}`);
+  });
+});
+
+window.addEventListener('scroll', () => {
+  const scroll = window.scrollY;
+  const body = document.body;
+
+  // Subtle oscillation using sine, very slow
+  const oscillation1 = 30 + Math.sin(scroll * 0.002) * 8;  // +/- 8px movement
+  const oscillation2 = 10 + Math.sin(scroll * 0.0025 + 1) * 6; // slightly offset
+  const linearEnd = 100 + Math.sin(scroll * 0.0015) * 4;  // slow depth shift
+
+  body.style.background = `
+    radial-gradient(circle at 20% ${oscillation1}%, rgba(79,140,255,0.25), transparent 50%),
+    radial-gradient(circle at 80% ${oscillation2}%, rgba(20,40,90,0.3), transparent 60%),
+    linear-gradient(180deg, #0b0d10 0%, #0f172a ${linearEnd}%)
+  `;
+});
+</script>
+
 </body>
 </html>
+
