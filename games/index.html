@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games • TATOMIR N. ALEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark:#0b0d10;
+  --bg-deep:#0f172a;
+  --panel: rgba(255,255,255,0.06);
+  --ink:#f5f7fa;
+  --muted:#9aa3b2;
+  --accent:#4f8cff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  line-height:1.7;
+  background: linear-gradient(180deg, #0b0d10 0%, #0f172a 100%);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* NAV */
+nav{
+  position: fixed;
+  top:20px;
+  left:50%;
+  transform: translateX(-50%);
+  z-index:100;
+  backdrop-filter: blur(16px);
+  background: var(--panel);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:999px;
+  padding:10px 22px;
+  display:flex;
+  gap:16px;
+  align-items:center;
+}
+nav a{
+  color: var(--muted);
+  text-decoration: none;
+  font-weight:500;
+  margin:0 10px;
+  font-size:14px;
+}
+nav a:hover{color: var(--accent);}
+#lang-toggle{
+  margin-left:12px;
+  cursor:pointer;
+  background: var(--accent);
+  border:none;
+  border-radius:999px;
+  padding:6px 12px;
+  font-weight:600;
+  color:white;
+  font-size:13px;
+  transition:0.2s;
+}
+#lang-toggle:hover{background:#3570d1;}
+
+/* SECTIONS */
+section{
+  max-width:1100px;
+  margin:0 auto;
+  padding:120px 24px 60px;
+}
+.section-title{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  color:var(--muted);
+  margin-bottom:18px;
+}
+.section-heading{
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin-bottom:28px;
+}
+
+/* REVEAL ANIMATION */
+.reveal{
+  opacity:0;
+  transform: translateY(24px);
+  transition:0.8s ease;
+}
+.reveal.visible{
+  opacity:1;
+  transform:none;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:60px 24px 40px;
+  color:var(--muted);
+  font-size:13px;
+  border-top:1px solid rgba(255,255,255,0.06);
+}
+
+/* GAMES LAYOUT */
+#games{text-align:center;}
+.games-row{
+  display:flex;
+  gap:32px;
+  justify-content:center;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.game-col{
+  flex:0 1 440px;
+  min-width:0;
+}
+
+/* SNAKE GAME */
+.snake-score-bar{
+  display:flex;
+  justify-content:center;
+  gap:32px;
+  margin-bottom:18px;
+  font-size:14px;
+  color:var(--muted);
+}
+.snake-score-bar span{color:var(--accent);font-weight:600;}
+.snake-canvas-wrap{
+  position:relative;
+  display:inline-block;
+  border-radius:14px;
+  overflow:hidden;
+  border:2px solid rgba(79,140,255,0.35);
+  box-shadow:0 0 30px rgba(79,140,255,0.1);
+}
+#snake-canvas{display:block;background:#0b0d10;max-width:100%;height:auto;}
+.snake-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:rgba(11,13,16,0.82);
+  backdrop-filter:blur(6px);
+  z-index:2;
+  transition:opacity 0.3s;
+}
+.snake-overlay.hidden{opacity:0;pointer-events:none;}
+.snake-overlay h3{font-size:1.6rem;margin-bottom:8px;}
+.snake-overlay p{color:var(--muted);margin-bottom:18px;font-size:0.95rem;}
+.snake-overlay .snake-final-score{font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:6px;}
+.snake-btn{
+  padding:12px 28px;border:none;border-radius:999px;
+  background:var(--accent);color:#fff;font-weight:600;font-size:14px;
+  cursor:pointer;transition:0.2s;margin:4px;
+}
+.snake-btn:hover{background:#3570d1;transform:translateY(-1px);}
+.snake-btn.secondary-btn{
+  background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--ink);
+}
+.snake-btn.secondary-btn:hover{background:rgba(255,255,255,0.05);}
+.snake-initials-input{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  border-radius:8px;padding:8px 12px;color:var(--ink);font-size:1rem;
+  text-align:center;width:80px;text-transform:uppercase;font-weight:600;
+  margin-bottom:10px;outline:none;
+}
+.snake-initials-input:focus{border-color:var(--accent);}
+.snake-leaderboard{
+  margin:28px auto 0;max-width:340px;
+  backdrop-filter:blur(16px);background:var(--panel);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:20px 24px;
+}
+.snake-leaderboard h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:12px;}
+.snake-leaderboard table{width:100%;border-collapse:collapse;font-size:14px;}
+.snake-leaderboard th{color:var(--muted);font-weight:500;text-align:left;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.snake-leaderboard td{padding:6px 0;}
+.snake-leaderboard td:last-child{text-align:right;color:var(--accent);font-weight:600;}
+.snake-dpad{
+  display:none;
+  margin:18px auto 0;
+  width:160px;height:160px;
+  position:relative;
+}
+.snake-dpad button{
+  position:absolute;width:50px;height:50px;
+  border:none;border-radius:10px;
+  background:var(--panel);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,0.1);
+  color:var(--ink);font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:0.15s;-webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.snake-dpad button:active{background:rgba(79,140,255,0.25);}
+.snake-dpad .d-up{top:0;left:55px;}
+.snake-dpad .d-down{bottom:0;left:55px;}
+.snake-dpad .d-left{top:55px;left:0;}
+.snake-dpad .d-right{top:55px;right:0;}
+
+/* TRADING GAME */
+.trade-panel{
+  backdrop-filter:blur(16px);background:var(--panel);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:20px;text-align:center;
+}
+.trade-panel h3{font-size:1.1rem;font-weight:600;margin-bottom:12px;}
+.trade-info{
+  display:flex;justify-content:space-around;margin-bottom:14px;font-size:13px;color:var(--muted);
+}
+.trade-info span{display:block;font-size:1.05rem;font-weight:600;color:var(--ink);margin-top:2px;}
+.trade-info .pnl-pos{color:#34d399;}
+.trade-info .pnl-neg{color:#ef4444;}
+.trade-canvas-wrap{
+  position:relative;border-radius:10px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.08);margin-bottom:14px;
+}
+#trade-canvas{display:block;width:100%;height:auto;}
+.trade-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(11,13,16,0.82);backdrop-filter:blur(6px);z-index:2;transition:opacity 0.3s;
+}
+.trade-overlay.hidden{opacity:0;pointer-events:none;}
+.trade-overlay h3{font-size:1.4rem;margin-bottom:6px;}
+.trade-overlay p{color:var(--muted);margin-bottom:14px;font-size:0.9rem;}
+.trade-result{font-size:1.8rem;font-weight:700;margin-bottom:10px;}
+.trade-btns{display:flex;gap:8px;justify-content:center;}
+.trade-btn{
+  padding:10px 22px;border:none;border-radius:999px;
+  font-weight:600;font-size:14px;cursor:pointer;transition:0.2s;
+}
+.trade-btn:hover{transform:translateY(-1px);}
+.trade-btn.buy{background:#34d399;color:#0b0d10;}
+.trade-btn.buy:hover{background:#2ab884;}
+.trade-btn.sell{background:#ef4444;color:#fff;}
+.trade-btn.sell:hover{background:#d63535;}
+.trade-btn.start{background:var(--accent);color:#fff;}
+.trade-btn.start:hover{background:#3570d1;}
+.trade-position-bar{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  margin-bottom:14px;font-size:13px;color:var(--muted);
+}
+.trade-pos-dots{display:flex;gap:2px;align-items:center;}
+.trade-pos-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+  transition:0.15s;
+}
+.trade-pos-dot.zero{width:9px;height:9px;border-color:rgba(255,255,255,0.25);}
+.trade-pos-dot.long{background:#34d399;border-color:#34d399;}
+.trade-pos-dot.short{background:#ef4444;border-color:#ef4444;}
+.trade-timer{
+  height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:14px;overflow:hidden;
+}
+.trade-timer-fill{height:100%;background:var(--accent);transition:width 0.1s linear;width:0%;}
+.trade-lb{margin-top:16px;}
+.trade-lb h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:10px;}
+.trade-lb table{width:100%;border-collapse:collapse;font-size:14px;}
+.trade-lb th{color:var(--muted);font-weight:500;text-align:left;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.trade-lb td{padding:6px 0;}
+.trade-lb td:last-child{text-align:right;font-weight:600;}
+
+/* RESPONSIVE */
+@media (max-width:768px){
+  .section-heading{font-size:2rem;}
+  nav a{font-size:13px; margin:0 8px;}
+  .snake-dpad{display:block;}
+  .games-row{flex-direction:column;align-items:center;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" data-en="Home" data-ro="Acasă">Home</a>
+  <a href="/games" data-en="Games" data-ro="Jocuri">Games</a>
+  <button id="lang-toggle">RO</button>
+</nav>
+
+<section id="games" class="reveal">
+  <div class="section-title" data-en="Mini Games" data-ro="Mini Jocuri">Mini Games</div>
+  <div class="section-heading" data-en="Take a Break" data-ro="Ia o Pauză">Take a Break</div>
+  <div class="games-row">
+
+    <!-- SNAKE -->
+    <div class="game-col">
+      <div class="snake-score-bar">
+        <div><span data-en="Score" data-ro="Scor">Score</span>: <span id="snake-score">0</span></div>
+        <div><span data-en="Best" data-ro="Record">Best</span>: <span id="snake-high">0</span></div>
+      </div>
+      <div class="snake-canvas-wrap">
+        <canvas id="snake-canvas" width="400" height="400"></canvas>
+        <div class="snake-overlay" id="snake-overlay-start">
+          <h3 data-en="Snake" data-ro="Snake">Snake</h3>
+          <p data-en="Use arrow keys or WASD to play" data-ro="Folosește săgețile sau WASD">Use arrow keys or WASD to play</p>
+          <button class="snake-btn" id="snake-start-btn" data-en="Start Game" data-ro="Începe Jocul">Start Game</button>
+        </div>
+        <div class="snake-overlay hidden" id="snake-overlay-end">
+          <h3 data-en="Game Over" data-ro="Joc Terminat">Game Over</h3>
+          <div class="snake-final-score" id="snake-final-score">0</div>
+          <p data-en="Enter your initials:" data-ro="Introdu inițialele:">Enter your initials:</p>
+          <input class="snake-initials-input" id="snake-initials" maxlength="3" placeholder="AAA">
+          <div>
+            <button class="snake-btn" id="snake-save-btn" data-en="Save Score" data-ro="Salvează Scor">Save Score</button>
+            <button class="snake-btn secondary-btn" id="snake-restart-btn" data-en="Play Again" data-ro="Joacă Din Nou">Play Again</button>
+          </div>
+        </div>
+      </div>
+      <div class="snake-dpad">
+        <button class="d-up" data-dir="up">&#9650;</button>
+        <button class="d-down" data-dir="down">&#9660;</button>
+        <button class="d-left" data-dir="left">&#9664;</button>
+        <button class="d-right" data-dir="right">&#9654;</button>
+      </div>
+      <div class="snake-leaderboard">
+        <h4 data-en="Leaderboard" data-ro="Clasament">Leaderboard</h4>
+        <table>
+          <thead><tr>
+            <th data-en="#" data-ro="#">#</th>
+            <th data-en="Player" data-ro="Jucător">Player</th>
+            <th data-en="Score" data-ro="Scor">Score</th>
+          </tr></thead>
+          <tbody id="snake-lb-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TRADING -->
+    <div class="game-col">
+      <div class="trade-panel">
+        <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
+        <div class="trade-timer"><div class="trade-timer-fill" id="trade-timer-fill"></div></div>
+        <div class="trade-info">
+          <div><small data-en="Price" data-ro="Preț">Price</small><span id="trade-price">—</span></div>
+          <div><small data-en="Position" data-ro="Poziție">Position</small><span id="trade-pos">0</span></div>
+          <div><small data-en="P&amp;L" data-ro="Profit">P&amp;L</small><span id="trade-pnl">$0.00</span></div>
+        </div>
+        <div class="trade-position-bar">
+          <small>-1000</small>
+          <div class="trade-pos-dots">
+            <div class="trade-pos-dot" data-i="-10"></div>
+            <div class="trade-pos-dot" data-i="-9"></div>
+            <div class="trade-pos-dot" data-i="-8"></div>
+            <div class="trade-pos-dot" data-i="-7"></div>
+            <div class="trade-pos-dot" data-i="-6"></div>
+            <div class="trade-pos-dot" data-i="-5"></div>
+            <div class="trade-pos-dot" data-i="-4"></div>
+            <div class="trade-pos-dot" data-i="-3"></div>
+            <div class="trade-pos-dot" data-i="-2"></div>
+            <div class="trade-pos-dot" data-i="-1"></div>
+            <div class="trade-pos-dot zero" data-i="0"></div>
+            <div class="trade-pos-dot" data-i="1"></div>
+            <div class="trade-pos-dot" data-i="2"></div>
+            <div class="trade-pos-dot" data-i="3"></div>
+            <div class="trade-pos-dot" data-i="4"></div>
+            <div class="trade-pos-dot" data-i="5"></div>
+            <div class="trade-pos-dot" data-i="6"></div>
+            <div class="trade-pos-dot" data-i="7"></div>
+            <div class="trade-pos-dot" data-i="8"></div>
+            <div class="trade-pos-dot" data-i="9"></div>
+            <div class="trade-pos-dot" data-i="10"></div>
+          </div>
+          <small>+1000</small>
+        </div>
+        <div class="trade-canvas-wrap">
+          <canvas id="trade-canvas" width="400" height="220"></canvas>
+          <div class="trade-overlay" id="trade-overlay-start">
+            <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
+            <p data-en="Trade simulated SPY in 30s. Use arrows or buttons." data-ro="Tranzacționează SPY simulat în 30s. Săgeți sau butoane.">Trade simulated SPY in 30s. Use arrows or buttons.</p>
+            <button class="trade-btn start" id="trade-start-btn" data-en="Start Trading" data-ro="Începe Tranzacția">Start Trading</button>
+          </div>
+          <div class="trade-overlay hidden" id="trade-overlay-end">
+            <h3 data-en="Market Closed" data-ro="Piața Închisă">Market Closed</h3>
+            <div class="trade-result" id="trade-result">$0.00</div>
+            <button class="trade-btn start" id="trade-restart-btn" data-en="Trade Again" data-ro="Tranzacționează Din Nou">Trade Again</button>
+          </div>
+        </div>
+        <div class="trade-btns">
+          <button class="trade-btn buy" id="trade-buy-btn" disabled data-en="Buy +100 (&#9650;)" data-ro="Cumpără +100 (&#9650;)">Buy +100 (&#9650;)</button>
+          <button class="trade-btn sell" id="trade-sell-btn" disabled data-en="Sell -100 (&#9660;)" data-ro="Vinde -100 (&#9660;)">Sell -100 (&#9660;)</button>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--muted)">
+          <span data-en="100x multiplier" data-ro="Multiplicator 100x">100x multiplier</span>
+        </div>
+        <div class="trade-lb">
+          <h4 data-en="Best Trades" data-ro="Cele Mai Bune Tranzacții">Best Trades</h4>
+          <table>
+            <thead><tr>
+              <th data-en="#" data-ro="#">#</th>
+              <th data-en="P&amp;L" data-ro="Profit">P&amp;L</th>
+            </tr></thead>
+            <tbody id="trade-lb-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="reveal">
+  © 2025 TATOMIR N. ALEX PFA. All rights reserved.
+</footer>
+
+<script>
+// Reveal animations
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add("visible");
+  });
+},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Language toggle
+const toggle = document.getElementById('lang-toggle');
+let lang = 'en';
+toggle.addEventListener('click', ()=>{
+  lang = lang === 'en' ? 'ro' : 'en';
+  toggle.textContent = lang === 'en' ? 'RO' : 'EN';
+  document.querySelectorAll('[data-en]').forEach(el=>{
+    el.textContent = el.getAttribute(`data-${lang}`);
+  });
+});
+
+// Snake Game
+(function(){
+  const canvas = document.getElementById('snake-canvas');
+  const ctx = canvas.getContext('2d');
+  const SIZE = 20;
+  const COLS = canvas.width / SIZE;
+  const ROWS = canvas.height / SIZE;
+  const BASE_SPEED = 140;
+  const SPEED_STEP = 4;
+  const MIN_SPEED = 60;
+
+  let snake, dir, nextDir, food, score, highScore, speed, loop, running;
+  let gem, gemTimer, bombs, bombTimer;
+
+  highScore = parseInt(localStorage.getItem('snakeHigh') || '0');
+  document.getElementById('snake-high').textContent = highScore;
+
+  function loadLB(){ return JSON.parse(localStorage.getItem('snakeLB') || '[]'); }
+  function saveLB(lb){ localStorage.setItem('snakeLB', JSON.stringify(lb)); }
+  function renderLB(){
+    const lb = loadLB();
+    const tbody = document.getElementById('snake-lb-body');
+    tbody.innerHTML = lb.length === 0
+      ? '<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:12px 0">—</td></tr>'
+      : lb.map((e,i)=>`<tr><td>${i+1}</td><td>${e.name}</td><td>${e.score}</td></tr>`).join('');
+  }
+  renderLB();
+
+  function isFree(pos){
+    if(snake.some(s=>s.x===pos.x&&s.y===pos.y)) return false;
+    if(food&&food.x===pos.x&&food.y===pos.y) return false;
+    if(gem&&gem.x===pos.x&&gem.y===pos.y) return false;
+    if(bombs.some(b=>b.x===pos.x&&b.y===pos.y)) return false;
+    return true;
+  }
+  function randFreePos(){
+    let pos;
+    do { pos={x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)}; } while(!isFree(pos));
+    return pos;
+  }
+  function placeFood(){ food = randFreePos(); }
+
+  function spawnGem(){
+    gem = randFreePos();
+    if(gemTimer) clearTimeout(gemTimer);
+    gemTimer = setTimeout(()=>{ gem=null; scheduleGem(); }, 4000+Math.random()*2000);
+  }
+  function scheduleGem(){
+    if(!running) return;
+    gemTimer = setTimeout(()=>{ if(running) spawnGem(); }, 5000+Math.random()*5000);
+  }
+  function spawnBomb(){
+    if(!running) return;
+    if(bombs.length<3) bombs.push(randFreePos());
+    scheduleBomb();
+  }
+  function scheduleBomb(){
+    if(!running) return;
+    bombTimer = setTimeout(()=>{ if(running) spawnBomb(); }, 6000+Math.random()*6000);
+  }
+
+  function startGame(){
+    snake = [{x:Math.floor(COLS/2), y:Math.floor(ROWS/2)}];
+    dir = {x:1,y:0}; nextDir = {x:1,y:0};
+    score = 0; speed = BASE_SPEED; running = true;
+    gem = null; bombs = [];
+    if(gemTimer) clearTimeout(gemTimer);
+    if(bombTimer) clearTimeout(bombTimer);
+    document.getElementById('snake-score').textContent = 0;
+    placeFood(); scheduleGem(); scheduleBomb();
+    document.getElementById('snake-overlay-start').classList.add('hidden');
+    document.getElementById('snake-overlay-end').classList.add('hidden');
+    if(loop) clearInterval(loop);
+    loop = setInterval(tick, speed);
+  }
+
+  function tick(){
+    dir = nextDir;
+    const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+    if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS||snake.some(s=>s.x===head.x&&s.y===head.y)){ gameOver(); return; }
+    if(bombs.some(b=>b.x===head.x&&b.y===head.y)){ gameOver(); return; }
+    snake.unshift(head);
+    let ate = false;
+    if(head.x===food.x&&head.y===food.y){ score++; ate = true; placeFood(); }
+    if(gem&&head.x===gem.x&&head.y===gem.y){
+      score += 3; gem = null;
+      if(gemTimer) clearTimeout(gemTimer);
+      scheduleGem();
+    }
+    if(ate || score !== parseInt(document.getElementById('snake-score').textContent)){
+      document.getElementById('snake-score').textContent = score;
+      if(score>highScore){
+        highScore = score;
+        localStorage.setItem('snakeHigh', highScore);
+        document.getElementById('snake-high').textContent = highScore;
+      }
+    }
+    if(ate){
+      const newSpeed = Math.max(MIN_SPEED, BASE_SPEED - score * SPEED_STEP);
+      if(newSpeed !== speed){ speed = newSpeed; clearInterval(loop); loop = setInterval(tick, speed); }
+    } else { snake.pop(); }
+    draw();
+  }
+
+  function draw(){
+    ctx.fillStyle = '#0b0d10';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*SIZE,0);ctx.lineTo(x*SIZE,canvas.height);ctx.stroke();}
+    for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*SIZE);ctx.lineTo(canvas.width,y*SIZE);ctx.stroke();}
+    ctx.fillStyle = '#ff5f5f';
+    ctx.beginPath(); ctx.arc(food.x*SIZE+SIZE/2, food.y*SIZE+SIZE/2, SIZE/2-2, 0, Math.PI*2); ctx.fill();
+    if(gem){
+      const gx=gem.x*SIZE+SIZE/2, gy=gem.y*SIZE+SIZE/2, gr=SIZE/2-2;
+      ctx.fillStyle='#34d399';
+      ctx.beginPath(); ctx.moveTo(gx,gy-gr); ctx.lineTo(gx+gr,gy); ctx.lineTo(gx,gy+gr); ctx.lineTo(gx-gr,gy);
+      ctx.closePath(); ctx.fill();
+      ctx.shadowColor='#34d399'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+    }
+    bombs.forEach(b=>{
+      const bx=b.x*SIZE+SIZE/2, by=b.y*SIZE+SIZE/2, br=SIZE/2-2;
+      ctx.fillStyle='#ef4444';
+      ctx.beginPath(); ctx.arc(bx,by,br,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#0b0d10'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(bx-3,by-3); ctx.lineTo(bx+3,by+3); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(bx+3,by-3); ctx.lineTo(bx-3,by+3); ctx.stroke();
+      ctx.lineWidth=1;
+    });
+    snake.forEach((s,i)=>{
+      ctx.fillStyle = i===0 ? '#4f8cff' : 'rgba(79,140,255,0.65)';
+      ctx.beginPath(); ctx.roundRect(s.x*SIZE+1, s.y*SIZE+1, SIZE-2, SIZE-2, 4); ctx.fill();
+    });
+  }
+  ctx.fillStyle='#0b0d10';ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  function gameOver(){
+    running = false; clearInterval(loop);
+    if(gemTimer) clearTimeout(gemTimer);
+    if(bombTimer) clearTimeout(bombTimer);
+    document.getElementById('snake-final-score').textContent = score;
+    document.getElementById('snake-initials').value = '';
+    document.getElementById('snake-overlay-end').classList.remove('hidden');
+  }
+
+  const DIR_MAP = {
+    ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},
+    w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0},
+    W:{x:0,y:-1},S:{x:0,y:1},A:{x:-1,y:0},D:{x:1,y:0}
+  };
+  document.addEventListener('keydown', e=>{
+    const d = DIR_MAP[e.key];
+    if(d && running){ if(d.x !== -dir.x || d.y !== -dir.y) nextDir = d; e.preventDefault(); }
+  });
+
+  document.querySelectorAll('.snake-dpad button').forEach(btn=>{
+    const dirName = btn.dataset.dir;
+    const map = {up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
+    btn.addEventListener('touchstart', e=>{ e.preventDefault(); if(!running) return; const d=map[dirName]; if(d.x!==-dir.x||d.y!==-dir.y) nextDir=d; });
+    btn.addEventListener('mousedown', ()=>{ if(!running) return; const d=map[dirName]; if(d.x!==-dir.x||d.y!==-dir.y) nextDir=d; });
+  });
+
+  document.getElementById('snake-start-btn').addEventListener('click', startGame);
+  document.getElementById('snake-restart-btn').addEventListener('click', startGame);
+  document.getElementById('snake-save-btn').addEventListener('click', ()=>{
+    const initials = document.getElementById('snake-initials').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,3) || '???';
+    const lb = loadLB(); lb.push({name:initials, score:score});
+    lb.sort((a,b)=>b.score-a.score); if(lb.length>5) lb.length=5;
+    saveLB(lb); renderLB(); startGame();
+  });
+})();
+
+// Trading Game
+(function(){
+  const canvas = document.getElementById('trade-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const DURATION = 30000;
+  const TICK = 100;
+  const TOTAL_TICKS = DURATION / TICK;
+  const MULTIPLIER = 100;
+  const MAX_POS = 10;
+
+  let prices, currentTick, position, pnl, running, loop;
+
+  function generatePrices(){
+    const p = [580 + Math.random()*20];
+    const mu = (Math.random()-0.5)*0.0001;
+    const sigma = 0.002;
+    for(let i=1;i<=TOTAL_TICKS;i++){
+      const prev = p[i-1];
+      const shock = (Math.random()+Math.random()+Math.random()-1.5)*2;
+      p.push(prev * (1 + mu + sigma * shock));
+    }
+    return p;
+  }
+
+  function loadTradeLB(){ return JSON.parse(localStorage.getItem('tradeLB')||'[]'); }
+  function saveTradeLB(lb){ localStorage.setItem('tradeLB',JSON.stringify(lb)); }
+  function renderTradeLB(){
+    const lb = loadTradeLB();
+    const tbody = document.getElementById('trade-lb-body');
+    tbody.innerHTML = lb.length===0
+      ? '<tr><td colspan="2" style="color:var(--muted);text-align:center;padding:12px 0">—</td></tr>'
+      : lb.map((e,i)=>{
+        const cls = e>=0?'pnl-pos':'pnl-neg';
+        const sign = e>=0?'+':'';
+        return `<tr><td>${i+1}</td><td class="${cls}">${sign}$${Math.abs(e).toFixed(2)}</td></tr>`;
+      }).join('');
+  }
+  renderTradeLB();
+
+  function doBuy(){
+    if(!running||position>=MAX_POS) return;
+    position++;
+    updatePosDisplay();
+  }
+  function doSell(){
+    if(!running||position<=-MAX_POS) return;
+    position--;
+    updatePosDisplay();
+  }
+
+  function updatePosDisplay(){
+    const display = position * MULTIPLIER;
+    document.getElementById('trade-pos').textContent = (display>0?'+':'') + display;
+    document.querySelectorAll('.trade-pos-dot').forEach(dot=>{
+      const i = parseInt(dot.dataset.i);
+      dot.classList.remove('long','short');
+      if(position>0 && i>0 && i<=position) dot.classList.add('long');
+      if(position<0 && i<0 && i>=position) dot.classList.add('short');
+    });
+  }
+
+  function updatePnlDisplay(){
+    const el = document.getElementById('trade-pnl');
+    const sign = pnl>=0?'+':'';
+    el.textContent = `${sign}$${Math.abs(pnl).toFixed(2)}`;
+    el.className = pnl>=0?'pnl-pos':'pnl-neg';
+  }
+
+  function drawChart(){
+    ctx.fillStyle='#0b0d10';
+    ctx.fillRect(0,0,W,H);
+    if(currentTick<1) return;
+    const slice = prices.slice(0, currentTick+1);
+    const minP = Math.min(...slice)-0.5;
+    const maxP = Math.max(...slice)+0.5;
+    const range = maxP-minP||1;
+    const padT=18, padB=22, padL=6, padR=6;
+    const cW=W-padL-padR, cH=H-padT-padB;
+
+    ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+    for(let i=0;i<5;i++){const y=padT+cH*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();}
+
+    ctx.strokeStyle='#4f8cff';ctx.lineWidth=2;ctx.beginPath();
+    for(let i=0;i<=currentTick;i++){
+      const x=padL+(i/TOTAL_TICKS)*cW;
+      const y=padT+cH*(1-(slice[i]-minP)/range);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    const lastX=padL+(currentTick/TOTAL_TICKS)*cW;
+    const lastY=padT+cH*(1-(slice[currentTick]-minP)/range);
+    ctx.lineTo(lastX,padT+cH);ctx.lineTo(padL,padT+cH);ctx.closePath();
+    ctx.fillStyle='rgba(79,140,255,0.08)';ctx.fill();
+
+    ctx.fillStyle='#4f8cff';ctx.beginPath();ctx.arc(lastX,lastY,4,0,Math.PI*2);ctx.fill();
+
+    ctx.fillStyle='#f5f7fa';ctx.font='11px Inter,sans-serif';ctx.textAlign='right';
+    ctx.fillText('$'+slice[currentTick].toFixed(2),W-padR,padT-5);
+    ctx.fillStyle='#9aa3b2';ctx.font='10px Inter,sans-serif';ctx.textAlign='left';
+    ctx.fillText('$'+slice[0].toFixed(2),padL,H-5);
+  }
+
+  function tick(){
+    if(currentTick>=TOTAL_TICKS){endGame();return;}
+    const prevPrice = prices[currentTick];
+    currentTick++;
+    const newPrice = prices[currentTick];
+    pnl += position * MULTIPLIER * (newPrice - prevPrice);
+    document.getElementById('trade-price').textContent = '$'+newPrice.toFixed(2);
+    updatePnlDisplay();
+    document.getElementById('trade-timer-fill').style.width = (currentTick/TOTAL_TICKS*100)+'%';
+    drawChart();
+  }
+
+  function startGame(){
+    prices = generatePrices();
+    currentTick = 0; position = 0; pnl = 0; running = true;
+    document.getElementById('trade-price').textContent = '$'+prices[0].toFixed(2);
+    document.getElementById('trade-pos').textContent = '0';
+    updatePnlDisplay();
+    updatePosDisplay();
+    document.getElementById('trade-timer-fill').style.width = '0%';
+    document.getElementById('trade-overlay-start').classList.add('hidden');
+    document.getElementById('trade-overlay-end').classList.add('hidden');
+    document.getElementById('trade-buy-btn').disabled = false;
+    document.getElementById('trade-sell-btn').disabled = false;
+    drawChart();
+    if(loop) clearInterval(loop);
+    loop = setInterval(tick, TICK);
+  }
+
+  function endGame(){
+    running = false;
+    clearInterval(loop);
+    document.getElementById('trade-buy-btn').disabled = true;
+    document.getElementById('trade-sell-btn').disabled = true;
+    const el = document.getElementById('trade-result');
+    const sign = pnl>=0?'+':'';
+    el.textContent = `${sign}$${Math.abs(pnl).toFixed(2)}`;
+    el.style.color = pnl>=0?'#34d399':'#ef4444';
+    document.getElementById('trade-overlay-end').classList.remove('hidden');
+    const lb = loadTradeLB();
+    lb.push(parseFloat(pnl.toFixed(2)));
+    lb.sort((a,b)=>b-a);
+    if(lb.length>5) lb.length=5;
+    saveTradeLB(lb);
+    renderTradeLB();
+  }
+
+  document.getElementById('trade-buy-btn').addEventListener('click', doBuy);
+  document.getElementById('trade-sell-btn').addEventListener('click', doSell);
+  document.getElementById('trade-start-btn').addEventListener('click', startGame);
+  document.getElementById('trade-restart-btn').addEventListener('click', startGame);
+
+  document.addEventListener('keydown', e=>{
+    if(!running) return;
+    if(e.key==='ArrowUp'||e.key==='ArrowRight'){doBuy();e.preventDefault();}
+    if(e.key==='ArrowDown'||e.key==='ArrowLeft'){doSell();e.preventDefault();}
+  });
+
+  ctx.fillStyle='#0b0d10';ctx.fillRect(0,0,W,H);
+})();
+</script>
+
+</body>
+</html>
