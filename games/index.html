@@ -277,6 +277,13 @@ footer{
 .trade-log th{color:var(--muted);font-weight:500;text-align:left;padding:3px 4px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:11px;position:sticky;top:0;background:rgba(15,23,42,0.95);}
 .trade-log td{padding:4px;white-space:nowrap;}
 .trade-log td:last-child{text-align:right;font-weight:600;}
+.lb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.lb-header h4{margin:0;}
+.lb-clear-btn{
+  background:none;border:none;color:var(--muted);font-size:14px;
+  cursor:pointer;padding:2px 4px;border-radius:4px;transition:0.2s;line-height:1;
+}
+.lb-clear-btn:hover{color:#ef4444;background:rgba(239,68,68,0.1);}
 .trade-lb{margin-top:16px;}
 .trade-lb h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:10px;}
 .trade-lb table{width:100%;border-collapse:collapse;font-size:14px;}
@@ -284,45 +291,39 @@ footer{
 .trade-lb td{padding:6px 0;}
 .trade-lb td:last-child{text-align:right;font-weight:600;}
 
-/* TRADING SETTINGS */
-.trade-settings-btn{
+/* GAME SETTINGS (shared) */
+.game-settings-btn{
   position:absolute;top:12px;right:12px;
   background:none;border:none;color:var(--muted);font-size:18px;
   cursor:pointer;padding:4px 6px;border-radius:6px;transition:0.2s;z-index:3;
 }
-.trade-settings-btn:hover{color:var(--ink);background:rgba(255,255,255,0.08);}
-.trade-settings-modal{
+.game-settings-btn:hover{color:var(--ink);background:rgba(255,255,255,0.08);}
+.game-settings-modal{
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:rgba(11,13,16,0.88);backdrop-filter:blur(8px);z-index:10;
   transition:opacity 0.3s;
 }
-.trade-settings-modal.hidden{opacity:0;pointer-events:none;}
-.trade-settings-inner{width:85%;max-width:300px;text-align:left;}
-.trade-settings-inner h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:14px;text-align:center;}
-.trade-settings-row{
+.game-settings-modal.hidden{opacity:0;pointer-events:none;}
+.game-settings-inner{width:85%;max-width:300px;text-align:left;}
+.game-settings-inner h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:14px;text-align:center;}
+.game-settings-row{
   display:flex;justify-content:space-between;align-items:center;
   margin-bottom:10px;font-size:13px;color:var(--ink);
 }
-.trade-settings-row label{color:var(--muted);}
-.trade-settings-select{
+.game-settings-row label{color:var(--muted);}
+.game-settings-select{
   background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
   border-radius:6px;padding:4px 8px;color:var(--ink);font-size:12px;
   font-family:inherit;outline:none;cursor:pointer;
 }
-.trade-settings-select:focus{border-color:var(--accent);}
-.trade-settings-danger{
-  margin-top:12px;width:100%;padding:8px;border:none;border-radius:8px;
-  background:rgba(239,68,68,0.15);color:#ef4444;font-weight:600;font-size:12px;
-  cursor:pointer;transition:0.2s;font-family:inherit;
-}
-.trade-settings-danger:hover{background:rgba(239,68,68,0.3);}
-.trade-settings-close{
+.game-settings-select:focus{border-color:var(--accent);}
+.game-settings-close{
   margin-top:10px;width:100%;padding:8px;border:none;border-radius:8px;
   background:rgba(255,255,255,0.08);color:var(--ink);font-weight:600;font-size:12px;
   cursor:pointer;transition:0.2s;font-family:inherit;
 }
-.trade-settings-close:hover{background:rgba(255,255,255,0.15);}
+.game-settings-close:hover{background:rgba(255,255,255,0.15);}
 
 /* RESPONSIVE */
 @media (max-width:768px){
@@ -353,21 +354,68 @@ footer{
         <div><span data-en="Best" data-ro="Record">Best</span>: <span id="snake-high">0</span></div>
       </div>
       <div class="snake-canvas-wrap">
+        <button class="game-settings-btn" id="snake-settings-btn" title="Settings">&#9881;</button>
+        <div class="game-settings-modal hidden" id="snake-settings-modal">
+          <div class="game-settings-inner">
+            <h4>Settings</h4>
+            <div class="game-settings-row">
+              <label>Speed</label>
+              <select class="game-settings-select" id="ss-speed">
+                <option value="slow">Slow</option>
+                <option value="normal" selected>Normal</option>
+                <option value="fast">Fast</option>
+              </select>
+            </div>
+            <div class="game-settings-row">
+              <label>Green Gems</label>
+              <select class="game-settings-select" id="ss-gems">
+                <option value="rare">Rare</option>
+                <option value="normal" selected>Normal</option>
+                <option value="frequent">Frequent</option>
+              </select>
+            </div>
+            <div class="game-settings-row">
+              <label>Purple Gems</label>
+              <select class="game-settings-select" id="ss-shrink">
+                <option value="rare">Rare</option>
+                <option value="normal" selected>Normal</option>
+                <option value="frequent">Frequent</option>
+              </select>
+            </div>
+            <div class="game-settings-row">
+              <label>Bombs</label>
+              <select class="game-settings-select" id="ss-bombs">
+                <option value="off">Off</option>
+                <option value="rare">Rare</option>
+                <option value="normal" selected>Normal</option>
+                <option value="frequent">Frequent</option>
+              </select>
+            </div>
+            <div class="game-settings-row">
+              <label>Walls</label>
+              <select class="game-settings-select" id="ss-walls">
+                <option value="on" selected>Solid</option>
+                <option value="off">Wrap Around</option>
+              </select>
+            </div>
+            <button class="game-settings-close" id="ss-close">Close</button>
+          </div>
+        </div>
         <canvas id="snake-canvas" width="400" height="400"></canvas>
         <div class="snake-overlay" id="snake-overlay-start">
           <h3 data-en="Snake" data-ro="Snake">Snake</h3>
           <p data-en="Use arrow keys or WASD to play" data-ro="Folosește săgețile sau WASD">Use arrow keys or WASD to play</p>
           <button class="snake-btn" id="snake-start-btn" data-en="Start Game" data-ro="Începe Jocul">Start Game</button>
         </div>
+        <div class="snake-overlay hidden" id="snake-overlay-pause">
+          <h3 data-en="Paused" data-ro="Pauză">Paused</h3>
+          <p data-en="Press Space or click to resume" data-ro="Apasă Space sau click pt. reluare">Press Space or click to resume</p>
+          <button class="snake-btn" id="snake-resume-btn" data-en="Resume" data-ro="Reia">Resume</button>
+        </div>
         <div class="snake-overlay hidden" id="snake-overlay-end">
           <h3 data-en="Game Over" data-ro="Joc Terminat">Game Over</h3>
           <div class="snake-final-score" id="snake-final-score">0</div>
-          <p data-en="Enter your initials:" data-ro="Introdu inițialele:">Enter your initials:</p>
-          <input class="snake-initials-input" id="snake-initials" maxlength="3" placeholder="AAA">
-          <div>
-            <button class="snake-btn" id="snake-save-btn" data-en="Save Score" data-ro="Salvează Scor">Save Score</button>
-            <button class="snake-btn secondary-btn" id="snake-restart-btn" data-en="Play Again" data-ro="Joacă Din Nou">Play Again</button>
-          </div>
+          <button class="snake-btn" id="snake-restart-btn" data-en="Play Again" data-ro="Joacă Din Nou">Play Again</button>
         </div>
       </div>
       <div class="snake-dpad">
@@ -377,12 +425,15 @@ footer{
         <button class="d-right" data-dir="right">&#9654;</button>
       </div>
       <div class="snake-leaderboard">
-        <h4 data-en="Leaderboard" data-ro="Clasament">Leaderboard</h4>
+        <div class="lb-header">
+          <h4 data-en="Best Scores" data-ro="Cele Mai Bune Scoruri">Best Scores</h4>
+          <button class="lb-clear-btn" id="snake-clear-lb" title="Clear leaderboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        </div>
         <table>
           <thead><tr>
             <th data-en="#" data-ro="#">#</th>
-            <th data-en="Player" data-ro="Jucător">Player</th>
             <th data-en="Score" data-ro="Scor">Score</th>
+            <th data-en="Date" data-ro="Data">Date</th>
           </tr></thead>
           <tbody id="snake-lb-body"></tbody>
         </table>
@@ -393,42 +444,41 @@ footer{
     <div class="game-col">
       <div class="trade-panel">
         <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
-        <button class="trade-settings-btn" id="trade-settings-btn" title="Settings">&#9881;</button>
-        <div class="trade-settings-modal hidden" id="trade-settings-modal">
-          <div class="trade-settings-inner">
+        <button class="game-settings-btn" id="game-settings-btn" title="Settings">&#9881;</button>
+        <div class="game-settings-modal hidden" id="game-settings-modal">
+          <div class="game-settings-inner">
             <h4>Settings</h4>
-            <div class="trade-settings-row">
+            <div class="game-settings-row">
               <label>Data Source</label>
-              <select class="trade-settings-select" id="ts-source">
+              <select class="game-settings-select" id="ts-source">
                 <option value="real">Real (Yahoo)</option>
                 <option value="simulated">Simulated</option>
               </select>
             </div>
-            <div class="trade-settings-row">
+            <div class="game-settings-row">
               <label>Duration</label>
-              <select class="trade-settings-select" id="ts-duration">
+              <select class="game-settings-select" id="ts-duration">
                 <option value="10">10s</option>
                 <option value="30" selected>30s</option>
                 <option value="60">60s</option>
                 <option value="300">300s</option>
               </select>
             </div>
-            <div class="trade-settings-row">
+            <div class="game-settings-row">
               <label>P&amp;L Display</label>
-              <select class="trade-settings-select" id="ts-pnlmode">
+              <select class="game-settings-select" id="ts-pnlmode">
                 <option value="total">Total</option>
                 <option value="split" selected>Realized + Unrealized</option>
               </select>
             </div>
-            <div class="trade-settings-row">
+            <div class="game-settings-row">
               <label>Position Tint</label>
-              <select class="trade-settings-select" id="ts-postint">
+              <select class="game-settings-select" id="ts-postint">
                 <option value="on" selected>On</option>
                 <option value="off">Off</option>
               </select>
             </div>
-            <button class="trade-settings-danger" id="ts-clear-lb">Clear Leaderboard</button>
-            <button class="trade-settings-close" id="ts-close">Close</button>
+            <button class="game-settings-close" id="ts-close">Close</button>
           </div>
         </div>
         <div class="trade-timer"><div class="trade-timer-fill" id="trade-timer-fill"></div></div>
@@ -485,6 +535,7 @@ footer{
           <div class="trade-overlay hidden" id="trade-overlay-end">
             <h3 data-en="Market Closed" data-ro="Piața Închisă">Market Closed</h3>
             <div class="trade-result" id="trade-result">$0.00</div>
+            <p id="trade-vol-info" style="font-size:0.85rem;color:var(--muted);margin-bottom:4px"></p>
             <p id="trade-date-info" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px"></p>
             <button class="trade-btn start" id="trade-restart-btn" data-en="Trade Again" data-ro="Tranzacționează Din Nou">Trade Again</button>
           </div>
@@ -513,11 +564,16 @@ footer{
           </div>
         </div>
         <div class="trade-lb" id="trade-lb">
-          <h4 data-en="Best Sessions" data-ro="Cele Mai Bune Sesiuni">Best Sessions</h4>
+          <div class="lb-header">
+            <h4 data-en="Best Sessions" data-ro="Cele Mai Bune Sesiuni">Best Sessions</h4>
+            <button class="lb-clear-btn" id="trade-clear-lb" title="Clear leaderboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+          </div>
           <table>
             <thead><tr>
               <th data-en="#" data-ro="#">#</th>
               <th data-en="P&amp;L" data-ro="Profit">P&amp;L</th>
+              <th data-en="Vol" data-ro="Vol">Vol</th>
+              <th data-en="Date" data-ro="Data">Date</th>
             </tr></thead>
             <tbody id="trade-lb-body"></tbody>
           </table>
@@ -560,24 +616,55 @@ toggle.addEventListener('click', ()=>{
   const SIZE = 20;
   const COLS = canvas.width / SIZE;
   const ROWS = canvas.height / SIZE;
-  const BASE_SPEED = 140;
-  const SPEED_STEP = 4;
-  const MIN_SPEED = 60;
+  const BOMB_LIFETIME = 8000;
 
-  let snake, dir, nextDir, food, score, highScore, speed, loop, running;
-  let gem, gemTimer, bombs, bombTimer;
+  // Settings
+  const SNAKE_DEFAULTS = { speed:'normal', gems:'normal', shrink:'normal', bombs:'normal', walls:'on' };
+  function loadSnakeSettings(){ try { return Object.assign({}, SNAKE_DEFAULTS, JSON.parse(localStorage.getItem('snakeSettings'))); } catch(e){ return Object.assign({}, SNAKE_DEFAULTS); } }
+  function saveSnakeSettings(s){ localStorage.setItem('snakeSettings', JSON.stringify(s)); }
+  let snakeSettings = loadSnakeSettings();
+
+  function getSpeedParams(){
+    const map = { slow:[180,0.5,80], normal:[140,1,60], fast:[100,2,40] };
+    const [base, step, min] = map[snakeSettings.speed] || map.normal;
+    return { BASE_SPEED:base, SPEED_STEP:step, MIN_SPEED:min };
+  }
+  function getSpawnDelay(setting){
+    const map = { rare:[8000,12000], normal:[4000,6000], frequent:[1500,3000] };
+    return map[setting] || map.normal;
+  }
+
+  function applySnakeSettingsUI(){
+    document.getElementById('ss-speed').value = snakeSettings.speed;
+    document.getElementById('ss-gems').value = snakeSettings.gems;
+    document.getElementById('ss-shrink').value = snakeSettings.shrink;
+    document.getElementById('ss-bombs').value = snakeSettings.bombs;
+    document.getElementById('ss-walls').value = snakeSettings.walls;
+  }
+  applySnakeSettingsUI();
+
+  let snake, dir, dirQueue, food, score, highScore, speed, loop, running, paused;
+  let gem, gemTimer, bombs, bombTimer, bombTimers;
+  let shrinkGem, shrinkGemTimer;
 
   highScore = parseInt(localStorage.getItem('snakeHigh') || '0');
   document.getElementById('snake-high').textContent = highScore;
 
-  function loadLB(){ return JSON.parse(localStorage.getItem('snakeLB') || '[]'); }
+  function loadLB(){
+    let lb = JSON.parse(localStorage.getItem('snakeLB') || '[]');
+    // Migrate old formats to {score, date}
+    if(lb.length && typeof lb[0] === 'object' && lb[0].name) lb = lb.map(e=>({score:e.score, date:null}));
+    else if(lb.length && typeof lb[0] === 'number') lb = lb.map(e=>({score:e, date:null}));
+    return lb;
+  }
   function saveLB(lb){ localStorage.setItem('snakeLB', JSON.stringify(lb)); }
+  function fmtDate(d){ if(!d) return '—'; const dt=new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
   function renderLB(){
     const lb = loadLB();
     const tbody = document.getElementById('snake-lb-body');
     tbody.innerHTML = lb.length === 0
       ? '<tr><td colspan="3" style="color:var(--muted);text-align:center;padding:12px 0">—</td></tr>'
-      : lb.map((e,i)=>`<tr><td>${i+1}</td><td>${e.name}</td><td>${e.score}</td></tr>`).join('');
+      : lb.map((e,i)=>`<tr><td>${i+1}</td><td>${e.score}</td><td style="color:var(--muted);font-size:11px">${fmtDate(e.date)}</td></tr>`).join('');
   }
   renderLB();
 
@@ -585,6 +672,7 @@ toggle.addEventListener('click', ()=>{
     if(snake.some(s=>s.x===pos.x&&s.y===pos.y)) return false;
     if(food&&food.x===pos.x&&food.y===pos.y) return false;
     if(gem&&gem.x===pos.x&&gem.y===pos.y) return false;
+    if(shrinkGem&&shrinkGem.x===pos.x&&shrinkGem.y===pos.y) return false;
     if(bombs.some(b=>b.x===pos.x&&b.y===pos.y)) return false;
     return true;
   }
@@ -601,48 +689,117 @@ toggle.addEventListener('click', ()=>{
     gemTimer = setTimeout(()=>{ gem=null; scheduleGem(); }, 4000+Math.random()*2000);
   }
   function scheduleGem(){
-    if(!running) return;
-    gemTimer = setTimeout(()=>{ if(running) spawnGem(); }, 5000+Math.random()*5000);
+    if(!running||paused) return;
+    const [base,range] = getSpawnDelay(snakeSettings.gems);
+    gemTimer = setTimeout(()=>{ if(running&&!paused) spawnGem(); }, base+Math.random()*range);
   }
   function spawnBomb(){
-    if(!running) return;
-    if(bombs.length<3) bombs.push(randFreePos());
+    if(!running||paused) return;
+    if(snakeSettings.bombs === 'off') return;
+    if(bombs.length<3){
+      const b = randFreePos();
+      bombs.push(b);
+      const timer = setTimeout(()=>{
+        const idx = bombs.indexOf(b);
+        if(idx !== -1) bombs.splice(idx, 1);
+        const ti = bombTimers.indexOf(timer);
+        if(ti !== -1) bombTimers.splice(ti, 1);
+        if(running&&!paused) draw();
+      }, BOMB_LIFETIME);
+      bombTimers.push(timer);
+    }
     scheduleBomb();
   }
   function scheduleBomb(){
+    if(!running||paused||snakeSettings.bombs==='off') return;
+    const [base,range] = getSpawnDelay(snakeSettings.bombs);
+    bombTimer = setTimeout(()=>{ if(running&&!paused) spawnBomb(); }, base+Math.random()*range);
+  }
+
+  function spawnShrinkGem(){
+    shrinkGem = randFreePos();
+    if(shrinkGemTimer) clearTimeout(shrinkGemTimer);
+    shrinkGemTimer = setTimeout(()=>{ shrinkGem=null; scheduleShrinkGem(); }, 3000+Math.random()*2000);
+  }
+  function scheduleShrinkGem(){
+    if(!running||paused) return;
+    const [base,range] = getSpawnDelay(snakeSettings.shrink);
+    shrinkGemTimer = setTimeout(()=>{ if(running&&!paused) spawnShrinkGem(); }, base+Math.random()*range);
+  }
+
+  function clearAllTimers(){
+    if(gemTimer) clearTimeout(gemTimer);
+    if(bombTimer) clearTimeout(bombTimer);
+    if(bombTimers) bombTimers.forEach(t=>clearTimeout(t));
+    if(shrinkGemTimer) clearTimeout(shrinkGemTimer);
+  }
+
+  function togglePause(){
     if(!running) return;
-    bombTimer = setTimeout(()=>{ if(running) spawnBomb(); }, 6000+Math.random()*6000);
+    if(paused){
+      paused = false;
+      loop = setInterval(tick, speed);
+      document.getElementById('snake-overlay-pause').classList.add('hidden');
+      scheduleGem(); scheduleBomb(); scheduleShrinkGem();
+    } else {
+      paused = true;
+      clearInterval(loop);
+      if(gemTimer) clearTimeout(gemTimer);
+      if(bombTimer) clearTimeout(bombTimer);
+      document.getElementById('snake-overlay-pause').classList.remove('hidden');
+    }
   }
 
   function startGame(){
+    snakeSettings = loadSnakeSettings();
+    const sp = getSpeedParams();
     snake = [{x:Math.floor(COLS/2), y:Math.floor(ROWS/2)}];
-    dir = {x:1,y:0}; nextDir = {x:1,y:0};
-    score = 0; speed = BASE_SPEED; running = true;
-    gem = null; bombs = [];
-    if(gemTimer) clearTimeout(gemTimer);
-    if(bombTimer) clearTimeout(bombTimer);
+    dir = {x:1,y:0}; dirQueue = [];
+    score = 0; speed = sp.BASE_SPEED; running = true; paused = false;
+    gem = null; shrinkGem = null; bombs = []; bombTimers = [];
+    clearAllTimers();
     document.getElementById('snake-score').textContent = 0;
-    placeFood(); scheduleGem(); scheduleBomb();
+    placeFood(); scheduleGem(); scheduleBomb(); scheduleShrinkGem();
     document.getElementById('snake-overlay-start').classList.add('hidden');
     document.getElementById('snake-overlay-end').classList.add('hidden');
+    document.getElementById('snake-overlay-pause').classList.add('hidden');
+    document.getElementById('snake-settings-modal').classList.add('hidden');
     if(loop) clearInterval(loop);
     loop = setInterval(tick, speed);
   }
 
   function tick(){
-    dir = nextDir;
+    if(dirQueue.length) dir = dirQueue.shift();
     const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
-    if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS||snake.some(s=>s.x===head.x&&s.y===head.y)){ gameOver(); return; }
+    if(snakeSettings.walls === 'off'){
+      if(head.x < 0) head.x = COLS - 1;
+      else if(head.x >= COLS) head.x = 0;
+      if(head.y < 0) head.y = ROWS - 1;
+      else if(head.y >= ROWS) head.y = 0;
+    } else {
+      if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){ gameOver(); return; }
+    }
+    if(snake.some(s=>s.x===head.x&&s.y===head.y)){ gameOver(); return; }
     if(bombs.some(b=>b.x===head.x&&b.y===head.y)){ gameOver(); return; }
     snake.unshift(head);
     let ate = false;
+    let ateGem = false;
     if(head.x===food.x&&head.y===food.y){ score++; ate = true; placeFood(); }
     if(gem&&head.x===gem.x&&head.y===gem.y){
-      score += 3; gem = null;
+      score += 3; ateGem = true; gem = null;
       if(gemTimer) clearTimeout(gemTimer);
       scheduleGem();
     }
-    if(ate || score !== parseInt(document.getElementById('snake-score').textContent)){
+    let ateShrink = false;
+    if(shrinkGem&&head.x===shrinkGem.x&&head.y===shrinkGem.y){
+      score += 2; ateShrink = true; shrinkGem = null;
+      if(shrinkGemTimer) clearTimeout(shrinkGemTimer);
+      scheduleShrinkGem();
+      // Shrink: remove tail segments but keep at least 1
+      const removeCount = Math.min(3, snake.length - 1);
+      for(let r=0;r<removeCount;r++) snake.pop();
+    }
+    if(ate || ateGem || ateShrink){
       document.getElementById('snake-score').textContent = score;
       if(score>highScore){
         highScore = score;
@@ -650,10 +807,11 @@ toggle.addEventListener('click', ()=>{
         document.getElementById('snake-high').textContent = highScore;
       }
     }
-    if(ate){
-      const newSpeed = Math.max(MIN_SPEED, BASE_SPEED - score * SPEED_STEP);
+    if(ate || ateGem){
+      const sp = getSpeedParams();
+      const newSpeed = Math.max(sp.MIN_SPEED, sp.BASE_SPEED - score * sp.SPEED_STEP);
       if(newSpeed !== speed){ speed = newSpeed; clearInterval(loop); loop = setInterval(tick, speed); }
-    } else { snake.pop(); }
+    } else if(!ateShrink) { snake.pop(); }
     draw();
   }
 
@@ -663,7 +821,7 @@ toggle.addEventListener('click', ()=>{
     ctx.strokeStyle = 'rgba(255,255,255,0.03)';
     for(let x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*SIZE,0);ctx.lineTo(x*SIZE,canvas.height);ctx.stroke();}
     for(let y=0;y<=ROWS;y++){ctx.beginPath();ctx.moveTo(0,y*SIZE);ctx.lineTo(canvas.width,y*SIZE);ctx.stroke();}
-    ctx.fillStyle = '#ff5f5f';
+    ctx.fillStyle = '#fbbf24';
     ctx.beginPath(); ctx.arc(food.x*SIZE+SIZE/2, food.y*SIZE+SIZE/2, SIZE/2-2, 0, Math.PI*2); ctx.fill();
     if(gem){
       const gx=gem.x*SIZE+SIZE/2, gy=gem.y*SIZE+SIZE/2, gr=SIZE/2-2;
@@ -672,11 +830,19 @@ toggle.addEventListener('click', ()=>{
       ctx.closePath(); ctx.fill();
       ctx.shadowColor='#34d399'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
     }
+    if(shrinkGem){
+      const sx=shrinkGem.x*SIZE+SIZE/2, sy=shrinkGem.y*SIZE+SIZE/2, sr=SIZE/2-1;
+      ctx.fillStyle='#a855f7';
+      ctx.beginPath();
+      for(let i=0;i<6;i++){const a=Math.PI/6+i*Math.PI/3;ctx.lineTo(sx+sr*Math.cos(a),sy+sr*Math.sin(a));}
+      ctx.closePath(); ctx.fill();
+      ctx.shadowColor='#a855f7'; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+    }
     bombs.forEach(b=>{
-      const bx=b.x*SIZE+SIZE/2, by=b.y*SIZE+SIZE/2, br=SIZE/2-2;
       ctx.fillStyle='#ef4444';
-      ctx.beginPath(); ctx.arc(bx,by,br,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(b.x*SIZE+2, b.y*SIZE+2, SIZE-4, SIZE-4);
       ctx.strokeStyle='#0b0d10'; ctx.lineWidth=2;
+      const bx=b.x*SIZE+SIZE/2, by=b.y*SIZE+SIZE/2;
       ctx.beginPath(); ctx.moveTo(bx-3,by-3); ctx.lineTo(bx+3,by+3); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(bx+3,by-3); ctx.lineTo(bx-3,by+3); ctx.stroke();
       ctx.lineWidth=1;
@@ -690,11 +856,13 @@ toggle.addEventListener('click', ()=>{
 
   function gameOver(){
     running = false; clearInterval(loop);
-    if(gemTimer) clearTimeout(gemTimer);
-    if(bombTimer) clearTimeout(bombTimer);
+    clearAllTimers();
     document.getElementById('snake-final-score').textContent = score;
-    document.getElementById('snake-initials').value = '';
     document.getElementById('snake-overlay-end').classList.remove('hidden');
+    // Save score to leaderboard
+    const lb = loadLB(); lb.push({score, date: new Date().toISOString()});
+    lb.sort((a,b)=>b.score-a.score); if(lb.length>5) lb.length=5;
+    saveLB(lb); renderLB();
   }
 
   const DIR_MAP = {
@@ -703,24 +871,46 @@ toggle.addEventListener('click', ()=>{
     W:{x:0,y:-1},S:{x:0,y:1},A:{x:-1,y:0},D:{x:1,y:0}
   };
   document.addEventListener('keydown', e=>{
+    if((e.key===' '||e.key==='Escape') && running){ togglePause(); e.preventDefault(); return; }
+    if(!running||paused) return;
     const d = DIR_MAP[e.key];
-    if(d && running){ if(d.x !== -dir.x || d.y !== -dir.y) nextDir = d; e.preventDefault(); }
+    if(d){
+      const last = dirQueue.length ? dirQueue[dirQueue.length-1] : dir;
+      if(d.x !== -last.x || d.y !== -last.y){ dirQueue.push(d); if(dirQueue.length>4) dirQueue.shift(); }
+      e.preventDefault();
+    }
   });
 
   document.querySelectorAll('.snake-dpad button').forEach(btn=>{
     const dirName = btn.dataset.dir;
     const map = {up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
-    btn.addEventListener('touchstart', e=>{ e.preventDefault(); if(!running) return; const d=map[dirName]; if(d.x!==-dir.x||d.y!==-dir.y) nextDir=d; });
-    btn.addEventListener('mousedown', ()=>{ if(!running) return; const d=map[dirName]; if(d.x!==-dir.x||d.y!==-dir.y) nextDir=d; });
+    btn.addEventListener('touchstart', e=>{ e.preventDefault(); if(!running||paused) return; const d=map[dirName]; const last=dirQueue.length?dirQueue[dirQueue.length-1]:dir; if(d.x!==-last.x||d.y!==-last.y){dirQueue.push(d);if(dirQueue.length>4)dirQueue.shift();} });
+    btn.addEventListener('mousedown', ()=>{ if(!running||paused) return; const d=map[dirName]; const last=dirQueue.length?dirQueue[dirQueue.length-1]:dir; if(d.x!==-last.x||d.y!==-last.y){dirQueue.push(d);if(dirQueue.length>4)dirQueue.shift();} });
   });
 
   document.getElementById('snake-start-btn').addEventListener('click', startGame);
   document.getElementById('snake-restart-btn').addEventListener('click', startGame);
-  document.getElementById('snake-save-btn').addEventListener('click', ()=>{
-    const initials = document.getElementById('snake-initials').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,3) || '???';
-    const lb = loadLB(); lb.push({name:initials, score:score});
-    lb.sort((a,b)=>b.score-a.score); if(lb.length>5) lb.length=5;
-    saveLB(lb); renderLB(); startGame();
+  document.getElementById('snake-resume-btn').addEventListener('click', togglePause);
+  document.getElementById('snake-clear-lb').addEventListener('click', ()=>{
+    if(confirm('Clear the snake leaderboard?')){
+      localStorage.removeItem('snakeLB');
+      renderLB();
+    }
+  });
+
+  // Snake settings modal
+  document.getElementById('snake-settings-btn').addEventListener('click', ()=>{
+    if(running && !paused) togglePause();
+    document.getElementById('snake-settings-modal').classList.remove('hidden');
+  });
+  document.getElementById('ss-close').addEventListener('click', ()=>{
+    snakeSettings.speed = document.getElementById('ss-speed').value;
+    snakeSettings.gems = document.getElementById('ss-gems').value;
+    snakeSettings.shrink = document.getElementById('ss-shrink').value;
+    snakeSettings.bombs = document.getElementById('ss-bombs').value;
+    snakeSettings.walls = document.getElementById('ss-walls').value;
+    saveSnakeSettings(snakeSettings);
+    document.getElementById('snake-settings-modal').classList.add('hidden');
   });
 })();
 
@@ -754,6 +944,7 @@ toggle.addEventListener('click', ()=>{
   let totalCost, avgPrice; // cost basis tracking
   let realizedPnl; // for split PnL mode
   let posHistory; // position at each tick for tinting
+  let tradedVolume; // total $ volume traded
 
   function generateSimulatedPrices(){
     tradingDate = 'Simulated';
@@ -787,17 +978,30 @@ toggle.addEventListener('click', ()=>{
     return resampled;
   }
 
-  function loadTradeLB(){ return JSON.parse(localStorage.getItem('tradeLB')||'[]'); }
+  function loadTradeLB(){
+    let lb = JSON.parse(localStorage.getItem('tradeLB')||'[]');
+    // Migrate old formats
+    if(lb.length && typeof lb[0] === 'number') lb = lb.map(e=>({pnl:e, date:null, vol:0}));
+    else if(lb.length && typeof lb[0] === 'object' && lb[0].vol === undefined) lb = lb.map(e=>({...e, vol:0}));
+    return lb;
+  }
   function saveTradeLB(lb){ localStorage.setItem('tradeLB',JSON.stringify(lb)); }
+  function fmtTradeDate(d){ if(!d) return '—'; const dt=new Date(d); return dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+dt.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+  function fmtVol(v){
+    if(!v) return '—';
+    if(v>=1e6) return '$'+(v/1e6).toFixed(1)+'M';
+    if(v>=1e3) return '$'+(v/1e3).toFixed(0)+'K';
+    return '$'+v.toFixed(0);
+  }
   function renderTradeLB(){
     const lb = loadTradeLB();
     const tbody = document.getElementById('trade-lb-body');
     tbody.innerHTML = lb.length===0
-      ? '<tr><td colspan="2" style="color:var(--muted);text-align:center;padding:12px 0">—</td></tr>'
+      ? '<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:12px 0">—</td></tr>'
       : lb.map((e,i)=>{
-        const cls = e>=0?'pnl-pos':'pnl-neg';
-        const sign = e>=0?'+':'-';
-        return `<tr><td>${i+1}</td><td class="${cls}">${sign}$${Math.abs(e).toFixed(2)}</td></tr>`;
+        const cls = e.pnl>=0?'pnl-pos':'pnl-neg';
+        const sign = e.pnl>=0?'+':'-';
+        return `<tr><td>${i+1}</td><td class="${cls}">${sign}$${Math.abs(e.pnl).toFixed(2)}</td><td style="color:var(--muted);font-size:11px">${fmtVol(e.vol)}</td><td style="color:var(--muted);font-size:11px">${fmtTradeDate(e.date)}</td></tr>`;
       }).join('');
   }
   renderTradeLB();
@@ -818,6 +1022,7 @@ toggle.addEventListener('click', ()=>{
   }
   function logTrade(side, qty, price, rpnl){
     const time = formatTradeTime(currentTick);
+    tradedVolume += qty * price;
     tradeLog.push({ time, side, qty, price, rpnl });
     renderTradeLog();
   }
@@ -1042,7 +1247,7 @@ toggle.addEventListener('click', ()=>{
     prices = fetchRealPrices();
 
     currentTick = 0; position = 0; pnl = 0; running = true; paused = false;
-    totalCost = 0; avgPrice = 0; realizedPnl = 0;
+    totalCost = 0; avgPrice = 0; realizedPnl = 0; tradedVolume = 0;
     posHistory = [0];
     tradeLog = [];
     document.getElementById('trade-log').style.display = '';
@@ -1056,7 +1261,7 @@ toggle.addEventListener('click', ()=>{
     document.getElementById('trade-overlay-start').classList.add('hidden');
     document.getElementById('trade-overlay-end').classList.add('hidden');
     document.getElementById('trade-overlay-pause').classList.add('hidden');
-    document.getElementById('trade-settings-modal').classList.add('hidden');
+    document.getElementById('game-settings-modal').classList.add('hidden');
     document.getElementById('trade-paused-badge').classList.remove('visible');
     document.getElementById('trade-buy-btn').disabled = false;
     document.getElementById('trade-sell-btn').disabled = false;
@@ -1078,6 +1283,7 @@ toggle.addEventListener('click', ()=>{
     el.style.color = pnl>=0?'#34d399':'#ef4444';
 
     // Show date and chart link
+    document.getElementById('trade-vol-info').textContent = 'Volume: ' + fmtVol(tradedVolume);
     const dateInfo = document.getElementById('trade-date-info');
     if(tradingDate === 'Simulated'){
       dateInfo.innerHTML = `Trading day: <strong>Simulated</strong>`;
@@ -1103,8 +1309,8 @@ toggle.addEventListener('click', ()=>{
 
     document.getElementById('trade-overlay-end').classList.remove('hidden');
     const lb = loadTradeLB();
-    lb.push(parseFloat(pnl.toFixed(2)));
-    lb.sort((a,b)=>b-a);
+    lb.push({pnl: parseFloat(pnl.toFixed(2)), vol: Math.round(tradedVolume), date: new Date().toISOString()});
+    lb.sort((a,b)=>b.pnl-a.pnl);
     if(lb.length>5) lb.length=5;
     saveTradeLB(lb);
     renderTradeLB();
@@ -1113,9 +1319,9 @@ toggle.addEventListener('click', ()=>{
   }
 
   // Settings modal
-  document.getElementById('trade-settings-btn').addEventListener('click', ()=>{
+  document.getElementById('game-settings-btn').addEventListener('click', ()=>{
     if(running && !paused) togglePause();
-    document.getElementById('trade-settings-modal').classList.remove('hidden');
+    document.getElementById('game-settings-modal').classList.remove('hidden');
   });
   document.getElementById('ts-close').addEventListener('click', ()=>{
     settings.dataSource = document.getElementById('ts-source').value;
@@ -1125,9 +1331,9 @@ toggle.addEventListener('click', ()=>{
     saveSettings(settings);
     // Apply PnL mode immediately if a game is running
     if(running) updatePnlDisplay();
-    document.getElementById('trade-settings-modal').classList.add('hidden');
+    document.getElementById('game-settings-modal').classList.add('hidden');
   });
-  document.getElementById('ts-clear-lb').addEventListener('click', ()=>{
+  document.getElementById('trade-clear-lb').addEventListener('click', ()=>{
     if(confirm('Clear the trading leaderboard?')){
       localStorage.removeItem('tradeLB');
       renderTradeLB();
