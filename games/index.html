@@ -201,15 +201,17 @@ footer{
 
 /* TRADING GAME */
 .trade-panel{
+  position:relative;
   backdrop-filter:blur(16px);background:var(--panel);
   border:1px solid rgba(255,255,255,0.08);border-radius:14px;
   padding:20px;text-align:center;
 }
 .trade-panel h3{font-size:1.1rem;font-weight:600;margin-bottom:12px;}
 .trade-info{
-  display:flex;justify-content:space-around;margin-bottom:14px;font-size:13px;color:var(--muted);
+  display:flex;justify-content:center;margin-bottom:14px;font-size:13px;color:var(--muted);
 }
-.trade-info span{display:block;font-size:1.05rem;font-weight:600;color:var(--ink);margin-top:2px;}
+.trade-info > div{flex:1 1 0;min-width:0;text-align:center;}
+.trade-info span{display:block;font-size:1.05rem;font-weight:600;color:var(--ink);margin-top:2px;font-variant-numeric:tabular-nums;}
 .trade-info .pnl-pos{color:#34d399;}
 .trade-info .pnl-neg{color:#ef4444;}
 .trade-canvas-wrap{
@@ -255,12 +257,72 @@ footer{
   height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:14px;overflow:hidden;
 }
 .trade-timer-fill{height:100%;background:var(--accent);transition:width 0.1s linear;width:0%;}
+.trade-btn.end{background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--ink);}
+.trade-btn.end:hover{background:rgba(255,255,255,0.05);}
+.trade-hint{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.6;}
+.trade-hint kbd{
+  display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-family:inherit;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+  color:var(--ink);vertical-align:1px;
+}
+.trade-paused-badge{
+  display:none;align-items:center;justify-content:center;gap:6px;
+  margin-bottom:10px;font-size:13px;font-weight:600;color:#fbbf24;
+}
+.trade-paused-badge.visible{display:flex;}
+.trade-log{margin-top:16px;}
+.trade-log h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:10px;}
+.trade-log-scroll{max-height:150px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.1) transparent;}
+.trade-log table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums;}
+.trade-log th{color:var(--muted);font-weight:500;text-align:left;padding:3px 4px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:11px;position:sticky;top:0;background:rgba(15,23,42,0.95);}
+.trade-log td{padding:4px;white-space:nowrap;}
+.trade-log td:last-child{text-align:right;font-weight:600;}
 .trade-lb{margin-top:16px;}
 .trade-lb h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:10px;}
 .trade-lb table{width:100%;border-collapse:collapse;font-size:14px;}
 .trade-lb th{color:var(--muted);font-weight:500;text-align:left;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
 .trade-lb td{padding:6px 0;}
 .trade-lb td:last-child{text-align:right;font-weight:600;}
+
+/* TRADING SETTINGS */
+.trade-settings-btn{
+  position:absolute;top:12px;right:12px;
+  background:none;border:none;color:var(--muted);font-size:18px;
+  cursor:pointer;padding:4px 6px;border-radius:6px;transition:0.2s;z-index:3;
+}
+.trade-settings-btn:hover{color:var(--ink);background:rgba(255,255,255,0.08);}
+.trade-settings-modal{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(11,13,16,0.88);backdrop-filter:blur(8px);z-index:10;
+  transition:opacity 0.3s;
+}
+.trade-settings-modal.hidden{opacity:0;pointer-events:none;}
+.trade-settings-inner{width:85%;max-width:300px;text-align:left;}
+.trade-settings-inner h4{font-size:13px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:14px;text-align:center;}
+.trade-settings-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;font-size:13px;color:var(--ink);
+}
+.trade-settings-row label{color:var(--muted);}
+.trade-settings-select{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+  border-radius:6px;padding:4px 8px;color:var(--ink);font-size:12px;
+  font-family:inherit;outline:none;cursor:pointer;
+}
+.trade-settings-select:focus{border-color:var(--accent);}
+.trade-settings-danger{
+  margin-top:12px;width:100%;padding:8px;border:none;border-radius:8px;
+  background:rgba(239,68,68,0.15);color:#ef4444;font-weight:600;font-size:12px;
+  cursor:pointer;transition:0.2s;font-family:inherit;
+}
+.trade-settings-danger:hover{background:rgba(239,68,68,0.3);}
+.trade-settings-close{
+  margin-top:10px;width:100%;padding:8px;border:none;border-radius:8px;
+  background:rgba(255,255,255,0.08);color:var(--ink);font-weight:600;font-size:12px;
+  cursor:pointer;transition:0.2s;font-family:inherit;
+}
+.trade-settings-close:hover{background:rgba(255,255,255,0.15);}
 
 /* RESPONSIVE */
 @media (max-width:768px){
@@ -331,11 +393,51 @@ footer{
     <div class="game-col">
       <div class="trade-panel">
         <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
+        <button class="trade-settings-btn" id="trade-settings-btn" title="Settings">&#9881;</button>
+        <div class="trade-settings-modal hidden" id="trade-settings-modal">
+          <div class="trade-settings-inner">
+            <h4>Settings</h4>
+            <div class="trade-settings-row">
+              <label>Data Source</label>
+              <select class="trade-settings-select" id="ts-source">
+                <option value="real">Real (Yahoo)</option>
+                <option value="simulated">Simulated</option>
+              </select>
+            </div>
+            <div class="trade-settings-row">
+              <label>Duration</label>
+              <select class="trade-settings-select" id="ts-duration">
+                <option value="10">10s</option>
+                <option value="30" selected>30s</option>
+                <option value="60">60s</option>
+                <option value="300">300s</option>
+              </select>
+            </div>
+            <div class="trade-settings-row">
+              <label>P&amp;L Display</label>
+              <select class="trade-settings-select" id="ts-pnlmode">
+                <option value="total">Total</option>
+                <option value="split" selected>Realized + Unrealized</option>
+              </select>
+            </div>
+            <div class="trade-settings-row">
+              <label>Position Tint</label>
+              <select class="trade-settings-select" id="ts-postint">
+                <option value="on" selected>On</option>
+                <option value="off">Off</option>
+              </select>
+            </div>
+            <button class="trade-settings-danger" id="ts-clear-lb">Clear Leaderboard</button>
+            <button class="trade-settings-close" id="ts-close">Close</button>
+          </div>
+        </div>
         <div class="trade-timer"><div class="trade-timer-fill" id="trade-timer-fill"></div></div>
         <div class="trade-info">
           <div><small data-en="Price" data-ro="Preț">Price</small><span id="trade-price">—</span></div>
           <div><small data-en="Position" data-ro="Poziție">Position</small><span id="trade-pos">0</span></div>
-          <div><small data-en="P&amp;L" data-ro="Profit">P&amp;L</small><span id="trade-pnl">$0.00</span></div>
+          <div id="trade-pnl-total"><small data-en="P&amp;L" data-ro="Profit">P&amp;L</small><span id="trade-pnl">$0.00</span></div>
+          <div id="trade-pnl-realized" style="display:none"><small>Realized</small><span id="trade-rpnl">$0.00</span></div>
+          <div id="trade-pnl-unrealized" style="display:none"><small>Unrealized</small><span id="trade-upnl">$0.00</span></div>
         </div>
         <div class="trade-position-bar">
           <small>-1000</small>
@@ -368,24 +470,50 @@ footer{
           <canvas id="trade-canvas" width="400" height="220"></canvas>
           <div class="trade-overlay" id="trade-overlay-start">
             <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
-            <p data-en="Trade simulated SPY in 30s. Use arrows or buttons." data-ro="Tranzacționează SPY simulat în 30s. Săgeți sau butoane.">Trade simulated SPY in 30s. Use arrows or buttons.</p>
+            <p data-en="Trade simulated SPY in 30 seconds." data-ro="Tranzacționează SPY simulat în 30 de secunde.">Trade simulated SPY in 30 seconds.</p>
+            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px" data-en="&#9650;/&#9660; or buttons to trade &bull; Space to pause" data-ro="&#9650;/&#9660; sau butoane pt. tranzacții &bull; Space pt. pauză">&#9650;/&#9660; or buttons to trade &bull; Space to pause</p>
             <button class="trade-btn start" id="trade-start-btn" data-en="Start Trading" data-ro="Începe Tranzacția">Start Trading</button>
+          </div>
+          <div class="trade-overlay hidden" id="trade-overlay-pause">
+            <h3 data-en="Paused" data-ro="Pauză">Paused</h3>
+            <p data-en="Press Space or click to resume" data-ro="Apasă Space sau click pt. reluare">Press Space or click to resume</p>
+            <div style="display:flex;gap:8px">
+              <button class="trade-btn start" id="trade-resume-btn" data-en="Resume" data-ro="Reia">Resume</button>
+              <button class="trade-btn end" id="trade-end-btn" data-en="End Session" data-ro="Încheie Sesiunea">End Session</button>
+            </div>
           </div>
           <div class="trade-overlay hidden" id="trade-overlay-end">
             <h3 data-en="Market Closed" data-ro="Piața Închisă">Market Closed</h3>
             <div class="trade-result" id="trade-result">$0.00</div>
+            <p id="trade-date-info" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px"></p>
             <button class="trade-btn start" id="trade-restart-btn" data-en="Trade Again" data-ro="Tranzacționează Din Nou">Trade Again</button>
           </div>
         </div>
+        <div class="trade-paused-badge" id="trade-paused-badge" data-en="&#9208; PAUSED" data-ro="&#9208; PAUZĂ">&#9208; PAUSED</div>
         <div class="trade-btns">
           <button class="trade-btn buy" id="trade-buy-btn" disabled data-en="Buy +100 (&#9650;)" data-ro="Cumpără +100 (&#9650;)">Buy +100 (&#9650;)</button>
           <button class="trade-btn sell" id="trade-sell-btn" disabled data-en="Sell -100 (&#9660;)" data-ro="Vinde -100 (&#9660;)">Sell -100 (&#9660;)</button>
         </div>
-        <div style="margin-top:8px;font-size:11px;color:var(--muted)">
-          <span data-en="100x multiplier" data-ro="Multiplicator 100x">100x multiplier</span>
+        <div class="trade-hint" data-en="&#9650;/&#9660; Buy &amp; Sell &bull; <kbd>Space</kbd> Pause" data-ro="&#9650;/&#9660; Cumpără &amp; Vinde &bull; <kbd>Space</kbd> Pauză">&#9650;/&#9660; Buy &amp; Sell &bull; <kbd>Space</kbd> Pause</div>
+        <div class="trade-log" id="trade-log" style="display:none">
+          <h4>Trade Log</h4>
+          <div class="trade-log-scroll">
+            <table>
+              <thead><tr>
+                <th>Time</th>
+                <th>Side</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>R. P&amp;L</th>
+              </tr></thead>
+              <tbody id="trade-log-body">
+                <tr><td colspan="5" style="color:var(--muted);text-align:center;padding:12px 0">No trades yet</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="trade-lb">
-          <h4 data-en="Best Trades" data-ro="Cele Mai Bune Tranzacții">Best Trades</h4>
+        <div class="trade-lb" id="trade-lb">
+          <h4 data-en="Best Sessions" data-ro="Cele Mai Bune Sesiuni">Best Sessions</h4>
           <table>
             <thead><tr>
               <th data-en="#" data-ro="#">#</th>
@@ -404,6 +532,7 @@ footer{
   © 2025 TATOMIR N. ALEX PFA. All rights reserved.
 </footer>
 
+<script src="data/spy_data.js"></script>
 <script>
 // Reveal animations
 const observer = new IntersectionObserver(entries=>{
@@ -600,24 +729,62 @@ toggle.addEventListener('click', ()=>{
   const canvas = document.getElementById('trade-canvas');
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
-  const DURATION = 30000;
   const TICK = 100;
-  const TOTAL_TICKS = DURATION / TICK;
   const MULTIPLIER = 100;
   const MAX_POS = 10;
 
-  let prices, currentTick, position, pnl, running, loop;
+  // Settings
+  const DEFAULT_SETTINGS = { dataSource: 'real', duration: 30, pnlMode: 'split', posTint: true };
+  function loadSettings(){ try { return Object.assign({}, DEFAULT_SETTINGS, JSON.parse(localStorage.getItem('tradeSettings'))); } catch(e){ return Object.assign({}, DEFAULT_SETTINGS); } }
+  function saveSettings(s){ localStorage.setItem('tradeSettings', JSON.stringify(s)); }
+  let settings = loadSettings();
+  let DURATION = settings.duration * 1000;
+  let TOTAL_TICKS = DURATION / TICK;
 
-  function generatePrices(){
-    const p = [580 + Math.random()*20];
-    const mu = (Math.random()-0.5)*0.0001;
-    const sigma = 0.002;
-    for(let i=1;i<=TOTAL_TICKS;i++){
-      const prev = p[i-1];
-      const shock = (Math.random()+Math.random()+Math.random()-1.5)*2;
-      p.push(prev * (1 + mu + sigma * shock));
+  // Apply settings to UI
+  function applySettingsUI(){
+    document.getElementById('ts-source').value = settings.dataSource;
+    document.getElementById('ts-duration').value = settings.duration;
+    document.getElementById('ts-pnlmode').value = settings.pnlMode;
+    document.getElementById('ts-postint').value = settings.posTint ? 'on' : 'off';
+  }
+  applySettingsUI();
+
+  let prices, currentTick, position, pnl, running, paused, loop, tradingDate;
+  let totalCost, avgPrice; // cost basis tracking
+  let realizedPnl; // for split PnL mode
+  let posHistory; // position at each tick for tinting
+
+  function generateSimulatedPrices(){
+    tradingDate = 'Simulated';
+    const base = 450 + Math.random() * 150; // ~$450-$600
+    const dailyVol = 0.01;
+    const tickVol = dailyVol / Math.sqrt(TOTAL_TICKS);
+    const pts = [base];
+    for(let i = 1; i <= TOTAL_TICKS; i++){
+      const ret = (Math.random() + Math.random() + Math.random() - 1.5) * tickVol;
+      pts.push(pts[i-1] * (1 + ret));
     }
-    return p;
+    return pts;
+  }
+
+  function fetchRealPrices(){
+    if(settings.dataSource === 'simulated') return generateSimulatedPrices();
+    // Pick a random trading day from the bundled data
+    const idx = Math.floor(Math.random() * window.SPY_DATA.length);
+    const [date, dayPrices] = window.SPY_DATA[idx];
+    tradingDate = date;
+
+    // Resample to TOTAL_TICKS+1 points via linear interpolation
+    const resampled = [];
+    for(let i = 0; i <= TOTAL_TICKS; i++){
+      const t = i * (dayPrices.length - 1) / TOTAL_TICKS;
+      const lo = Math.floor(t);
+      const hi = Math.min(lo + 1, dayPrices.length - 1);
+      const frac = t - lo;
+      resampled.push(dayPrices[lo] * (1 - frac) + dayPrices[hi] * frac);
+    }
+    return resampled;
   }
 
   function loadTradeLB(){ return JSON.parse(localStorage.getItem('tradeLB')||'[]'); }
@@ -629,21 +796,114 @@ toggle.addEventListener('click', ()=>{
       ? '<tr><td colspan="2" style="color:var(--muted);text-align:center;padding:12px 0">—</td></tr>'
       : lb.map((e,i)=>{
         const cls = e>=0?'pnl-pos':'pnl-neg';
-        const sign = e>=0?'+':'';
+        const sign = e>=0?'+':'-';
         return `<tr><td>${i+1}</td><td class="${cls}">${sign}$${Math.abs(e).toFixed(2)}</td></tr>`;
       }).join('');
   }
   renderTradeLB();
 
+  let tradeLog = [];
+  function formatTradeTime(tick){
+    if(settings.dataSource === 'simulated'){
+      return (tick * TICK / 1000).toFixed(1) + 's';
+    }
+    // Map tick to market hours 9:30–16:00
+    const frac = tick / TOTAL_TICKS;
+    const hours = 9.5 + frac * 6.5;
+    const h = Math.floor(hours);
+    const m = Math.floor((hours - h) * 60);
+    const h12 = h > 12 ? h - 12 : h;
+    const ampm = h >= 12 ? 'pm' : 'am';
+    return h12 + ':' + String(m).padStart(2, '0') + ampm;
+  }
+  function logTrade(side, qty, price, rpnl){
+    const time = formatTradeTime(currentTick);
+    tradeLog.push({ time, side, qty, price, rpnl });
+    renderTradeLog();
+  }
+  function renderTradeLog(){
+    const tbody = document.getElementById('trade-log-body');
+    if(!tbody) return;
+    if(tradeLog.length === 0){
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:12px 0">No trades yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = tradeLog.slice().reverse().map(t=>{
+      const sideColor = t.side==='BUY'?'#34d399':'#ef4444';
+      const rpnlStr = t.rpnl !== 0
+        ? `<span class="${t.rpnl>=0?'pnl-pos':'pnl-neg'}">${t.rpnl>=0?'+':'-'}$${Math.abs(t.rpnl).toFixed(2)}</span>`
+        : '<span style="color:var(--muted)">—</span>';
+      return `<tr><td>${t.time}</td><td style="color:${sideColor};font-weight:600">${t.side}</td><td>${t.qty}</td><td>$${t.price.toFixed(2)}</td><td>${rpnlStr}</td></tr>`;
+    }).join('');
+  }
+
+  function updateAvgPrice(newPos, price){
+    const oldPos = position;
+    let tradeRpnl = 0;
+    // Track realized P&L when reducing position
+    if(oldPos !== 0){
+      if(newPos === 0){
+        tradeRpnl = oldPos * MULTIPLIER * (price - avgPrice);
+      } else if(Math.sign(newPos) !== Math.sign(oldPos)){
+        tradeRpnl = oldPos * MULTIPLIER * (price - avgPrice);
+      } else if(Math.abs(newPos) < Math.abs(oldPos)){
+        const closed = oldPos - newPos;
+        tradeRpnl = closed * MULTIPLIER * (price - avgPrice);
+      }
+      realizedPnl += tradeRpnl;
+    }
+
+    if(newPos === 0){ totalCost = 0; avgPrice = 0; }
+    else if(Math.sign(newPos) !== Math.sign(oldPos) && oldPos !== 0){
+      totalCost = newPos * price; avgPrice = price;
+    } else if(Math.abs(newPos) > Math.abs(oldPos)){
+      totalCost += (newPos - oldPos) * price;
+      avgPrice = totalCost / newPos;
+    } else if(Math.abs(newPos) < Math.abs(oldPos)){
+      // Reducing position: keep avgPrice, shrink totalCost
+      totalCost = newPos * avgPrice;
+    }
+    return tradeRpnl;
+  }
+
   function doBuy(){
-    if(!running||position>=MAX_POS) return;
+    if(!running||paused||position>=MAX_POS) return;
+    const price = prices[currentTick];
+    const rpnl = updateAvgPrice(position+1, price);
     position++;
+    posHistory[currentTick] = position;
+    logTrade('BUY', MULTIPLIER, price, rpnl);
     updatePosDisplay();
+    drawChart();
   }
   function doSell(){
-    if(!running||position<=-MAX_POS) return;
+    if(!running||paused||position<=-MAX_POS) return;
+    const price = prices[currentTick];
+    const rpnl = updateAvgPrice(position-1, price);
     position--;
+    posHistory[currentTick] = position;
+    logTrade('SELL', MULTIPLIER, price, rpnl);
     updatePosDisplay();
+    drawChart();
+  }
+
+  function togglePause(){
+    if(!running) return;
+    if(paused){
+      paused = false;
+      loop = setInterval(tick, TICK);
+      document.getElementById('trade-overlay-pause').classList.add('hidden');
+      document.getElementById('trade-paused-badge').classList.remove('visible');
+      document.getElementById('trade-buy-btn').disabled = false;
+      document.getElementById('trade-sell-btn').disabled = false;
+    } else {
+      paused = true;
+      clearInterval(loop);
+      document.getElementById('trade-overlay-pause').classList.remove('hidden');
+      document.getElementById('trade-paused-badge').classList.add('visible');
+      document.getElementById('trade-buy-btn').disabled = true;
+      document.getElementById('trade-sell-btn').disabled = true;
+    }
   }
 
   function updatePosDisplay(){
@@ -658,10 +918,25 @@ toggle.addEventListener('click', ()=>{
   }
 
   function updatePnlDisplay(){
-    const el = document.getElementById('trade-pnl');
-    const sign = pnl>=0?'+':'';
-    el.textContent = `${sign}$${Math.abs(pnl).toFixed(2)}`;
-    el.className = pnl>=0?'pnl-pos':'pnl-neg';
+    const isSplit = settings.pnlMode === 'split';
+    document.getElementById('trade-pnl-total').style.display = isSplit ? 'none' : '';
+    document.getElementById('trade-pnl-realized').style.display = isSplit ? '' : 'none';
+    document.getElementById('trade-pnl-unrealized').style.display = isSplit ? '' : 'none';
+
+    if(isSplit){
+      const unrealized = (running && position !== 0) ? position * MULTIPLIER * (prices[currentTick] - avgPrice) : 0;
+      const rEl = document.getElementById('trade-rpnl');
+      const uEl = document.getElementById('trade-upnl');
+      rEl.textContent = `${realizedPnl>=0?'+':''}$${Math.abs(realizedPnl).toFixed(2)}`;
+      rEl.className = realizedPnl>=0?'pnl-pos':'pnl-neg';
+      uEl.textContent = `${unrealized>=0?'+':''}$${Math.abs(unrealized).toFixed(2)}`;
+      uEl.className = unrealized>=0?'pnl-pos':'pnl-neg';
+    } else {
+      const el = document.getElementById('trade-pnl');
+      const sign = pnl>=0?'+':'';
+      el.textContent = `${sign}$${Math.abs(pnl).toFixed(2)}`;
+      el.className = pnl>=0?'pnl-pos':'pnl-neg';
+    }
   }
 
   function drawChart(){
@@ -672,11 +947,47 @@ toggle.addEventListener('click', ()=>{
     const minP = Math.min(...slice)-0.5;
     const maxP = Math.max(...slice)+0.5;
     const range = maxP-minP||1;
-    const padT=18, padB=22, padL=6, padR=6;
+    const padT=18, padB=32, padL=6, padR=6;
     const cW=W-padL-padR, cH=H-padT-padB;
+
+    // Position tint bands
+    if(settings.posTint && posHistory){
+      for(let i=0;i<=currentTick;i++){
+        const p = posHistory[i] || 0;
+        if(p === 0) continue;
+        const alpha = Math.min(Math.abs(p) / MAX_POS, 1) * 0.12;
+        ctx.fillStyle = p > 0 ? `rgba(52,211,153,${alpha})` : `rgba(239,68,68,${alpha})`;
+        const x0 = padL + (i / TOTAL_TICKS) * cW;
+        const x1 = padL + ((i + 1) / TOTAL_TICKS) * cW;
+        ctx.fillRect(x0, padT, x1 - x0, cH);
+      }
+    }
 
     ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
     for(let i=0;i<5;i++){const y=padT+cH*i/4;ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();}
+
+    // Time labels on x-axis
+    if(settings.dataSource === 'simulated'){
+      ctx.fillStyle='#9aa3b2';ctx.font='9px Inter,sans-serif';ctx.textAlign='center';
+      const totalSec = settings.duration;
+      const step = totalSec <= 30 ? 5 : totalSec <= 60 ? 10 : 60;
+      for(let s = step; s < totalSec; s += step){
+        const frac = s / totalSec;
+        const x = padL + frac * cW;
+        ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,padT+cH);ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.stroke();
+        ctx.fillText(s + 's', x, padT+cH+12);
+      }
+    } else {
+      const MARKET_START=9.5, MARKET_END=16;
+      ctx.fillStyle='#9aa3b2';ctx.font='9px Inter,sans-serif';ctx.textAlign='center';
+      for(let hr=10;hr<=15;hr++){
+        const frac=(hr-MARKET_START)/(MARKET_END-MARKET_START);
+        const x=padL+frac*cW;
+        ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,padT+cH);ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.stroke();
+        const label=hr<=12?hr+'am':(hr-12)+'pm';
+        ctx.fillText(label,x,padT+cH+12);
+      }
+    }
 
     ctx.strokeStyle='#4f8cff';ctx.lineWidth=2;ctx.beginPath();
     for(let i=0;i<=currentTick;i++){
@@ -691,12 +1002,23 @@ toggle.addEventListener('click', ()=>{
     ctx.lineTo(lastX,padT+cH);ctx.lineTo(padL,padT+cH);ctx.closePath();
     ctx.fillStyle='rgba(79,140,255,0.08)';ctx.fill();
 
+    // Average price horizontal line
+    if(position !== 0 && avgPrice >= minP && avgPrice <= maxP){
+      const avgY = padT + cH * (1 - (avgPrice - minP) / range);
+      const color = position > 0 ? '#34d399' : '#ef4444';
+      ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(padL, avgY); ctx.lineTo(W-padR, avgY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = color; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText('avg $'+avgPrice.toFixed(2), W-padR, avgY-3);
+    }
+
     ctx.fillStyle='#4f8cff';ctx.beginPath();ctx.arc(lastX,lastY,4,0,Math.PI*2);ctx.fill();
 
     ctx.fillStyle='#f5f7fa';ctx.font='11px Inter,sans-serif';ctx.textAlign='right';
     ctx.fillText('$'+slice[currentTick].toFixed(2),W-padR,padT-5);
     ctx.fillStyle='#9aa3b2';ctx.font='10px Inter,sans-serif';ctx.textAlign='left';
-    ctx.fillText('$'+slice[0].toFixed(2),padL,H-5);
+    ctx.fillText('$'+slice[0].toFixed(2),padL,padT+cH+24);
   }
 
   function tick(){
@@ -705,6 +1027,7 @@ toggle.addEventListener('click', ()=>{
     currentTick++;
     const newPrice = prices[currentTick];
     pnl += position * MULTIPLIER * (newPrice - prevPrice);
+    posHistory[currentTick] = position;
     document.getElementById('trade-price').textContent = '$'+newPrice.toFixed(2);
     updatePnlDisplay();
     document.getElementById('trade-timer-fill').style.width = (currentTick/TOTAL_TICKS*100)+'%';
@@ -712,8 +1035,19 @@ toggle.addEventListener('click', ()=>{
   }
 
   function startGame(){
-    prices = generatePrices();
-    currentTick = 0; position = 0; pnl = 0; running = true;
+    settings = loadSettings();
+    DURATION = settings.duration * 1000;
+    TOTAL_TICKS = DURATION / TICK;
+
+    prices = fetchRealPrices();
+
+    currentTick = 0; position = 0; pnl = 0; running = true; paused = false;
+    totalCost = 0; avgPrice = 0; realizedPnl = 0;
+    posHistory = [0];
+    tradeLog = [];
+    document.getElementById('trade-log').style.display = '';
+    document.getElementById('trade-lb').style.display = 'none';
+    renderTradeLog();
     document.getElementById('trade-price').textContent = '$'+prices[0].toFixed(2);
     document.getElementById('trade-pos').textContent = '0';
     updatePnlDisplay();
@@ -721,6 +1055,9 @@ toggle.addEventListener('click', ()=>{
     document.getElementById('trade-timer-fill').style.width = '0%';
     document.getElementById('trade-overlay-start').classList.add('hidden');
     document.getElementById('trade-overlay-end').classList.add('hidden');
+    document.getElementById('trade-overlay-pause').classList.add('hidden');
+    document.getElementById('trade-settings-modal').classList.add('hidden');
+    document.getElementById('trade-paused-badge').classList.remove('visible');
     document.getElementById('trade-buy-btn').disabled = false;
     document.getElementById('trade-sell-btn').disabled = false;
     drawChart();
@@ -729,14 +1066,41 @@ toggle.addEventListener('click', ()=>{
   }
 
   function endGame(){
-    running = false;
+    running = false; paused = false;
     clearInterval(loop);
     document.getElementById('trade-buy-btn').disabled = true;
     document.getElementById('trade-sell-btn').disabled = true;
+    document.getElementById('trade-overlay-pause').classList.add('hidden');
+    document.getElementById('trade-paused-badge').classList.remove('visible');
     const el = document.getElementById('trade-result');
     const sign = pnl>=0?'+':'';
     el.textContent = `${sign}$${Math.abs(pnl).toFixed(2)}`;
     el.style.color = pnl>=0?'#34d399':'#ef4444';
+
+    // Show date and chart link
+    const dateInfo = document.getElementById('trade-date-info');
+    if(tradingDate === 'Simulated'){
+      dateInfo.innerHTML = `Trading day: <strong>Simulated</strong>`;
+    } else {
+      const formattedDate = new Date(tradingDate + 'T12:00:00').toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+      const d = new Date(tradingDate + 'T00:00:00');
+      const p1 = Math.floor(d.getTime()/1000);
+      const p2 = p1 + 86400;
+      const yahooUrl = `https://finance.yahoo.com/quote/SPY/history/?period1=${p1}&period2=${p2}`;
+      dateInfo.innerHTML = `Trading day: <strong>${formattedDate}</strong><br><a href="${yahooUrl}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;font-size:0.8rem">View on Yahoo Finance &rarr;</a>`;
+    }
+
+    // Show total PnL at game end regardless of mode
+    document.getElementById('trade-pnl-total').style.display = '';
+    document.getElementById('trade-pnl-realized').style.display = 'none';
+    document.getElementById('trade-pnl-unrealized').style.display = 'none';
+    const pnlEl = document.getElementById('trade-pnl');
+    const pnlSign = pnl>=0?'+':'';
+    pnlEl.textContent = `${pnlSign}$${Math.abs(pnl).toFixed(2)}`;
+    pnlEl.className = pnl>=0?'pnl-pos':'pnl-neg';
+
     document.getElementById('trade-overlay-end').classList.remove('hidden');
     const lb = loadTradeLB();
     lb.push(parseFloat(pnl.toFixed(2)));
@@ -744,15 +1108,42 @@ toggle.addEventListener('click', ()=>{
     if(lb.length>5) lb.length=5;
     saveTradeLB(lb);
     renderTradeLB();
+    document.getElementById('trade-log').style.display = 'none';
+    document.getElementById('trade-lb').style.display = '';
   }
+
+  // Settings modal
+  document.getElementById('trade-settings-btn').addEventListener('click', ()=>{
+    if(running && !paused) togglePause();
+    document.getElementById('trade-settings-modal').classList.remove('hidden');
+  });
+  document.getElementById('ts-close').addEventListener('click', ()=>{
+    settings.dataSource = document.getElementById('ts-source').value;
+    settings.duration = parseInt(document.getElementById('ts-duration').value);
+    settings.pnlMode = document.getElementById('ts-pnlmode').value;
+    settings.posTint = document.getElementById('ts-postint').value === 'on';
+    saveSettings(settings);
+    // Apply PnL mode immediately if a game is running
+    if(running) updatePnlDisplay();
+    document.getElementById('trade-settings-modal').classList.add('hidden');
+  });
+  document.getElementById('ts-clear-lb').addEventListener('click', ()=>{
+    if(confirm('Clear the trading leaderboard?')){
+      localStorage.removeItem('tradeLB');
+      renderTradeLB();
+    }
+  });
 
   document.getElementById('trade-buy-btn').addEventListener('click', doBuy);
   document.getElementById('trade-sell-btn').addEventListener('click', doSell);
   document.getElementById('trade-start-btn').addEventListener('click', startGame);
   document.getElementById('trade-restart-btn').addEventListener('click', startGame);
+  document.getElementById('trade-resume-btn').addEventListener('click', togglePause);
+  document.getElementById('trade-end-btn').addEventListener('click', ()=>{ if(running) endGame(); });
 
   document.addEventListener('keydown', e=>{
-    if(!running) return;
+    if((e.key===' '||e.key==='Escape') && running){ togglePause(); e.preventDefault(); return; }
+    if(!running||paused) return;
     if(e.key==='ArrowUp'||e.key==='ArrowRight'){doBuy();e.preventDefault();}
     if(e.key==='ArrowDown'||e.key==='ArrowLeft'){doSell();e.preventDefault();}
   });
