@@ -330,6 +330,61 @@ footer{
 }
 .game-settings-close:hover{background:rgba(255,255,255,0.15);}
 
+/* WHITEBOARD */
+.wb-wrap{
+  width:100%;margin-top:32px;
+  backdrop-filter:blur(16px);background:var(--panel);
+  border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:0;overflow:hidden;position:relative;
+}
+.wb-toolbar{
+  display:flex;align-items:center;gap:6px;padding:10px 14px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  flex-wrap:wrap;background:rgba(0,0,0,0.15);
+}
+.wb-toolbar-group{display:flex;align-items:center;gap:3px;}
+.wb-sep{width:1px;height:22px;background:rgba(255,255,255,0.1);margin:0 6px;}
+.wb-btn{
+  background:none;border:1px solid transparent;color:var(--muted);
+  cursor:pointer;padding:5px 7px;border-radius:6px;transition:0.15s;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  min-width:30px;height:30px;
+}
+.wb-btn:hover{color:var(--ink);background:rgba(255,255,255,0.08);}
+.wb-btn.active{color:var(--accent);background:rgba(79,140,255,0.15);border-color:rgba(79,140,255,0.3);}
+.wb-btn svg{pointer-events:none;}
+.wb-color-btn{
+  width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);
+  cursor:pointer;transition:0.15s;padding:0;flex-shrink:0;
+}
+.wb-color-btn:hover,.wb-color-btn.active{border-color:var(--accent);transform:scale(1.15);}
+.wb-size-slider{
+  -webkit-appearance:none;appearance:none;width:70px;height:4px;
+  background:rgba(255,255,255,0.15);border-radius:2px;outline:none;cursor:pointer;
+}
+.wb-size-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:none;
+}
+.wb-size-slider::-moz-range-thumb{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:none;
+}
+.wb-size-label{font-size:11px;color:var(--muted);min-width:22px;text-align:center;}
+.wb-canvas-area{
+  position:relative;cursor:crosshair;background:#181b22;
+  touch-action:none;
+}
+#wb-canvas{display:block;width:100%;height:auto;}
+.wb-wrap:fullscreen{
+  display:flex;flex-direction:column;background:#0b0d10;width:100%;height:100%;
+}
+.wb-wrap:fullscreen .wb-canvas-area{flex:1;min-height:0;}
+.wb-wrap:fullscreen #wb-canvas{width:100%;height:100%;max-width:none;}
+.wb-toolbar-right{margin-left:auto;display:flex;align-items:center;gap:3px;}
+.wb-fill-toggle{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;}
+.wb-fill-toggle input{accent-color:var(--accent);cursor:pointer;}
+
 /* FULLSCREEN */
 .snake-canvas-wrap:fullscreen, .trade-panel:fullscreen{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -604,6 +659,50 @@ footer{
     </div>
 
   </div>
+
+  <!-- WHITEBOARD -->
+  <div class="wb-wrap" id="wb-wrap">
+    <div class="wb-toolbar" id="wb-toolbar">
+      <span style="font-size:13px;font-weight:600;color:var(--ink);margin-right:6px" data-en="Whiteboard" data-ro="Tablă">Whiteboard</span>
+      <div class="wb-sep"></div>
+      <div class="wb-toolbar-group" id="wb-tools">
+        <button class="wb-btn active" data-tool="pen" title="Pen (P)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></button>
+        <button class="wb-btn" data-tool="line" title="Line (L)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/></svg></button>
+        <button class="wb-btn" data-tool="rect" title="Rectangle (R)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+        <button class="wb-btn" data-tool="ellipse" title="Ellipse (E)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="7"/></svg></button>
+        <button class="wb-btn" data-tool="arrow" title="Arrow (A)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/><polyline points="10 5 19 5 19 14"/></svg></button>
+        <button class="wb-btn" data-tool="eraser" title="Eraser (X)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l9-9 8 8-4 4z"/><path d="M6.5 13.5l5 5"/></svg></button>
+      </div>
+      <div class="wb-sep"></div>
+      <div class="wb-toolbar-group" id="wb-colors">
+        <button class="wb-color-btn active" data-color="#f5f7fa" style="background:#f5f7fa" title="White"></button>
+        <button class="wb-color-btn" data-color="#ef4444" style="background:#ef4444" title="Red"></button>
+        <button class="wb-color-btn" data-color="#fbbf24" style="background:#fbbf24" title="Yellow"></button>
+        <button class="wb-color-btn" data-color="#34d399" style="background:#34d399" title="Green"></button>
+        <button class="wb-color-btn" data-color="#4f8cff" style="background:#4f8cff" title="Blue"></button>
+        <button class="wb-color-btn" data-color="#a855f7" style="background:#a855f7" title="Purple"></button>
+      </div>
+      <div class="wb-sep"></div>
+      <div class="wb-toolbar-group">
+        <input type="range" class="wb-size-slider" id="wb-size" min="1" max="32" value="3">
+        <span class="wb-size-label" id="wb-size-label">3</span>
+      </div>
+      <div class="wb-sep"></div>
+      <label class="wb-fill-toggle" title="Fill shapes"><input type="checkbox" id="wb-fill-check"> Fill</label>
+      <div class="wb-toolbar-right">
+        <button class="wb-btn" id="wb-undo-btn" title="Undo (Ctrl+Z)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg></button>
+        <button class="wb-btn" id="wb-redo-btn" title="Redo (Ctrl+Y)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-5.64-11.36L23 10"/></svg></button>
+        <button class="wb-btn" id="wb-clear-btn" title="Clear All"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        <div class="wb-sep"></div>
+        <button class="wb-btn" id="wb-download-btn" title="Save as PNG"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        <button class="wb-btn" id="wb-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg></button>
+      </div>
+    </div>
+    <div class="wb-canvas-area" id="wb-canvas-area">
+      <canvas id="wb-canvas" width="1200" height="600"></canvas>
+    </div>
+  </div>
+
 </section>
 
 <footer class="reveal">
@@ -1443,6 +1542,386 @@ toggle.addEventListener('click', ()=>{
       canvas.height = H;
     }
     drawChart();
+  });
+})();
+
+// Whiteboard
+(function(){
+  const canvas = document.getElementById('wb-canvas');
+  const ctx = canvas.getContext('2d');
+  const area = document.getElementById('wb-canvas-area');
+  const wrap = document.getElementById('wb-wrap');
+
+  let W = canvas.width, H = canvas.height;
+  let tool = 'pen';
+  let color = '#f5f7fa';
+  let lineWidth = 3;
+  let fillShapes = false;
+  let drawing = false;
+  let startX, startY, lastX, lastY;
+
+  // History for undo/redo
+  let history = [];
+  let redoStack = [];
+  const MAX_HISTORY = 50;
+
+  function saveState(){
+    history.push(canvas.toDataURL());
+    if(history.length > MAX_HISTORY) history.shift();
+    redoStack = [];
+  }
+
+  function restoreState(dataUrl){
+    const img = new Image();
+    img.onload = ()=>{
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = dataUrl;
+  }
+
+  // Snapshot for shape preview (using ImageData for instant restore)
+  let snapshot = null;
+
+  function clearCanvas(){
+    ctx.fillStyle = '#181b22';
+    ctx.fillRect(0, 0, W, H);
+  }
+  clearCanvas();
+  saveState();
+
+  function takeSnapshot(){
+    return ctx.getImageData(0, 0, W, H);
+  }
+  function restoreSnapshot(imgData){
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  // Get pointer position relative to canvas, accounting for CSS scaling
+  function getPos(e){
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const scaleY = H / rect.height;
+    let clientX, clientY;
+    if(e.touches){
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
+  // Smooth pen drawing using quadratic curves
+  let penMoved = false;
+
+  function penDown(pos){
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    lastX = pos.x;
+    lastY = pos.y;
+    penMoved = false;
+  }
+
+  function penMove(pos){
+    penMoved = true;
+    // Use midpoint for smooth quadratic curves
+    const midX = (lastX + pos.x) / 2;
+    const midY = (lastY + pos.y) / 2;
+    ctx.quadraticCurveTo(lastX, lastY, midX, midY);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    // Start new sub-path from midpoint for continuity
+    ctx.beginPath();
+    ctx.moveTo(midX, midY);
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function penUp(pos){
+    if(!penMoved){
+      // Single click: draw a dot
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, lineWidth / 2, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    } else {
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+  }
+
+  function eraserDown(pos){
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function eraserMove(pos){
+    const midX = (lastX + pos.x) / 2;
+    const midY = (lastY + pos.y) / 2;
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.quadraticCurveTo(lastX, lastY, midX, midY);
+    ctx.strokeStyle = '#181b22';
+    ctx.lineWidth = lineWidth * 4;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    lastX = pos.x;
+    lastY = pos.y;
+  }
+
+  function drawShapePreview(pos){
+    // Instantly restore snapshot (synchronous) then draw shape
+    restoreSnapshot(snapshot);
+    drawShape(startX, startY, pos.x, pos.y);
+  }
+
+  function drawShape(x1, y1, x2, y2){
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.fillStyle = color;
+
+    if(tool === 'line'){
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    } else if(tool === 'arrow'){
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const headLen = Math.max(14, lineWidth * 5);
+      // Draw line (slightly shorter so it doesn't poke through the arrowhead)
+      const tipX = x2 - headLen * 0.3 * Math.cos(angle);
+      const tipY = y2 - headLen * 0.3 * Math.sin(angle);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(tipX, tipY);
+      ctx.stroke();
+      // Filled arrowhead triangle
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/7), y2 - headLen * Math.sin(angle - Math.PI/7));
+      ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/7), y2 - headLen * Math.sin(angle + Math.PI/7));
+      ctx.closePath();
+      ctx.fill();
+    } else if(tool === 'rect'){
+      if(fillShapes){
+        ctx.fillRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+      }
+      ctx.strokeRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+    } else if(tool === 'ellipse'){
+      const cx = (x1+x2)/2, cy = (y1+y2)/2;
+      const rx = Math.abs(x2-x1)/2, ry = Math.abs(y2-y1)/2;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+      if(fillShapes) ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  // Pointer event handlers
+  function onPointerDown(e){
+    if(e.button && e.button !== 0) return;
+    e.preventDefault();
+    drawing = true;
+    const pos = getPos(e);
+    startX = pos.x;
+    startY = pos.y;
+
+    if(tool === 'pen'){
+      penDown(pos);
+    } else if(tool === 'eraser'){
+      eraserDown(pos);
+    } else {
+      // Shape tools: take snapshot for instant preview
+      snapshot = takeSnapshot();
+    }
+  }
+
+  function onPointerMove(e){
+    if(!drawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+
+    if(tool === 'pen'){
+      penMove(pos);
+    } else if(tool === 'eraser'){
+      eraserMove(pos);
+    } else {
+      drawShapePreview(pos);
+    }
+  }
+
+  function onPointerUp(e){
+    if(!drawing) return;
+    drawing = false;
+    const pos = getPos(e);
+
+    if(tool === 'pen'){
+      penUp(pos);
+    } else if(tool === 'eraser'){
+      // Nothing extra needed
+    } else {
+      // Final shape - restore snapshot and draw final shape cleanly
+      if(snapshot){
+        restoreSnapshot(snapshot);
+        drawShape(startX, startY, pos.x, pos.y);
+      }
+    }
+    snapshot = null;
+    saveState();
+  }
+
+  // Use pointer events for unified mouse+touch handling with capture
+  canvas.addEventListener('pointerdown', (e)=>{
+    canvas.setPointerCapture(e.pointerId);
+    onPointerDown(e);
+  });
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', (e)=>{
+    canvas.releasePointerCapture(e.pointerId);
+    onPointerUp(e);
+  });
+  canvas.addEventListener('lostpointercapture', (e)=>{ if(drawing) onPointerUp(e); });
+
+  // Prevent scrolling/zooming when touching the canvas
+  canvas.addEventListener('touchstart', e=>e.preventDefault(), {passive:false});
+  canvas.addEventListener('touchmove', e=>e.preventDefault(), {passive:false});
+
+  function updateCursor(){
+    if(tool === 'eraser'){
+      const sz = Math.max(8, lineWidth * 4);
+      const half = sz / 2;
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${sz}' height='${sz}'><circle cx='${half}' cy='${half}' r='${half-1}' fill='none' stroke='white' stroke-width='1.5'/></svg>`;
+      area.style.cursor = `url("data:image/svg+xml,${encodeURIComponent(svg)}") ${half} ${half}, cell`;
+    } else {
+      area.style.cursor = 'crosshair';
+    }
+  }
+
+  // Tool selection
+  document.querySelectorAll('#wb-tools .wb-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#wb-tools .wb-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      tool = btn.dataset.tool;
+      updateCursor();
+    });
+  });
+
+  // Color selection
+  document.querySelectorAll('#wb-colors .wb-color-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#wb-colors .wb-color-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      color = btn.dataset.color;
+    });
+  });
+
+  // Size slider
+  const sizeSlider = document.getElementById('wb-size');
+  const sizeLabel = document.getElementById('wb-size-label');
+  sizeSlider.addEventListener('input', ()=>{
+    lineWidth = parseInt(sizeSlider.value);
+    sizeLabel.textContent = lineWidth;
+    updateCursor();
+  });
+
+  // Fill toggle
+  document.getElementById('wb-fill-check').addEventListener('change', (e)=>{
+    fillShapes = e.target.checked;
+  });
+
+  // Undo
+  document.getElementById('wb-undo-btn').addEventListener('click', ()=>{
+    if(history.length <= 1) return;
+    redoStack.push(history.pop());
+    restoreState(history[history.length - 1]);
+  });
+
+  // Redo
+  document.getElementById('wb-redo-btn').addEventListener('click', ()=>{
+    if(redoStack.length === 0) return;
+    const state = redoStack.pop();
+    history.push(state);
+    restoreState(state);
+  });
+
+  // Clear
+  document.getElementById('wb-clear-btn').addEventListener('click', ()=>{
+    if(!confirm('Clear the whiteboard?')) return;
+    clearCanvas();
+    saveState();
+  });
+
+  // Download as PNG
+  document.getElementById('wb-download-btn').addEventListener('click', ()=>{
+    const link = document.createElement('a');
+    link.download = 'whiteboard.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  // Fullscreen
+  document.getElementById('wb-fullscreen-btn').addEventListener('click', ()=>{
+    if(!document.fullscreenElement) wrap.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen();
+  });
+
+  document.addEventListener('fullscreenchange', ()=>{
+    if(document.fullscreenElement === wrap){
+      // Save current drawing
+      const data = canvas.toDataURL();
+      W = window.innerWidth;
+      H = window.innerHeight - document.getElementById('wb-toolbar').offsetHeight;
+      canvas.width = W;
+      canvas.height = H;
+      // Restore drawing
+      clearCanvas();
+      const img = new Image();
+      img.onload = ()=>{ ctx.drawImage(img, 0, 0); saveState(); };
+      img.src = data;
+    } else {
+      const data = canvas.toDataURL();
+      W = 1200; H = 600;
+      canvas.width = W;
+      canvas.height = H;
+      clearCanvas();
+      const img = new Image();
+      img.onload = ()=>{ ctx.drawImage(img, 0, 0); saveState(); };
+      img.src = data;
+    }
+  });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e)=>{
+    // Only handle if not in an input
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+    if((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey){
+      e.preventDefault();
+      document.getElementById('wb-undo-btn').click();
+    }
+    if((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))){
+      e.preventDefault();
+      document.getElementById('wb-redo-btn').click();
+    }
+
+    // Tool shortcuts (only when not ctrl/meta)
+    if(e.ctrlKey || e.metaKey) return;
+    const keyMap = {p:'pen', l:'line', r:'rect', e:'ellipse', a:'arrow', x:'eraser'};
+    if(keyMap[e.key]){
+      document.querySelector(`#wb-tools .wb-btn[data-tool="${keyMap[e.key]}"]`).click();
+    }
   });
 })();
 </script>
