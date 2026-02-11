@@ -396,7 +396,7 @@ footer{
 .wb-size-label{font-size:11px;color:var(--muted);min-width:22px;text-align:center;}
 .wb-canvas-area{
   position:relative;cursor:crosshair;background:#181b22;
-  touch-action:none;
+  touch-action:none;overflow:hidden;
 }
 #wb-canvas{display:block;width:100%;height:auto;}
 .wb-wrap:fullscreen{
@@ -516,11 +516,25 @@ footer{
 .wb-collab-peers{font-size:10px;color:var(--muted);margin-left:2px;}
 
 /* Chat */
-.wb-chat-row{display:flex;gap:0;}
+.wb-chat-row{position:relative;}
 .wb-chat{
-  width:240px;flex-shrink:0;display:flex;flex-direction:column;
-  border-left:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.25);
+  position:absolute;right:0;top:0;bottom:0;width:240px;z-index:8;
+  display:flex;flex-direction:column;
+  border-left:1px solid rgba(255,255,255,0.06);
+  background:rgba(12,14,20,0.35);backdrop-filter:blur(6px);
+  transition:transform 0.25s ease;
 }
+.wb-chat.collapsed{transform:translateX(100%);}
+.wb-chat-toggle{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:9;
+  width:22px;height:44px;border:none;cursor:pointer;
+  background:rgba(12,14,20,0.85);backdrop-filter:blur(8px);
+  border-radius:6px 0 0 6px;border:1px solid rgba(255,255,255,0.08);border-right:none;
+  color:var(--muted);display:flex;align-items:center;justify-content:center;
+  transition:right 0.25s ease, color 0.15s;
+}
+.wb-chat-toggle:hover{color:var(--ink);}
+.wb-chat-toggle.shifted{right:240px;}
 .wb-chat-header{
   padding:8px 12px;font-size:11px;font-weight:600;color:var(--muted);
   border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:6px;
@@ -532,8 +546,9 @@ footer{
 }
 .wb-chat-nick:focus{border-color:var(--accent);}
 .wb-chat-msgs{
-  flex:1;overflow-y:auto;padding:10px 10px;min-height:120px;max-height:400px;
+  flex:1;overflow-y:auto;padding:10px 10px;
   display:flex;flex-direction:column;gap:6px;
+  align-items:flex-start;
 }
 .wb-chat-bubble{
   max-width:82%;padding:7px 11px;border-radius:16px;
@@ -554,11 +569,11 @@ footer{
   display:block;font-size:9px;font-weight:700;margin-bottom:2px;
   opacity:0.7;letter-spacing:0.3px;
 }
-.wb-chat-bubble.mine .wb-chat-nick-label{color:rgba(255,255,255,0.7);}
-.wb-chat-bubble.theirs .wb-chat-nick-label{color:var(--accent);}
+.wb-chat-bubble.mine .wb-chat-nick-label{color:rgba(255,255,255,0.7);text-align:right;}
+.wb-chat-bubble.theirs .wb-chat-nick-label{color:var(--accent);text-align:left;}
 .wb-chat-sys{
   text-align:center;font-size:10px;color:var(--muted);
-  font-style:italic;padding:2px 0;
+  font-style:italic;padding:2px 0;align-self:center;
 }
 .wb-chat-input-row{
   display:flex;border-top:1px solid rgba(255,255,255,0.06);
@@ -1027,20 +1042,21 @@ footer{
       </div>
     </div>
     <div class="wb-chat-row">
-      <div class="wb-canvas-area" id="wb-canvas-area" style="flex:1;min-width:0">
+      <div class="wb-canvas-area" id="wb-canvas-area">
         <canvas id="wb-canvas" width="1200" height="600"></canvas>
         <canvas id="wb-grid" class="wb-grid-canvas" width="1200" height="600"></canvas>
         <div class="wb-ai-guess" id="wb-ai-guess"><span class="wb-ai-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.581a.5.5 0 010 .964L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z"/></svg></span><span id="wb-ai-guess-text"></span></div>
-      </div>
-      <div class="wb-chat" id="wb-chat" style="display:none">
-        <div class="wb-chat-header">
-          Chat
-          <input class="wb-chat-nick" id="wb-chat-nick" placeholder="Nickname" spellcheck="false" autocomplete="off">
-        </div>
-        <div class="wb-chat-msgs" id="wb-chat-msgs"></div>
-        <div class="wb-chat-input-row">
-          <input class="wb-chat-input" id="wb-chat-input" placeholder="Type a message..." spellcheck="false" autocomplete="off">
-          <button class="wb-chat-send" id="wb-chat-send" title="Send"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+        <button class="wb-chat-toggle" id="wb-chat-toggle" style="display:none" title="Toggle chat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        <div class="wb-chat" id="wb-chat" style="display:none">
+          <div class="wb-chat-header">
+            Chat
+            <input class="wb-chat-nick" id="wb-chat-nick" placeholder="Nickname" spellcheck="false" autocomplete="off">
+          </div>
+          <div class="wb-chat-msgs" id="wb-chat-msgs"></div>
+          <div class="wb-chat-input-row">
+            <input class="wb-chat-input" id="wb-chat-input" placeholder="Type a message..." spellcheck="false" autocomplete="off">
+            <button class="wb-chat-send" id="wb-chat-send" title="Send"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+          </div>
         </div>
       </div>
     </div>
@@ -3188,7 +3204,8 @@ Example — a star:
   let collabPeer = null;
   let collabConns = [];
   let collabIsHost = false;
-  let collabRoomId = null;
+  let collabRoomId = null;   // internal ID (with suffix)
+  let collabRoomName = null; // display name (without suffix)
 
   const roomInput = document.getElementById('wb-room-input');
   const connectBtn = document.getElementById('wb-connect-btn');
@@ -3204,6 +3221,8 @@ Example — a star:
   const chatInput = document.getElementById('wb-chat-input');
   const chatSendBtn = document.getElementById('wb-chat-send');
   const chatNickInput = document.getElementById('wb-chat-nick');
+  const chatToggleBtn = document.getElementById('wb-chat-toggle');
+  let chatCollapsed = false;
 
   const _adj = ['Swift','Bold','Chill','Neon','Pixel','Dusk','Zen','Vivid','Amber','Cobalt','Lucky','Tiny','Warm','Cool','Bright','Silent','Wild','Calm','Fuzzy','Misty','Snowy','Stormy','Sunny','Rusty','Dizzy','Lazy','Witty','Jolly','Brave','Spicy'];
   const _noun = ['Fox','Owl','Cat','Wolf','Bear','Lynx','Crow','Hare','Frog','Moth','Panda','Otter','Raven','Finch','Whale','Shark','Tiger','Koala','Moose','Llama','Gecko','Robin','Crane','Bison','Viper','Sloth','Dingo','Hippo','Lemur','Quail'];
@@ -3259,6 +3278,14 @@ Example — a star:
     if(e.key === 'Enter') chatSend();
   });
 
+  chatToggleBtn.addEventListener('click', () => {
+    chatCollapsed = !chatCollapsed;
+    chatEl.classList.toggle('collapsed', chatCollapsed);
+    chatToggleBtn.classList.toggle('shifted', !chatCollapsed);
+    chatToggleBtn.querySelector('svg').style.transform = chatCollapsed ? 'rotate(180deg)' : '';
+    if(!chatCollapsed) setTimeout(() => chatInput.focus(), 260);
+  });
+
   function chatClear(){
     chatMsgs.innerHTML = '';
     lastChatNick = null;
@@ -3274,8 +3301,16 @@ Example — a star:
     collabDisconnectBtn.style.display = connected ? 'flex' : 'none';
     connectBtn.style.display = connected ? 'none' : 'flex';
     roomInput.disabled = !!connected;
-    if(connected && collabRoomId) roomInput.value = collabRoomId;
+    if(connected && collabRoomName) roomInput.value = collabRoomName;
     chatEl.style.display = connected ? 'flex' : 'none';
+    chatToggleBtn.style.display = connected ? 'flex' : 'none';
+    if(connected && !chatCollapsed) chatToggleBtn.classList.add('shifted');
+    if(!connected){
+      chatCollapsed = false;
+      chatEl.classList.remove('collapsed');
+      chatToggleBtn.classList.remove('shifted');
+      chatToggleBtn.querySelector('svg').style.transform = '';
+    }
   }
 
   function collabSend(conn, msg){
@@ -3323,71 +3358,88 @@ Example — a star:
     collabConns.push(conn);
     collabUpdateUI();
     conn.on('data', (data) => collabHandleMessage(data, conn));
-    conn.on('close', () => {
+    function onLost(){
       collabConns = collabConns.filter(c => c !== conn);
       collabUpdateUI();
-    });
-    conn.on('error', () => {
-      collabConns = collabConns.filter(c => c !== conn);
-      collabUpdateUI();
-    });
+      // Guest lost its only connection (to host) — auto-reconnect
+      if(!collabIsHost && collabConns.length === 0 && collabRoomId){
+        const name = collabRoomId;
+        chatAppend(null, 'Connection lost — reconnecting...', false, true);
+        setTimeout(() => connectToRoom(name), 1000);
+      }
+    }
+    conn.on('close', onLost);
+    conn.on('error', onLost);
   }
 
   function collabSaveSession(){
     try {
-      if(collabRoomId){
-        sessionStorage.setItem('wb-collab', JSON.stringify({id:collabRoomId, host:collabIsHost}));
-      } else {
-        sessionStorage.removeItem('wb-collab');
+      if(collabRoomName){
+        localStorage.setItem('wb-room', collabRoomName);
       }
     } catch(e){}
   }
 
-  // Try to join first; if the room doesn't exist, become the host
-  function connectToRoom(name){
-    if(!name) return;
-    if(collabPeer) collabDisconnect(true);
-    collabRoomId = name;
+  let collabRetryTimer = null;
+  let collabSettled = false; // true once successfully connected or hosting
+
+  function collabCleanup(){
+    if(collabRetryTimer){ clearTimeout(collabRetryTimer); collabRetryTimer = null; }
+    collabConns.forEach(c => { try { c.close(); } catch(e){} });
+    collabConns = [];
+    if(collabPeer){ try { collabPeer.destroy(); } catch(e){} }
+    collabPeer = null;
     collabIsHost = false;
+    collabSettled = false;
+  }
+
+  // Attempt to join as guest. Calls onResult(true) if connected, onResult(false) if failed.
+  function tryJoin(name, onResult){
+    collabCleanup();
+    collabRoomId = name;
     collabPeer = new Peer();
+    let done = false;
+    function finish(ok){
+      if(done) return; done = true;
+      onResult(ok);
+    }
     collabPeer.on('open', () => {
       const conn = collabPeer.connect(name, {reliable:true});
-      let opened = false;
       conn.on('open', () => {
-        opened = true;
+        collabIsHost = false;
+        collabSettled = true;
         collabSetupConn(conn);
         collabSend(conn, {type:'join-announce', nick:chatNick});
         collabSaveSession();
         collabUpdateUI();
+        finish(true);
       });
-      conn.on('error', () => {
-        if(!opened) becomeHost(name, 0);
-      });
-      // Timeout: if not connected within 3s, host it
+      conn.on('error', () => finish(false));
       setTimeout(() => {
-        if(!opened && collabPeer && !collabPeer.destroyed){
-          try { conn.close(); } catch(e){}
-          becomeHost(name, 0);
-        }
-      }, 3000);
+        if(!done){ try { conn.close(); } catch(e){} finish(false); }
+      }, 2500);
     });
-    collabPeer.on('error', (err) => {
-      console.warn('PeerJS error:', err);
-    });
+    collabPeer.on('error', () => finish(false));
     collabUpdateUI();
   }
 
-  function becomeHost(name, retries){
-    if(collabPeer){ try { collabPeer.destroy(); } catch(e){} }
-    collabPeer = null;
-    collabConns = [];
+  // Attempt to host. Calls onResult(true) if registered, onResult(false) if ID taken.
+  function tryHost(name, onResult){
+    collabCleanup();
     collabRoomId = name;
-    collabIsHost = true;
     collabPeer = new Peer(name);
+    let done = false;
+    function finish(ok){
+      if(done) return; done = true;
+      onResult(ok);
+    }
     collabPeer.on('open', () => {
+      collabIsHost = true;
+      collabSettled = true;
       collabSaveSession();
       collabUpdateUI();
       chatAppend(null, 'Room created — waiting for others', false, true);
+      finish(true);
     });
     collabPeer.on('connection', (conn) => {
       conn.on('open', () => {
@@ -3397,39 +3449,65 @@ Example — a star:
     });
     collabPeer.on('error', (err) => {
       if(err.type === 'unavailable-id'){
-        collabPeer.destroy();
-        collabPeer = null;
-        if(retries < 5){
-          // Stale ID on signaling server — retry after delay
-          setTimeout(() => becomeHost(name, retries + 1), 1500);
-        } else {
-          // Give up hosting, try joining instead
-          connectToRoom(name);
-        }
+        try { collabPeer.destroy(); } catch(e){} collabPeer = null;
+        finish(false);
       } else {
         console.warn('PeerJS error:', err);
+        finish(false);
+      }
+    });
+    // If host loses signaling server connection, re-register
+    collabPeer.on('disconnected', () => {
+      if(collabSettled && collabIsHost && collabRoomId){
+        try { collabPeer.reconnect(); } catch(e){
+          const n = collabRoomId;
+          chatAppend(null, 'Lost server — reconnecting...', false, true);
+          setTimeout(() => connectToRoom(n), 1000);
+        }
       }
     });
     collabUpdateUI();
   }
 
-  function collabDisconnect(skipSessionClear){
-    collabConns.forEach(c => { try { c.close(); } catch(e){} });
-    collabConns = [];
-    if(collabPeer){ try { collabPeer.destroy(); } catch(e){} }
-    collabPeer = null;
-    collabIsHost = false;
-    collabRoomId = null;
-    if(!skipSessionClear){
-      try { sessionStorage.removeItem('wb-collab'); } catch(e){}
+  // Keep alternating join/host until one succeeds
+  function connectToRoom(displayName){
+    if(!displayName) return;
+    const peerId = displayName;
+    collabCleanup();
+    collabRoomName = displayName;
+    collabRoomId = peerId;
+    collabUpdateUI();
+    let attempt = 0;
+
+    function cycle(){
+      if(collabSettled || collabRoomId !== peerId) return;
+      attempt++;
+      if(attempt % 2 === 1){
+        tryJoin(peerId, (ok) => {
+          if(ok || collabSettled) return;
+          cycle();
+        });
+      } else {
+        tryHost(peerId, (ok) => {
+          if(ok || collabSettled) return;
+          collabRetryTimer = setTimeout(cycle, 1500);
+        });
+      }
     }
+    cycle();
+  }
+
+  function collabDisconnect(){
+    if(collabRetryTimer){ clearTimeout(collabRetryTimer); collabRetryTimer = null; }
+    collabCleanup();
+    collabRoomId = null;
+    collabRoomName = null;
     chatClear();
     collabUpdateUI();
   }
 
   connectBtn.addEventListener('click', () => {
-    const name = roomInput.value.trim();
-    if(!name || name.length < 2) return;
+    const name = roomInput.value.trim() || 'main';
     connectToRoom(name);
   });
 
@@ -3440,16 +3518,12 @@ Example — a star:
 
   collabDisconnectBtn.addEventListener('click', () => collabDisconnect());
 
-  // Auto-reconnect from session
-  try {
-    const saved = JSON.parse(sessionStorage.getItem('wb-collab'));
-    if(saved && saved.id){
-      roomInput.value = saved.id;
-      // If we were the host, go straight to hosting (skip join attempt)
-      if(saved.host) becomeHost(saved.id, 0);
-      else connectToRoom(saved.id);
-    }
-  } catch(e){}
+  // Auto-connect on load
+  {
+    const savedRoom = localStorage.getItem('wb-room') || 'main';
+    roomInput.value = savedRoom;
+    connectToRoom(savedRoom);
+  }
 
 })();
 
