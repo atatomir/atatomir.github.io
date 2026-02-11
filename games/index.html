@@ -333,9 +333,11 @@ footer{
 /* FULLSCREEN */
 .snake-canvas-wrap:fullscreen, .trade-panel:fullscreen{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:#0b0d10;
+  background:#0b0d10;width:100%;height:100%;
 }
-.trade-panel:fullscreen{padding:24px;}
+.snake-canvas-wrap:fullscreen #snake-canvas{max-width:none;height:auto;}
+.trade-panel:fullscreen{padding:24px;overflow-y:auto;}
+.trade-panel:fullscreen .trade-canvas-wrap{width:100%;max-width:1200px;}
 
 /* RESPONSIVE */
 @media (max-width:768px){
@@ -633,7 +635,7 @@ toggle.addEventListener('click', ()=>{
 (function(){
   const canvas = document.getElementById('snake-canvas');
   const ctx = canvas.getContext('2d');
-  const SIZE = 20;
+  let SIZE = 20;
   const COLS = canvas.width / SIZE;
   const ROWS = canvas.height / SIZE;
   const BOMB_LIFETIME = 8000;
@@ -713,11 +715,34 @@ toggle.addEventListener('click', ()=>{
     const [base,range] = getSpawnDelay(snakeSettings.gems);
     gemTimer = setTimeout(()=>{ if(running&&!paused) spawnGem(); }, base+Math.random()*range);
   }
+  function isInFrontOfSnake(pos){
+    if(!snake||!snake.length||!dir) return false;
+    const head = snake[0];
+    for(let i=1;i<=4;i++){
+      let fx = head.x + dir.x * i;
+      let fy = head.y + dir.y * i;
+      if(snakeSettings.walls === 'off'){
+        fx = ((fx % COLS) + COLS) % COLS;
+        fy = ((fy % ROWS) + ROWS) % ROWS;
+      }
+      if(pos.x === fx && pos.y === fy) return true;
+    }
+    return false;
+  }
+  function randFreePosForBomb(){
+    let pos, attempts = 0;
+    do {
+      pos = {x:Math.floor(Math.random()*COLS),y:Math.floor(Math.random()*ROWS)};
+      attempts++;
+    } while((!isFree(pos) || isInFrontOfSnake(pos)) && attempts < 200);
+    return isFree(pos) ? pos : null;
+  }
   function spawnBomb(){
     if(!running||paused) return;
     if(snakeSettings.bombs === 'off') return;
     if(bombs.length<3){
-      const b = randFreePos();
+      const b = randFreePosForBomb();
+      if(!b){ scheduleBomb(); return; }
       bombs.push(b);
       const timer = setTimeout(()=>{
         const idx = bombs.indexOf(b);
@@ -939,13 +964,28 @@ toggle.addEventListener('click', ()=>{
     if(!document.fullscreenElement) el.requestFullscreen().catch(()=>{});
     else document.exitFullscreen();
   });
+  document.addEventListener('fullscreenchange', ()=>{
+    const wrap = document.getElementById('snake-wrap');
+    if(document.fullscreenElement === wrap){
+      const maxW = window.innerWidth;
+      const maxH = window.innerHeight;
+      SIZE = Math.floor(Math.min(maxW / COLS, maxH / ROWS));
+      canvas.width = COLS * SIZE;
+      canvas.height = ROWS * SIZE;
+    } else {
+      SIZE = 20;
+      canvas.width = COLS * SIZE;
+      canvas.height = ROWS * SIZE;
+    }
+    draw();
+  });
 })();
 
 // Trading Game
 (function(){
   const canvas = document.getElementById('trade-canvas');
   const ctx = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  let W = canvas.width, H = canvas.height;
   const TICK = 100;
   const MULTIPLIER = 100;
   const MAX_POS = 10;
@@ -1388,6 +1428,21 @@ toggle.addEventListener('click', ()=>{
     const el = document.getElementById('trade-wrap');
     if(!document.fullscreenElement) el.requestFullscreen().catch(()=>{});
     else document.exitFullscreen();
+  });
+  document.addEventListener('fullscreenchange', ()=>{
+    const wrap = document.getElementById('trade-wrap');
+    if(document.fullscreenElement === wrap){
+      const maxW = Math.min(window.innerWidth - 48, 1200);
+      W = maxW;
+      H = Math.round(maxW * 0.55);
+      canvas.width = W;
+      canvas.height = H;
+    } else {
+      W = 400; H = 220;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    drawChart();
   });
 })();
 </script>
