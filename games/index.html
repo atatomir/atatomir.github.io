@@ -105,6 +105,29 @@ footer{
 
 /* GAMES LAYOUT */
 #games{text-align:center;}
+/* GAME TABS */
+.nav-sep{
+  width:1px;height:16px;background:rgba(255,255,255,0.12);flex-shrink:0;
+}
+.game-tab{
+  padding:6px 12px;border-radius:999px;border:none;
+  background:transparent;color:var(--muted);font-size:13px;
+  font-family:inherit;font-weight:500;cursor:pointer;
+  transition:all 0.2s;white-space:nowrap;
+}
+.game-tab:hover{color:var(--ink);}
+.game-tab.active{color:var(--ink);background:rgba(255,255,255,0.1);}
+.game-slider{
+  overflow:hidden;position:relative;
+}
+.game-track{
+  display:flex;transition:transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  will-change:transform;
+}
+.game-pane{
+  flex:0 0 100%;min-width:0;
+  display:flex;justify-content:center;align-items:flex-start;
+}
 .games-row{
   display:flex;
   gap:32px;
@@ -332,7 +355,7 @@ footer{
 
 /* WHITEBOARD */
 .wb-wrap{
-  width:100%;margin-top:32px;
+  width:100%;
   backdrop-filter:blur(16px);background:var(--panel);
   border:1px solid rgba(255,255,255,0.08);border-radius:14px;
   padding:0;overflow:hidden;position:relative;
@@ -550,7 +573,7 @@ footer{
   .section-heading{font-size:2rem;}
   nav a{font-size:13px; margin:0 8px;}
   .snake-dpad{display:block;}
-  .games-row{flex-direction:column;align-items:center;}
+  .game-tab{padding:4px 10px;font-size:12px;}
 }
 </style>
 </head>
@@ -558,17 +581,23 @@ footer{
 
 <nav>
   <a href="/" data-en="Home" data-ro="Acasă">Home</a>
-  <a href="/games" data-en="Games" data-ro="Jocuri">Games</a>
+  <div class="nav-sep"></div>
+  <button class="game-tab active" data-tab="0" data-en="Snake" data-ro="Snake">Snake</button>
+  <button class="game-tab" data-tab="1" data-en="Day Trader" data-ro="Day Trader">Day Trader</button>
+  <button class="game-tab" data-tab="2" data-en="Whiteboard" data-ro="Tablă">Whiteboard</button>
+  <div class="nav-sep"></div>
   <button id="lang-toggle">RO</button>
 </nav>
 
 <section id="games" class="reveal">
-  <div class="section-title" data-en="Mini Games" data-ro="Mini Jocuri">Mini Games</div>
-  <div class="section-heading" data-en="Take a Break" data-ro="Ia o Pauză">Take a Break</div>
-  <div class="games-row">
+  <div class="game-slider" id="game-slider">
+    <div class="game-track" id="game-track">
+
+      <!-- PANE 0: SNAKE -->
+      <div class="game-pane">
+        <div class="game-col">
 
     <!-- SNAKE -->
-    <div class="game-col">
       <div class="game-toolbar">
         <div class="snake-score-bar">
           <div><span data-en="Score" data-ro="Scor">Score</span>: <span id="snake-score">0</span></div>
@@ -663,10 +692,12 @@ footer{
           <tbody id="snake-lb-body"></tbody>
         </table>
       </div>
-    </div>
+        </div><!-- /game-col -->
+      </div><!-- /game-pane 0 -->
 
-    <!-- TRADING -->
-    <div class="game-col">
+      <!-- PANE 1: TRADING -->
+      <div class="game-pane">
+        <div class="game-col">
       <div class="trade-panel" id="trade-wrap">
         <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
         <div class="game-toolbar-btns" style="position:absolute;top:12px;right:12px;z-index:3;">
@@ -807,11 +838,11 @@ footer{
           </table>
         </div>
       </div>
-    </div>
+        </div><!-- /game-col -->
+      </div><!-- /game-pane 1 -->
 
-  </div>
-
-  <!-- WHITEBOARD -->
+      <!-- PANE 2: WHITEBOARD -->
+      <div class="game-pane" style="padding:0 16px">
   <div class="wb-wrap" id="wb-wrap">
     <div class="wb-toolbar" id="wb-toolbar">
       <span style="font-size:13px;font-weight:600;color:var(--ink);margin-right:6px" data-en="Whiteboard" data-ro="Tablă">Whiteboard</span>
@@ -892,6 +923,10 @@ footer{
       <div class="wb-ai-guess" id="wb-ai-guess"><span class="wb-ai-icon">&#9733;</span><span id="wb-ai-guess-text"></span></div>
     </div>
   </div>
+      </div><!-- /game-pane 2 -->
+
+    </div><!-- /game-track -->
+  </div><!-- /game-slider -->
 
 </section>
 
@@ -938,6 +973,24 @@ toggle.addEventListener('click', ()=>{
     el.textContent = el.getAttribute(`data-${lang}`);
   });
 });
+
+// Game Tabs
+(function(){
+  const tabs = document.querySelectorAll('nav .game-tab');
+  const track = document.getElementById('game-track');
+  let current = 0;
+
+  function switchTab(idx){
+    if(idx === current) return;
+    current = idx;
+    track.style.transform = `translateX(-${idx * 100}%)`;
+    tabs.forEach(t => t.classList.toggle('active', parseInt(t.dataset.tab) === idx));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => switchTab(parseInt(tab.dataset.tab)));
+  });
+})();
 
 // Snake Game
 (function(){
