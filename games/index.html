@@ -490,6 +490,61 @@ footer{
 .trade-panel:fullscreen{padding:24px;overflow-y:auto;}
 .trade-panel:fullscreen .trade-canvas-wrap{width:100%;max-width:1200px;}
 
+/* SCREEN RECORDER */
+.rec-fab{
+  position:fixed;bottom:24px;right:24px;z-index:1000;
+  width:48px;height:48px;border-radius:50%;border:none;
+  background:rgba(30,33,48,0.92);backdrop-filter:blur(10px);
+  color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);transition:background 0.2s, transform 0.15s;
+}
+.rec-fab:hover{background:rgba(40,44,60,0.95);transform:scale(1.08);}
+.rec-fab.recording{background:rgba(220,38,38,0.85);animation:rec-pulse 1.5s infinite;}
+@keyframes rec-pulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.4);}50%{box-shadow:0 0 0 12px rgba(220,38,38,0);}}
+.rec-fab svg{pointer-events:none;}
+.rec-panel{
+  position:fixed;bottom:80px;right:24px;z-index:1000;
+  background:rgba(30,33,48,0.95);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.1);border-radius:14px;
+  padding:16px;width:340px;max-height:calc(100vh - 100px);overflow-y:auto;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);display:none;
+}
+.rec-panel.visible{display:block;}
+.rec-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.rec-panel-title{font-size:13px;font-weight:600;color:var(--ink);}
+.rec-panel-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;}
+.rec-panel-close:hover{color:var(--ink);}
+.rec-timer{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;color:#ef4444;text-align:center;margin:8px 0;}
+.rec-actions{display:flex;gap:8px;margin-top:8px;}
+.rec-actions button{
+  flex:1;padding:6px 12px;border-radius:8px;border:none;
+  font-size:12px;font-family:inherit;cursor:pointer;font-weight:500;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.rec-btn-stop{background:#ef4444;color:#fff;}
+.rec-btn-stop:hover{background:#dc2626;}
+.rec-btn-rec{background:var(--accent);color:#fff;}
+.rec-btn-rec:hover{opacity:0.85;}
+.rec-library{margin-top:12px;}
+.rec-library-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.rec-item{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:10px;margin-bottom:8px;
+}
+.rec-item video{width:100%;border-radius:6px;background:#000;display:block;margin-bottom:6px;}
+.rec-item-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.rec-item-info{font-size:11px;color:var(--muted);}
+.rec-item-actions{display:flex;gap:6px;}
+.rec-item-actions button{
+  padding:4px 10px;border-radius:6px;border:none;font-size:11px;
+  font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:4px;
+}
+.rec-item-dl{background:rgba(255,255,255,0.1);color:var(--ink);}
+.rec-item-dl:hover{background:rgba(255,255,255,0.15);}
+.rec-item-del{background:rgba(239,68,68,0.15);color:#ef4444;}
+.rec-item-del:hover{background:rgba(239,68,68,0.25);}
+.rec-empty{font-size:12px;color:var(--muted);text-align:center;padding:12px 0;}
+
 /* RESPONSIVE */
 @media (max-width:768px){
   .section-heading{font-size:2rem;}
@@ -839,6 +894,25 @@ footer{
   </div>
 
 </section>
+
+<!-- Screen Recorder -->
+<button class="rec-fab" id="rec-fab" title="Record screen">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg>
+</button>
+<div class="rec-panel" id="rec-panel">
+  <div class="rec-panel-header">
+    <span class="rec-panel-title" id="rec-panel-title">Screen Recorder</span>
+    <button class="rec-panel-close" id="rec-panel-close">&times;</button>
+  </div>
+  <div class="rec-timer" id="rec-timer" style="display:none">00:00</div>
+  <div class="rec-actions" id="rec-actions">
+    <button class="rec-btn-rec" id="rec-start">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg>
+      Record
+    </button>
+  </div>
+  <div class="rec-library" id="rec-library"></div>
+</div>
 
 <footer class="reveal">
   © 2025 TATOMIR N. ALEX PFA. All rights reserved.
@@ -2909,6 +2983,188 @@ Example — a star:
     }
   });
 
+})();
+
+// --- Screen Recorder ---
+(function(){
+  const fab = document.getElementById('rec-fab');
+  const panel = document.getElementById('rec-panel');
+  const panelTitle = document.getElementById('rec-panel-title');
+  const panelClose = document.getElementById('rec-panel-close');
+  const timerEl = document.getElementById('rec-timer');
+  const actions = document.getElementById('rec-actions');
+  const library = document.getElementById('rec-library');
+  const startBtn = document.getElementById('rec-start');
+
+  let mediaRecorder = null;
+  let recordedChunks = [];
+  let stream = null;
+  let timerInterval = null;
+  let startTime = 0;
+  let mimeType = 'video/webm';
+
+  // Library: array of { blobUrl, duration, timestamp }
+  const recordings = [];
+
+  function formatTime(ms){
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const ss = s % 60;
+    return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+  }
+
+  function formatTimestamp(ts){
+    const d = new Date(ts);
+    return d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  }
+
+  function showPanel(){ panel.classList.add('visible'); }
+  function hidePanel(){ panel.classList.remove('visible'); }
+
+  function setIdle(){
+    fab.classList.remove('recording');
+    fab.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></svg>';
+    timerEl.style.display = 'none';
+    panelTitle.textContent = 'Screen Recorder';
+    actions.innerHTML = `<button class="rec-btn-rec" id="rec-start-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="12" r="10"/></svg>
+      Record</button>`;
+    document.getElementById('rec-start-btn').addEventListener('click', startRecording);
+  }
+
+  function setRecording(){
+    fab.classList.add('recording');
+    fab.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+    panelTitle.textContent = 'Recording...';
+    timerEl.style.display = 'block';
+    timerEl.textContent = '00:00';
+    actions.innerHTML = '<button class="rec-btn-stop" id="rec-stop"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg> Stop</button>';
+    document.getElementById('rec-stop').addEventListener('click', stopRecording);
+  }
+
+  function renderLibrary(){
+    if(recordings.length === 0){
+      library.innerHTML = '<div class="rec-empty">No recordings yet</div>';
+      return;
+    }
+    library.innerHTML = '<div class="rec-library-title">Recordings</div>';
+    // Show newest first
+    for(let i = recordings.length - 1; i >= 0; i--){
+      const rec = recordings[i];
+      const item = document.createElement('div');
+      item.className = 'rec-item';
+      item.innerHTML = `
+        <video src="${rec.blobUrl}" controls playsinline preload="metadata"></video>
+        <div class="rec-item-meta">
+          <span class="rec-item-info">${formatTimestamp(rec.timestamp)} &middot; ${formatTime(rec.duration)}</span>
+          <div class="rec-item-actions">
+            <button class="rec-item-dl" data-idx="${i}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save</button>
+            <button class="rec-item-del" data-idx="${i}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+          </div>
+        </div>`;
+      library.appendChild(item);
+    }
+
+    library.querySelectorAll('.rec-item-dl').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.dataset.idx);
+        const rec = recordings[idx];
+        const a = document.createElement('a');
+        a.href = rec.blobUrl;
+        const ts = new Date(rec.timestamp).toISOString().replace(/[:.]/g,'-').slice(0,19);
+        a.download = `recording-${ts}.webm`;
+        a.click();
+      });
+    });
+
+    library.querySelectorAll('.rec-item-del').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const idx = parseInt(btn.dataset.idx);
+        URL.revokeObjectURL(recordings[idx].blobUrl);
+        recordings.splice(idx, 1);
+        renderLibrary();
+      });
+    });
+  }
+
+  async function startRecording(){
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true
+      });
+    } catch(e){
+      return; // User cancelled
+    }
+
+    recordedChunks = [];
+    mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ? 'video/webm;codecs=vp9'
+      : 'video/webm';
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+    mediaRecorder.ondataavailable = (e) => {
+      if(e.data.size > 0) recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const duration = Date.now() - startTime;
+      clearInterval(timerInterval);
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+
+      const blob = new Blob(recordedChunks, { type: mimeType });
+      const blobUrl = URL.createObjectURL(blob);
+      recordings.push({ blobUrl, duration, timestamp: Date.now() });
+
+      setIdle();
+      renderLibrary();
+      showPanel();
+    };
+
+    // Stop if user ends sharing via browser UI
+    stream.getVideoTracks()[0].addEventListener('ended', () => {
+      if(mediaRecorder && mediaRecorder.state !== 'inactive'){
+        mediaRecorder.stop();
+      }
+    });
+
+    mediaRecorder.start(100);
+    startTime = Date.now();
+    timerInterval = setInterval(() => {
+      timerEl.textContent = formatTime(Date.now() - startTime);
+    }, 500);
+
+    setRecording();
+    showPanel();
+  }
+
+  function stopRecording(){
+    if(mediaRecorder && mediaRecorder.state !== 'inactive'){
+      mediaRecorder.stop();
+    }
+  }
+
+  // FAB click: toggle panel, or stop if recording
+  fab.addEventListener('click', ()=>{
+    if(mediaRecorder && mediaRecorder.state === 'recording'){
+      stopRecording();
+      return;
+    }
+    panel.classList.toggle('visible');
+  });
+
+  panelClose.addEventListener('click', hidePanel);
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && panel.classList.contains('visible')){
+      hidePanel();
+    }
+  });
+
+  // Init
+  startBtn.addEventListener('click', startRecording);
+  renderLibrary();
 })();
 </script>
 
