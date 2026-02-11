@@ -504,6 +504,78 @@ footer{
 @keyframes wb-pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
 .wb-ai-guess.loading .wb-ai-icon{animation:wb-pulse 1s infinite;}
 
+/* Collaboration */
+.wb-collab{display:flex;align-items:center;gap:4px;margin-left:2px;}
+.wb-collab .wb-btn{font-size:11px;padding:2px 8px;gap:3px;display:inline-flex;align-items:center;}
+.wb-collab-input{width:90px;padding:2px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.3);color:var(--ink);font-size:11px;font-family:'SF Mono',monospace;outline:none;}
+.wb-collab-input:focus{border-color:var(--accent);}
+.wb-collab-input::placeholder{color:rgba(255,255,255,0.25);}
+.wb-collab-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);}
+.wb-collab-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;}
+.wb-collab-dot.on{background:#34d399;}
+.wb-collab-peers{font-size:10px;color:var(--muted);margin-left:2px;}
+
+/* Chat */
+.wb-chat-row{display:flex;gap:0;}
+.wb-chat{
+  width:240px;flex-shrink:0;display:flex;flex-direction:column;
+  border-left:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.25);
+}
+.wb-chat-header{
+  padding:8px 12px;font-size:11px;font-weight:600;color:var(--muted);
+  border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:6px;
+}
+.wb-chat-nick{
+  padding:2px 6px;border-radius:4px;border:1px solid rgba(255,255,255,0.1);
+  background:rgba(0,0,0,0.3);color:var(--ink);font-size:11px;outline:none;
+  width:80px;font-family:inherit;
+}
+.wb-chat-nick:focus{border-color:var(--accent);}
+.wb-chat-msgs{
+  flex:1;overflow-y:auto;padding:10px 10px;min-height:120px;max-height:400px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.wb-chat-bubble{
+  max-width:82%;padding:7px 11px;border-radius:16px;
+  font-size:11px;line-height:1.45;word-break:break-word;
+  position:relative;
+}
+.wb-chat-bubble.mine{
+  align-self:flex-end;
+  background:var(--accent);color:#fff;
+  border-bottom-right-radius:4px;
+}
+.wb-chat-bubble.theirs{
+  align-self:flex-start;
+  background:rgba(255,255,255,0.1);color:var(--ink);
+  border-bottom-left-radius:4px;
+}
+.wb-chat-bubble .wb-chat-nick-label{
+  display:block;font-size:9px;font-weight:700;margin-bottom:2px;
+  opacity:0.7;letter-spacing:0.3px;
+}
+.wb-chat-bubble.mine .wb-chat-nick-label{color:rgba(255,255,255,0.7);}
+.wb-chat-bubble.theirs .wb-chat-nick-label{color:var(--accent);}
+.wb-chat-sys{
+  text-align:center;font-size:10px;color:var(--muted);
+  font-style:italic;padding:2px 0;
+}
+.wb-chat-input-row{
+  display:flex;border-top:1px solid rgba(255,255,255,0.06);
+  align-items:center;gap:0;
+}
+.wb-chat-input{
+  flex:1;padding:9px 12px;border:none;background:transparent;
+  color:var(--ink);font-size:12px;font-family:inherit;outline:none;
+}
+.wb-chat-input::placeholder{color:rgba(255,255,255,0.2);}
+.wb-chat-send{
+  padding:6px 8px;margin-right:4px;background:none;border:none;color:var(--accent);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:0.15s;
+}
+.wb-chat-send:hover{background:rgba(79,140,255,0.15);}
+
 /* FULLSCREEN */
 .snake-canvas-wrap:fullscreen, .trade-panel:fullscreen{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -877,15 +949,15 @@ footer{
       <span style="font-size:13px;font-weight:600;color:var(--ink);margin-right:6px" data-en="Whiteboard" data-ro="Tablă">Whiteboard</span>
       <div class="wb-sep"></div>
       <div class="wb-toolbar-group" id="wb-tools">
-        <button class="wb-btn active" data-tool="pen" title="Pen (P)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></button>
-        <button class="wb-btn" data-tool="line" title="Line (L)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/></svg></button>
+        <button class="wb-btn active" data-tool="pen" title="Pen (P)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 00-3.986-3.987L3.842 16.174a2 2 0 00-.5.83l-1.321 4.352a.5.5 0 00.623.622l4.353-1.32a2 2 0 00.83-.497z"/></svg></button>
+        <button class="wb-btn" data-tool="line" title="Line (L)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20L20 4"/></svg></button>
         <button class="wb-btn" data-tool="rect" title="Rectangle (R)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
-        <button class="wb-btn" data-tool="ellipse" title="Ellipse (E)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="7"/></svg></button>
-        <button class="wb-btn" data-tool="arrow" title="Arrow (A)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/><polyline points="10 5 19 5 19 14"/></svg></button>
-        <button class="wb-btn" data-tool="highlighter" title="Highlighter (H)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 4.5l4 4L8 20H4v-4z"/><path d="M12.5 7.5l4 4"/></svg></button>
-        <button class="wb-btn" data-tool="text" title="Text (T)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9.5" y1="20" x2="14.5" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></button>
-        <button class="wb-btn" data-tool="eraser" title="Eraser (X)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l9-9 8 8-4 4z"/><path d="M6.5 13.5l5 5"/></svg></button>
-        <button class="wb-btn" data-tool="hand" title="Hand / Pan (G or Space+drag)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 00-4 0v1"/><path d="M14 10V4a2 2 0 00-4 0v6"/><path d="M10 10.5V5a2 2 0 00-4 0v9"/><path d="M18 11a2 2 0 014 0v3a8 8 0 01-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.66-3.66a2 2 0 012.83-2.83L7 15"/></svg></button>
+        <button class="wb-btn" data-tool="ellipse" title="Ellipse (E)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></button>
+        <button class="wb-btn" data-tool="arrow" title="Arrow (A)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button class="wb-btn" data-tool="highlighter" title="Highlighter (H)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 01-2.8 0l-5.2-5.2a2 2 0 010-2.8L14 4"/></svg></button>
+        <button class="wb-btn" data-tool="text" title="Text (T)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
+        <button class="wb-btn" data-tool="eraser" title="Eraser (X)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
+        <button class="wb-btn" data-tool="hand" title="Hand / Pan (G or Space+drag)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 10-4 0v5"/><path d="M14 10V4a2 2 0 10-4 0v6"/><path d="M10 9.5V4a2 2 0 10-4 0v10"/><path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.66-3.66a2 2 0 112.83-2.83L7 15"/></svg></button>
       </div>
       <div class="wb-sep"></div>
       <div class="wb-toolbar-group" id="wb-colors">
@@ -904,7 +976,7 @@ footer{
       </div>
       <div class="wb-sep"></div>
       <div class="wb-toolbar-group">
-        <span style="font-size:10px;color:var(--muted)">&#9681;</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20z" fill="currentColor" stroke="none"/></svg>
         <input type="range" class="wb-opacity-slider" id="wb-opacity" min="10" max="100" value="100">
         <span class="wb-size-label" id="wb-opacity-label">100%</span>
       </div>
@@ -912,21 +984,29 @@ footer{
       <label class="wb-fill-toggle" title="Fill shapes"><input type="checkbox" id="wb-fill-check"> Fill</label>
       <label class="wb-fill-toggle" title="Show grid"><input type="checkbox" id="wb-grid-check"> Grid</label>
       <div class="wb-toolbar-right">
-        <button class="wb-btn" id="wb-undo-btn" title="Undo (Ctrl+Z)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 105.64-11.36L1 10"/></svg></button>
-        <button class="wb-btn" id="wb-redo-btn" title="Redo (Ctrl+Y)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-5.64-11.36L23 10"/></svg></button>
-        <button class="wb-btn" id="wb-clear-btn" title="Clear All"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+        <button class="wb-btn" id="wb-undo-btn" title="Undo (Ctrl+Z)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg></button>
+        <button class="wb-btn" id="wb-redo-btn" title="Redo (Ctrl+Y)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg></button>
+        <button class="wb-btn" id="wb-clear-btn" title="Clear All"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
         <div class="wb-sep"></div>
-        <button class="wb-btn" id="wb-download-btn" title="Save as PNG"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        <button class="wb-btn" id="wb-download-btn" title="Save as PNG"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M8 5H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-4"/></svg></button>
         <div class="wb-sep"></div>
-        <button class="wb-btn wb-zoom-btn" id="wb-zoom-out" title="Zoom Out (Ctrl+-)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button class="wb-btn wb-zoom-btn" id="wb-zoom-out" title="Zoom Out (Ctrl+-)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></button>
         <span class="wb-zoom-label" id="wb-zoom-label" title="Double-click to reset zoom">100%</span>
-        <button class="wb-btn wb-zoom-btn" id="wb-zoom-in" title="Zoom In (Ctrl++)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button class="wb-btn wb-zoom-btn" id="wb-zoom-in" title="Zoom In (Ctrl++)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg></button>
         <div class="wb-sep"></div>
-        <button class="wb-btn" id="wb-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg></button>
+        <button class="wb-btn" id="wb-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+        <div class="wb-sep"></div>
+        <div class="wb-collab" id="wb-collab">
+          <input class="wb-collab-input" id="wb-room-input" placeholder="Room name">
+          <button class="wb-btn" id="wb-connect-btn" title="Connect to room"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></button>
+          <span class="wb-collab-status" id="wb-collab-status" style="display:none"><span class="wb-collab-dot" id="wb-collab-dot"></span><span id="wb-collab-text"></span></span>
+          <span class="wb-collab-peers" id="wb-collab-peers" style="display:none"></span>
+          <button class="wb-btn" id="wb-disconnect-btn" style="display:none" title="Disconnect"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        </div>
         <div class="wb-sep"></div>
         <div style="position:relative;display:flex;align-items:center;gap:3px">
-          <button class="wb-btn wb-ai-btn" id="wb-ai-btn" title="AI Guess (right-click to change key)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg></button>
-          <button class="wb-btn wb-ai-btn" id="wb-ai-draw-btn" title="AI Draw (right-click to change key)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></button>
+          <button class="wb-btn wb-ai-btn" id="wb-ai-btn" title="AI Guess (right-click to change key)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.581a.5.5 0 010 .964L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z"/></svg></button>
+          <button class="wb-btn wb-ai-btn" id="wb-ai-draw-btn" title="AI Draw (right-click to change key)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 01-1.287 1.288L3 12l5.8 1.9a2 2 0 011.288 1.288L12 21l1.9-5.8a2 2 0 011.287-1.288L21 12l-5.8-1.9a2 2 0 01-1.288-1.288z"/><path d="M2 8V2h6"/></svg></button>
           <div class="wb-ai-popover" id="wb-ai-popover">
             <label>OpenAI API Key</label>
             <input type="password" id="wb-ai-key" placeholder="sk-..." spellcheck="false" autocomplete="off">
@@ -946,10 +1026,23 @@ footer{
         </div>
       </div>
     </div>
-    <div class="wb-canvas-area" id="wb-canvas-area">
-      <canvas id="wb-canvas" width="1200" height="600"></canvas>
-      <canvas id="wb-grid" class="wb-grid-canvas" width="1200" height="600"></canvas>
-      <div class="wb-ai-guess" id="wb-ai-guess"><span class="wb-ai-icon">&#9733;</span><span id="wb-ai-guess-text"></span></div>
+    <div class="wb-chat-row">
+      <div class="wb-canvas-area" id="wb-canvas-area" style="flex:1;min-width:0">
+        <canvas id="wb-canvas" width="1200" height="600"></canvas>
+        <canvas id="wb-grid" class="wb-grid-canvas" width="1200" height="600"></canvas>
+        <div class="wb-ai-guess" id="wb-ai-guess"><span class="wb-ai-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.581a.5.5 0 010 .964L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z"/></svg></span><span id="wb-ai-guess-text"></span></div>
+      </div>
+      <div class="wb-chat" id="wb-chat" style="display:none">
+        <div class="wb-chat-header">
+          Chat
+          <input class="wb-chat-nick" id="wb-chat-nick" placeholder="Nickname" spellcheck="false" autocomplete="off">
+        </div>
+        <div class="wb-chat-msgs" id="wb-chat-msgs"></div>
+        <div class="wb-chat-input-row">
+          <input class="wb-chat-input" id="wb-chat-input" placeholder="Type a message..." spellcheck="false" autocomplete="off">
+          <button class="wb-chat-send" id="wb-chat-send" title="Send"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+        </div>
+      </div>
     </div>
   </div>
       </div><!-- /game-pane 2 -->
@@ -983,6 +1076,7 @@ footer{
 </footer>
 
 <script src="data/spy_data.js"></script>
+<script src="https://unpkg.com/peerjs@1/dist/peerjs.min.js"></script>
 <script>
 // Reveal animations
 const observer = new IntersectionObserver(entries=>{
@@ -1014,11 +1108,24 @@ toggle.addEventListener('click', ()=>{
     current = idx;
     track.style.transform = `translateX(-${idx * 100}%)`;
     tabs.forEach(t => t.classList.toggle('active', parseInt(t.dataset.tab) === idx));
+    try { sessionStorage.setItem('game-tab', idx); } catch(e){}
   }
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => switchTab(parseInt(tab.dataset.tab)));
   });
+
+  // Restore tab from session (skip transition on load)
+  try {
+    const saved = parseInt(sessionStorage.getItem('game-tab'));
+    if(saved > 0 && saved < tabs.length){
+      track.style.transition = 'none';
+      current = -1;
+      switchTab(saved);
+      // Re-enable transition after paint
+      requestAnimationFrame(() => { track.style.transition = ''; });
+    }
+  } catch(e){}
 })();
 
 // Snake Game
@@ -1878,10 +1985,11 @@ toggle.addEventListener('click', ()=>{
 
   function deepClone(arr){ return JSON.parse(JSON.stringify(arr)); }
 
-  function saveState(){
+  function saveState(broadcastType, broadcastData){
     undoStack.push(deepClone(objects));
     if(undoStack.length > MAX_HISTORY) undoStack.shift();
     redoStack = [];
+    if(broadcastType) collabBroadcast({type:broadcastType, ...(broadcastData||{})});
   }
 
   // --- Coordinate conversion ---
@@ -2170,11 +2278,12 @@ toggle.addEventListener('click', ()=>{
       const sy = (box.top - rect.top) * scaleY;
       const wpos = screenToWorld(sx, sy);
       const fontSize = parseFloat(activeTextInput.style.fontSize) * scaleX / zoom;
-      objects.push({
+      const textObj = {
         type:'text', x: wpos.x + 4/zoom, y: wpos.y + 2/zoom,
         text: txt, fontSize, color, opacity
-      });
-      saveState();
+      };
+      objects.push(textObj);
+      saveState('add', {obj: deepClone(textObj)});
       render();
     }
     activeTextInput.remove();
@@ -2361,21 +2470,26 @@ toggle.addEventListener('click', ()=>{
 
     if(tool === 'pen' || tool === 'highlighter'){
       if(currentObj){
-        objects.push(currentObj);
+        const obj = currentObj;
+        objects.push(obj);
         currentObj = null;
-        saveState(); render();
+        saveState('add', {obj: deepClone(obj)}); render();
       }
     } else if(tool === 'eraser'){
-      if(eraserDirty) saveState();
+      if(eraserDirty){
+        saveState();
+        collabBroadcast({type:'erase', objects: deepClone(objects)});
+      }
     } else {
       // Finalize shape
       const c = constrain(startWX, startWY, pos.x, pos.y);
-      objects.push({
+      const obj = {
         type:tool, x1:startWX, y1:startWY, x2:c.x2, y2:c.y2,
         color, lineWidth, opacity, fill:fillShapes
-      });
+      };
+      objects.push(obj);
       previewShape = null;
-      saveState(); render();
+      saveState('add', {obj: deepClone(obj)}); render();
     }
   }
 
@@ -2502,6 +2616,7 @@ toggle.addEventListener('click', ()=>{
     redoStack.push(undoStack.pop());
     objects = deepClone(undoStack[undoStack.length-1]);
     render();
+    collabBroadcast({type:'undo', objects: deepClone(objects)});
   }
   function redo(){
     if(redoStack.length === 0) return;
@@ -2509,6 +2624,7 @@ toggle.addEventListener('click', ()=>{
     undoStack.push(state);
     objects = deepClone(state);
     render();
+    collabBroadcast({type:'redo', objects: deepClone(objects)});
   }
   document.getElementById('wb-undo-btn').addEventListener('click', undo);
   document.getElementById('wb-redo-btn').addEventListener('click', redo);
@@ -2519,6 +2635,7 @@ toggle.addEventListener('click', ()=>{
     if(!confirm('Clear the whiteboard?')) return;
     objects = [];
     saveState(); render();
+    collabBroadcast({type:'clear', objects:[]});
   });
 
   // Download — renders all objects to a tight bounding box PNG
@@ -3041,13 +3158,15 @@ Example — a star:
           y: p.y * scale + offsetY
         }));
         if(pts.length > 0){
-          objects.push({
+          const aiObj = {
             type: 'pen',
             points: pts,
             color: s.color || color,
             lineWidth: Math.max(1, s.width * scale),
             opacity: 1
-          });
+          };
+          objects.push(aiObj);
+          collabBroadcast({type:'add', obj: deepClone(aiObj)});
           render();
         }
         strokeIdx++;
@@ -3064,6 +3183,273 @@ Example — a star:
       aiDrawGo.disabled = false;
     }
   });
+
+  // --- Multiplayer Collaboration via PeerJS ---
+  let collabPeer = null;
+  let collabConns = [];
+  let collabIsHost = false;
+  let collabRoomId = null;
+
+  const roomInput = document.getElementById('wb-room-input');
+  const connectBtn = document.getElementById('wb-connect-btn');
+  const collabStatus = document.getElementById('wb-collab-status');
+  const collabDot = document.getElementById('wb-collab-dot');
+  const collabText = document.getElementById('wb-collab-text');
+  const collabPeersEl = document.getElementById('wb-collab-peers');
+  const collabDisconnectBtn = document.getElementById('wb-disconnect-btn');
+
+  // Chat elements
+  const chatEl = document.getElementById('wb-chat');
+  const chatMsgs = document.getElementById('wb-chat-msgs');
+  const chatInput = document.getElementById('wb-chat-input');
+  const chatSendBtn = document.getElementById('wb-chat-send');
+  const chatNickInput = document.getElementById('wb-chat-nick');
+
+  const _adj = ['Swift','Bold','Chill','Neon','Pixel','Dusk','Zen','Vivid','Amber','Cobalt','Lucky','Tiny','Warm','Cool','Bright','Silent','Wild','Calm','Fuzzy','Misty','Snowy','Stormy','Sunny','Rusty','Dizzy','Lazy','Witty','Jolly','Brave','Spicy'];
+  const _noun = ['Fox','Owl','Cat','Wolf','Bear','Lynx','Crow','Hare','Frog','Moth','Panda','Otter','Raven','Finch','Whale','Shark','Tiger','Koala','Moose','Llama','Gecko','Robin','Crane','Bison','Viper','Sloth','Dingo','Hippo','Lemur','Quail'];
+  function randomNick(){ return _adj[Math.random()*_adj.length|0] + _noun[Math.random()*_noun.length|0] + (Math.random()*90+10|0); }
+  let chatNick = localStorage.getItem('wb-chat-nick') || randomNick();
+  if(!localStorage.getItem('wb-chat-nick')) localStorage.setItem('wb-chat-nick', chatNick);
+  chatNickInput.value = chatNick;
+
+  chatNickInput.addEventListener('input', () => {
+    chatNick = chatNickInput.value.trim() || chatNick;
+    localStorage.setItem('wb-chat-nick', chatNick);
+  });
+  chatNickInput.addEventListener('keydown', (e) => e.stopPropagation());
+
+  // Track last nick to avoid repeating name on consecutive messages
+  let lastChatNick = null;
+
+  function chatAppend(nick, text, isMine, sys){
+    if(sys){
+      const div = document.createElement('div');
+      div.className = 'wb-chat-sys';
+      div.textContent = text;
+      chatMsgs.appendChild(div);
+      lastChatNick = null;
+    } else {
+      const div = document.createElement('div');
+      div.className = 'wb-chat-bubble ' + (isMine ? 'mine' : 'theirs');
+      // Show nick label if different from last sender
+      if(nick !== lastChatNick){
+        const label = document.createElement('span');
+        label.className = 'wb-chat-nick-label';
+        label.textContent = nick;
+        div.appendChild(label);
+      }
+      div.appendChild(document.createTextNode(text));
+      lastChatNick = nick;
+      chatMsgs.appendChild(div);
+    }
+    chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  }
+
+  function chatSend(){
+    const text = chatInput.value.trim();
+    if(!text) return;
+    chatInput.value = '';
+    chatAppend(chatNick, text, true);
+    collabBroadcast({type:'chat', nick:chatNick, text});
+  }
+
+  chatSendBtn.addEventListener('click', chatSend);
+  chatInput.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if(e.key === 'Enter') chatSend();
+  });
+
+  function chatClear(){
+    chatMsgs.innerHTML = '';
+    lastChatNick = null;
+  }
+
+  function collabUpdateUI(){
+    const connected = collabPeer && !collabPeer.destroyed;
+    collabStatus.style.display = connected ? 'inline-flex' : 'none';
+    collabDot.classList.toggle('on', connected && collabConns.length > 0);
+    collabText.textContent = connected ? (collabConns.length > 0 ? 'Connected' : 'Waiting...') : '';
+    collabPeersEl.style.display = collabConns.length > 0 ? 'inline' : 'none';
+    collabPeersEl.textContent = collabConns.length + ' peer' + (collabConns.length !== 1 ? 's' : '');
+    collabDisconnectBtn.style.display = connected ? 'flex' : 'none';
+    connectBtn.style.display = connected ? 'none' : 'flex';
+    roomInput.disabled = !!connected;
+    if(connected && collabRoomId) roomInput.value = collabRoomId;
+    chatEl.style.display = connected ? 'flex' : 'none';
+  }
+
+  function collabSend(conn, msg){
+    try { conn.send(JSON.stringify(msg)); } catch(e){}
+  }
+
+  function collabBroadcast(msg){
+    collabConns.forEach(c => collabSend(c, msg));
+  }
+
+  function collabHandleMessage(raw, fromConn){
+    let msg;
+    try { msg = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch(e){ return; }
+    if(msg.type === 'sync'){
+      objects = deepClone(msg.objects);
+      undoStack = [deepClone(objects)];
+      redoStack = [];
+      render();
+    } else if(msg.type === 'add'){
+      objects.push(deepClone(msg.obj));
+      undoStack.push(deepClone(objects));
+      if(undoStack.length > MAX_HISTORY) undoStack.shift();
+      redoStack = [];
+      render();
+    } else if(msg.type === 'undo' || msg.type === 'redo' || msg.type === 'clear' || msg.type === 'erase'){
+      objects = deepClone(msg.objects);
+      undoStack.push(deepClone(objects));
+      if(undoStack.length > MAX_HISTORY) undoStack.shift();
+      redoStack = [];
+      render();
+    } else if(msg.type === 'chat'){
+      chatAppend(msg.nick || '?', msg.text || '', false);
+    } else if(msg.type === 'join-announce'){
+      chatAppend(null, msg.nick + ' joined', false, true);
+    }
+    // Host relays to all other guests
+    if(collabIsHost){
+      collabConns.forEach(c => {
+        if(c !== fromConn) collabSend(c, msg);
+      });
+    }
+  }
+
+  function collabSetupConn(conn){
+    collabConns.push(conn);
+    collabUpdateUI();
+    conn.on('data', (data) => collabHandleMessage(data, conn));
+    conn.on('close', () => {
+      collabConns = collabConns.filter(c => c !== conn);
+      collabUpdateUI();
+    });
+    conn.on('error', () => {
+      collabConns = collabConns.filter(c => c !== conn);
+      collabUpdateUI();
+    });
+  }
+
+  function collabSaveSession(){
+    try {
+      if(collabRoomId){
+        sessionStorage.setItem('wb-collab', JSON.stringify({id:collabRoomId, host:collabIsHost}));
+      } else {
+        sessionStorage.removeItem('wb-collab');
+      }
+    } catch(e){}
+  }
+
+  // Try to join first; if the room doesn't exist, become the host
+  function connectToRoom(name){
+    if(!name) return;
+    if(collabPeer) collabDisconnect(true);
+    collabRoomId = name;
+    collabIsHost = false;
+    collabPeer = new Peer();
+    collabPeer.on('open', () => {
+      const conn = collabPeer.connect(name, {reliable:true});
+      let opened = false;
+      conn.on('open', () => {
+        opened = true;
+        collabSetupConn(conn);
+        collabSend(conn, {type:'join-announce', nick:chatNick});
+        collabSaveSession();
+        collabUpdateUI();
+      });
+      conn.on('error', () => {
+        if(!opened) becomeHost(name, 0);
+      });
+      // Timeout: if not connected within 3s, host it
+      setTimeout(() => {
+        if(!opened && collabPeer && !collabPeer.destroyed){
+          try { conn.close(); } catch(e){}
+          becomeHost(name, 0);
+        }
+      }, 3000);
+    });
+    collabPeer.on('error', (err) => {
+      console.warn('PeerJS error:', err);
+    });
+    collabUpdateUI();
+  }
+
+  function becomeHost(name, retries){
+    if(collabPeer){ try { collabPeer.destroy(); } catch(e){} }
+    collabPeer = null;
+    collabConns = [];
+    collabRoomId = name;
+    collabIsHost = true;
+    collabPeer = new Peer(name);
+    collabPeer.on('open', () => {
+      collabSaveSession();
+      collabUpdateUI();
+      chatAppend(null, 'Room created — waiting for others', false, true);
+    });
+    collabPeer.on('connection', (conn) => {
+      conn.on('open', () => {
+        collabSetupConn(conn);
+        collabSend(conn, {type:'sync', objects: deepClone(objects)});
+      });
+    });
+    collabPeer.on('error', (err) => {
+      if(err.type === 'unavailable-id'){
+        collabPeer.destroy();
+        collabPeer = null;
+        if(retries < 5){
+          // Stale ID on signaling server — retry after delay
+          setTimeout(() => becomeHost(name, retries + 1), 1500);
+        } else {
+          // Give up hosting, try joining instead
+          connectToRoom(name);
+        }
+      } else {
+        console.warn('PeerJS error:', err);
+      }
+    });
+    collabUpdateUI();
+  }
+
+  function collabDisconnect(skipSessionClear){
+    collabConns.forEach(c => { try { c.close(); } catch(e){} });
+    collabConns = [];
+    if(collabPeer){ try { collabPeer.destroy(); } catch(e){} }
+    collabPeer = null;
+    collabIsHost = false;
+    collabRoomId = null;
+    if(!skipSessionClear){
+      try { sessionStorage.removeItem('wb-collab'); } catch(e){}
+    }
+    chatClear();
+    collabUpdateUI();
+  }
+
+  connectBtn.addEventListener('click', () => {
+    const name = roomInput.value.trim();
+    if(!name || name.length < 2) return;
+    connectToRoom(name);
+  });
+
+  roomInput.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if(e.key === 'Enter') connectBtn.click();
+  });
+
+  collabDisconnectBtn.addEventListener('click', () => collabDisconnect());
+
+  // Auto-reconnect from session
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('wb-collab'));
+    if(saved && saved.id){
+      roomInput.value = saved.id;
+      // If we were the host, go straight to hosting (skip join attempt)
+      if(saved.host) becomeHost(saved.id, 0);
+      else connectToRoom(saved.id);
+    }
+  } catch(e){}
 
 })();
 
