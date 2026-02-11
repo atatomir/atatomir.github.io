@@ -567,6 +567,35 @@ footer{
 .rec-item-del{background:rgba(239,68,68,0.15);color:#ef4444;}
 .rec-item-del:hover{background:rgba(239,68,68,0.25);}
 .rec-empty{font-size:12px;color:var(--muted);text-align:center;padding:12px 0;}
+.rec-item-trim{background:rgba(139,92,246,0.15);color:#a78bfa;}
+.rec-item-trim:hover{background:rgba(139,92,246,0.25);}
+.rec-trim-overlay{
+  display:none;position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
+  flex-direction:column;align-items:center;justify-content:center;padding:24px;
+}
+.rec-trim-overlay.visible{display:flex;}
+.rec-trim-overlay video{
+  max-width:min(90vw, 800px);max-height:55vh;width:auto;height:auto;
+  border-radius:10px;background:#000;display:block;
+}
+.rec-trim-controls{
+  width:min(90vw, 800px);margin-top:16px;
+  background:rgba(30,33,48,0.95);border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;padding:16px;
+}
+.rec-trim-times{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:8px;font-variant-numeric:tabular-nums;}
+.rec-trim-track{position:relative;height:32px;background:rgba(255,255,255,0.08);border-radius:6px;cursor:pointer;touch-action:none;user-select:none;}
+.rec-trim-range{position:absolute;top:0;height:100%;background:rgba(139,92,246,0.3);border-radius:6px;pointer-events:none;}
+.rec-trim-handle{position:absolute;top:50%;width:18px;height:18px;background:#a78bfa;border:2px solid #fff;border-radius:50%;transform:translate(-50%,-50%);cursor:grab;touch-action:none;z-index:1;}
+.rec-trim-handle:active{cursor:grabbing;background:#c4b5fd;}
+.rec-trim-actions{display:flex;gap:8px;margin-top:12px;}
+.rec-trim-actions button{flex:1;padding:8px 14px;border-radius:8px;border:none;font-size:13px;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:500;}
+.rec-trim-save{background:rgba(139,92,246,0.4);color:#e0d4fc;}
+.rec-trim-save:hover{background:rgba(139,92,246,0.55);}
+.rec-trim-save:disabled{opacity:0.5;cursor:not-allowed;}
+.rec-trim-cancel{background:rgba(255,255,255,0.1);color:var(--muted);}
+.rec-trim-cancel:hover{background:rgba(255,255,255,0.15);}
 
 /* RESPONSIVE */
 @media (max-width:768px){
@@ -3112,6 +3141,7 @@ Example — a star:
           <span class="rec-item-info">${formatTimestamp(rec.timestamp)} &middot; ${formatTime(rec.duration)}</span>
           <div class="rec-item-actions">
             <button class="rec-item-dl" data-idx="${i}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Save</button>
+            <button class="rec-item-trim" data-idx="${i}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg> Trim</button>
             <button class="rec-item-del" data-idx="${i}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
           </div>
         </div>`;
@@ -3138,6 +3168,185 @@ Example — a star:
         renderLibrary();
       });
     });
+
+    // Trim button: open overlay
+    library.querySelectorAll('.rec-item-trim').forEach(btn => {
+      btn.addEventListener('click', ()=> openTrimOverlay(parseInt(btn.dataset.idx)));
+    });
+  }
+
+  // --- Trim overlay ---
+  let trimOverlay = null;
+
+  function formatTimeSec(sec){
+    sec = Math.max(0, sec);
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    const ms = Math.floor((sec % 1) * 10);
+    return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${ms}`;
+  }
+
+  function openTrimOverlay(idx){
+    closeTrimOverlay();
+    const rec = recordings[idx];
+    const dur = rec.duration / 1000;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'rec-trim-overlay visible';
+    overlay._trimStart = 0;
+    overlay._trimEnd = dur;
+    overlay._duration = dur;
+    overlay._idx = idx;
+
+    overlay.innerHTML = `
+      <video src="${rec.blobUrl}" controls playsinline preload="auto"></video>
+      <div class="rec-trim-controls">
+        <div class="rec-trim-times">
+          <span class="rec-trim-start">${formatTimeSec(0)}</span>
+          <span class="rec-trim-end">${formatTimeSec(dur)}</span>
+        </div>
+        <div class="rec-trim-track">
+          <div class="rec-trim-range" style="left:0%;width:100%"></div>
+          <div class="rec-trim-handle rec-trim-handle-start" style="left:0%"></div>
+          <div class="rec-trim-handle rec-trim-handle-end" style="left:100%"></div>
+        </div>
+        <div class="rec-trim-actions">
+          <button class="rec-trim-save">✂ Save Trimmed</button>
+          <button class="rec-trim-cancel">Cancel</button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(overlay);
+    trimOverlay = overlay;
+
+    const video = overlay.querySelector('video');
+    const track = overlay.querySelector('.rec-trim-track');
+
+    // Handle dragging
+    let activeHandle = null;
+
+    track.addEventListener('pointerdown', e => {
+      const rect = track.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const time = pct * overlay._duration;
+      const dStart = Math.abs(time - overlay._trimStart);
+      const dEnd = Math.abs(time - overlay._trimEnd);
+      activeHandle = dStart <= dEnd ? 'start' : 'end';
+      moveHandle(e);
+      track.setPointerCapture(e.pointerId);
+    });
+
+    function moveHandle(e){
+      const rect = track.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const time = pct * overlay._duration;
+      if(activeHandle === 'start'){
+        overlay._trimStart = Math.max(0, Math.min(time, overlay._trimEnd - 0.1));
+      } else {
+        overlay._trimEnd = Math.min(overlay._duration, Math.max(time, overlay._trimStart + 0.1));
+      }
+      updateTrimOverlay(overlay);
+      if(video.duration) video.currentTime = activeHandle === 'start' ? overlay._trimStart : overlay._trimEnd;
+    }
+
+    track.addEventListener('pointermove', e => { if(activeHandle) moveHandle(e); });
+    track.addEventListener('pointerup', () => { activeHandle = null; });
+    track.addEventListener('pointercancel', () => { activeHandle = null; });
+
+    // Cancel
+    overlay.querySelector('.rec-trim-cancel').addEventListener('click', closeTrimOverlay);
+
+    // Close on Escape
+    overlay._onKey = e => { if(e.key === 'Escape') closeTrimOverlay(); };
+    document.addEventListener('keydown', overlay._onKey);
+
+    // Save trimmed
+    overlay.querySelector('.rec-trim-save').addEventListener('click', ()=> saveTrimmed(overlay));
+  }
+
+  function updateTrimOverlay(overlay){
+    const startPct = (overlay._trimStart / overlay._duration) * 100;
+    const endPct = (overlay._trimEnd / overlay._duration) * 100;
+    overlay.querySelector('.rec-trim-range').style.left = startPct + '%';
+    overlay.querySelector('.rec-trim-range').style.width = (endPct - startPct) + '%';
+    overlay.querySelector('.rec-trim-handle-start').style.left = startPct + '%';
+    overlay.querySelector('.rec-trim-handle-end').style.left = endPct + '%';
+    overlay.querySelector('.rec-trim-start').textContent = formatTimeSec(overlay._trimStart);
+    overlay.querySelector('.rec-trim-end').textContent = formatTimeSec(overlay._trimEnd);
+  }
+
+  function closeTrimOverlay(){
+    if(!trimOverlay) return;
+    const video = trimOverlay.querySelector('video');
+    if(video) video.pause();
+    if(trimOverlay._onKey) document.removeEventListener('keydown', trimOverlay._onKey);
+    trimOverlay.remove();
+    trimOverlay = null;
+  }
+
+  async function saveTrimmed(overlay){
+    const idx = overlay._idx;
+    const rec = recordings[idx];
+    const trimStart = overlay._trimStart;
+    const trimEnd = overlay._trimEnd;
+    const saveBtn = overlay.querySelector('.rec-trim-save');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Trimming...';
+
+    try {
+      const video = document.createElement('video');
+      video.src = rec.blobUrl;
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = 'auto';
+
+      await new Promise((resolve, reject) => {
+        video.onloadedmetadata = resolve;
+        video.onerror = reject;
+      });
+
+      video.currentTime = trimStart;
+      await new Promise(r => { video.onseeked = r; });
+
+      const captureStream = video.captureStream();
+      const trimMime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        ? 'video/webm;codecs=vp9' : 'video/webm';
+      const trimRecorder = new MediaRecorder(captureStream, { mimeType: trimMime });
+      const chunks = [];
+
+      trimRecorder.ondataavailable = e => { if(e.data.size > 0) chunks.push(e.data); };
+
+      const done = new Promise(resolve => { trimRecorder.onstop = resolve; });
+
+      trimRecorder.start(100);
+      video.play();
+
+      await new Promise(resolve => {
+        function check(){
+          if(video.currentTime >= trimEnd || video.ended || video.paused){
+            video.pause();
+            trimRecorder.stop();
+            resolve();
+          } else {
+            requestAnimationFrame(check);
+          }
+        }
+        check();
+      });
+
+      await done;
+
+      const blob = new Blob(chunks, { type: trimMime });
+      const blobUrl = URL.createObjectURL(blob);
+      const duration = (trimEnd - trimStart) * 1000;
+      recordings.push({ blobUrl, duration, timestamp: Date.now() });
+      closeTrimOverlay();
+      renderLibrary();
+    } catch(e) {
+      console.error('Trim failed:', e);
+      saveBtn.disabled = false;
+      saveBtn.textContent = '✂ Save Trimmed';
+    }
   }
 
   async function startRecording(){
