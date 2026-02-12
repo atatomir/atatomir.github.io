@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Games • TATOMIR N. ALEX</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -398,6 +398,15 @@ footer{
   position:relative;cursor:crosshair;background:#181b22;
   touch-action:none;overflow:hidden;
 }
+.wb-sidebar{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:6;
+  display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;
+  background:rgba(12,14,20,0.75);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.08);border-radius:12px;
+}
+.wb-sidebar .wb-toolbar-group{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.wb-sidebar .wb-btn{min-width:32px;height:32px;padding:4px;}
+.wb-sidebar .wb-sep{width:100%;height:1px;margin:2px 0;}
 #wb-canvas{display:block;width:100%;height:auto;}
 .wb-wrap:fullscreen{
   display:flex;flex-direction:column;background:#0b0d10;width:100%;height:100%;
@@ -405,8 +414,6 @@ footer{
 .wb-wrap:fullscreen .wb-canvas-area{flex:1;min-height:0;}
 .wb-wrap:fullscreen #wb-canvas{width:100%;height:100%;max-width:none;}
 .wb-toolbar-right{margin-left:auto;display:flex;align-items:center;gap:3px;}
-.wb-fill-toggle{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;}
-.wb-fill-toggle input{accent-color:var(--accent);cursor:pointer;}
 .wb-color-picker{
   width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);
   cursor:pointer;padding:0;-webkit-appearance:none;appearance:none;background:none;
@@ -439,12 +446,6 @@ footer{
   pointer-events:none;opacity:0;transition:opacity 0.2s;
 }
 .wb-grid-canvas.visible{opacity:1;}
-.wb-zoom-btn{min-width:26px;height:26px;padding:3px;}
-.wb-zoom-label{
-  font-size:11px;color:var(--muted);min-width:36px;text-align:center;
-  cursor:pointer;user-select:none;padding:2px 4px;border-radius:4px;
-}
-.wb-zoom-label:hover{color:var(--ink);background:rgba(255,255,255,0.06);}
 .wb-canvas-area.panning{cursor:grab !important;}
 .wb-canvas-area.panning-active{cursor:grabbing !important;}
 /* AI Guess */
@@ -503,6 +504,36 @@ footer{
 .wb-ai-guess .wb-ai-icon{margin-right:6px;}
 @keyframes wb-pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
 .wb-ai-guess.loading .wb-ai-icon{animation:wb-pulse 1s infinite;}
+
+/* More popover */
+.wb-more-popover{
+  position:absolute;top:100%;right:0;margin-top:6px;z-index:20;
+  background:#1e2130;border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  padding:6px 0;min-width:150px;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  display:none;
+}
+.wb-more-popover.visible{display:block;}
+.wb-more-item{
+  display:flex;align-items:center;gap:8px;padding:7px 14px;
+  font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap;
+  background:none;border:none;width:100%;font-family:inherit;
+}
+.wb-more-item:hover{background:rgba(255,255,255,0.06);}
+.wb-more-item input[type="checkbox"]{accent-color:var(--accent);cursor:pointer;}
+.wb-more-sep{height:1px;background:rgba(255,255,255,0.08);margin:4px 0;}
+
+/* Remote cursors */
+.wb-remote-cursor{
+  position:absolute;pointer-events:none;z-index:7;
+  transition:left 0.08s linear, top 0.08s linear;
+}
+.wb-remote-cursor svg{display:block;}
+.wb-remote-cursor-label{
+  position:absolute;left:14px;top:12px;
+  font-size:9px;font-weight:600;white-space:nowrap;
+  padding:1px 5px;border-radius:4px;color:#fff;
+  line-height:1.4;letter-spacing:0.2px;
+}
 
 /* Collaboration */
 .wb-collab{display:flex;align-items:center;gap:4px;margin-left:2px;}
@@ -590,6 +621,52 @@ footer{
   border-radius:50%;transition:0.15s;
 }
 .wb-chat-send:hover{background:rgba(79,140,255,0.15);}
+
+/* WHITEBOARD MOBILE */
+@media(max-width:768px){
+  .wb-toolbar{
+    gap:4px;padding:6px 8px;
+    overflow-x:auto;overflow-y:hidden;
+    flex-wrap:nowrap;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .wb-toolbar::-webkit-scrollbar{display:none;}
+  .wb-toolbar>span:first-child{display:none;}
+  .wb-toolbar .wb-sep{margin:0 3px;height:18px;}
+  .wb-toolbar .wb-btn{min-width:26px;height:26px;padding:3px 5px;}
+  .wb-toolbar .wb-btn svg{width:14px;height:14px;}
+  .wb-color-btn{width:18px;height:18px;}
+  .wb-color-picker{width:18px;height:18px;}
+  .wb-size-slider{width:46px;}
+  .wb-opacity-slider{width:32px;}
+  .wb-size-label{font-size:9px;min-width:16px;}
+  .wb-toolbar-right{gap:2px;}
+  .wb-collab-input{width:60px;font-size:10px;padding:2px 4px;}
+  .wb-collab{gap:3px;}
+  .wb-collab-status{font-size:9px;gap:2px;}
+  .wb-collab-peers{font-size:9px;}
+  .wb-ai-popover,.wb-ai-draw-popover{min-width:200px;right:-40px;}
+  .wb-chat{width:200px;}
+  .wb-sidebar{left:6px;padding:4px;gap:1px;border-radius:10px;}
+  .wb-sidebar .wb-btn{min-width:28px;height:28px;padding:3px;}
+  .wb-sidebar .wb-btn svg{width:14px;height:14px;}
+}
+@media(max-width:480px){
+  .wb-toolbar{gap:3px;padding:5px 6px;}
+  .wb-toolbar .wb-sep{display:none;}
+  .wb-toolbar .wb-btn{min-width:24px;height:24px;padding:2px 4px;}
+  .wb-toolbar .wb-btn svg{width:13px;height:13px;}
+  .wb-color-btn{width:16px;height:16px;border-width:1.5px;}
+  .wb-color-picker{width:16px;height:16px;}
+  .wb-size-slider{width:36px;}
+  .wb-opacity-slider{width:24px;}
+  .wb-collab-input{width:50px;}
+  .wb-chat{width:180px;}
+  .wb-sidebar{left:4px;padding:3px;border-radius:8px;}
+  .wb-sidebar .wb-btn{min-width:24px;height:24px;padding:2px;}
+  .wb-sidebar .wb-btn svg{width:13px;height:13px;}
+  .wb-sidebar .wb-sep{margin:1px 0;}
+}
 
 /* FULLSCREEN */
 .snake-canvas-wrap:fullscreen, .trade-panel:fullscreen{
@@ -963,18 +1040,6 @@ footer{
     <div class="wb-toolbar" id="wb-toolbar">
       <span style="font-size:13px;font-weight:600;color:var(--ink);margin-right:6px" data-en="Whiteboard" data-ro="Tablă">Whiteboard</span>
       <div class="wb-sep"></div>
-      <div class="wb-toolbar-group" id="wb-tools">
-        <button class="wb-btn active" data-tool="pen" title="Pen (P)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 00-3.986-3.987L3.842 16.174a2 2 0 00-.5.83l-1.321 4.352a.5.5 0 00.623.622l4.353-1.32a2 2 0 00.83-.497z"/></svg></button>
-        <button class="wb-btn" data-tool="line" title="Line (L)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20L20 4"/></svg></button>
-        <button class="wb-btn" data-tool="rect" title="Rectangle (R)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
-        <button class="wb-btn" data-tool="ellipse" title="Ellipse (E)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></button>
-        <button class="wb-btn" data-tool="arrow" title="Arrow (A)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
-        <button class="wb-btn" data-tool="highlighter" title="Highlighter (H)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 01-2.8 0l-5.2-5.2a2 2 0 010-2.8L14 4"/></svg></button>
-        <button class="wb-btn" data-tool="text" title="Text (T)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
-        <button class="wb-btn" data-tool="eraser" title="Eraser (X)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
-        <button class="wb-btn" data-tool="hand" title="Hand / Pan (G or Space+drag)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 10-4 0v5"/><path d="M14 10V4a2 2 0 10-4 0v6"/><path d="M10 9.5V4a2 2 0 10-4 0v10"/><path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.66-3.66a2 2 0 112.83-2.83L7 15"/></svg></button>
-      </div>
-      <div class="wb-sep"></div>
       <div class="wb-toolbar-group" id="wb-colors">
         <button class="wb-color-btn active" data-color="#f5f7fa" style="background:#f5f7fa" title="White"></button>
         <button class="wb-color-btn" data-color="#ef4444" style="background:#ef4444" title="Red"></button>
@@ -995,26 +1060,15 @@ footer{
         <input type="range" class="wb-opacity-slider" id="wb-opacity" min="10" max="100" value="100">
         <span class="wb-size-label" id="wb-opacity-label">100%</span>
       </div>
-      <div class="wb-sep"></div>
-      <label class="wb-fill-toggle" title="Fill shapes"><input type="checkbox" id="wb-fill-check"> Fill</label>
-      <label class="wb-fill-toggle" title="Show grid"><input type="checkbox" id="wb-grid-check"> Grid</label>
       <div class="wb-toolbar-right">
         <button class="wb-btn" id="wb-undo-btn" title="Undo (Ctrl+Z)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg></button>
         <button class="wb-btn" id="wb-redo-btn" title="Redo (Ctrl+Y)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg></button>
         <button class="wb-btn" id="wb-clear-btn" title="Clear All"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
         <div class="wb-sep"></div>
-        <button class="wb-btn" id="wb-download-btn" title="Save as PNG"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M8 5H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-4"/></svg></button>
-        <div class="wb-sep"></div>
-        <button class="wb-btn wb-zoom-btn" id="wb-zoom-out" title="Zoom Out (Ctrl+-)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></button>
-        <span class="wb-zoom-label" id="wb-zoom-label" title="Double-click to reset zoom">100%</span>
-        <button class="wb-btn wb-zoom-btn" id="wb-zoom-in" title="Zoom In (Ctrl++)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg></button>
-        <div class="wb-sep"></div>
-        <button class="wb-btn" id="wb-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
-        <div class="wb-sep"></div>
         <div class="wb-collab" id="wb-collab">
           <input class="wb-collab-input" id="wb-room-input" placeholder="Room name">
           <button class="wb-btn" id="wb-connect-btn" title="Connect to room"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></button>
-          <span class="wb-collab-status" id="wb-collab-status" style="display:none"><span class="wb-collab-dot" id="wb-collab-dot"></span><span id="wb-collab-text"></span></span>
+          <span class="wb-collab-status" id="wb-collab-status" style="display:none"><span class="wb-collab-dot" id="wb-collab-dot"></span><svg id="wb-host-icon" style="display:none" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M3 20h18"/></svg><span id="wb-collab-text"></span></span>
           <span class="wb-collab-peers" id="wb-collab-peers" style="display:none"></span>
           <button class="wb-btn" id="wb-disconnect-btn" style="display:none" title="Disconnect"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
         </div>
@@ -1039,10 +1093,36 @@ footer{
             </div>
           </div>
         </div>
+        <div class="wb-sep"></div>
+        <button class="wb-btn" id="wb-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+        <div style="position:relative">
+          <button class="wb-btn" id="wb-more-btn" title="More options"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>
+          <div class="wb-more-popover" id="wb-more-popover">
+            <label class="wb-more-item"><input type="checkbox" id="wb-fill-check"> Fill shapes</label>
+            <label class="wb-more-item"><input type="checkbox" id="wb-grid-check"> Show grid</label>
+            <div class="wb-more-sep"></div>
+            <button class="wb-more-item wb-more-action" id="wb-download-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M8 5H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2h-4"/></svg> Save as PNG</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="wb-chat-row">
       <div class="wb-canvas-area" id="wb-canvas-area">
+        <div class="wb-sidebar" id="wb-sidebar">
+          <div class="wb-toolbar-group" id="wb-tools">
+            <button class="wb-btn active" data-tool="pen" title="Pen (P)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 00-3.986-3.987L3.842 16.174a2 2 0 00-.5.83l-1.321 4.352a.5.5 0 00.623.622l4.353-1.32a2 2 0 00.83-.497z"/></svg></button>
+            <button class="wb-btn" data-tool="line" title="Line (L)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20L20 4"/></svg></button>
+            <button class="wb-btn" data-tool="rect" title="Rectangle (R)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+            <button class="wb-btn" data-tool="ellipse" title="Ellipse (E)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/></svg></button>
+            <button class="wb-btn" data-tool="arrow" title="Arrow (A)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+            <div class="wb-sep"></div>
+            <button class="wb-btn" data-tool="highlighter" title="Highlighter (H)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 01-2.8 0l-5.2-5.2a2 2 0 010-2.8L14 4"/></svg></button>
+            <button class="wb-btn" data-tool="text" title="Text (T)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
+            <div class="wb-sep"></div>
+            <button class="wb-btn" data-tool="eraser" title="Eraser (X)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
+            <button class="wb-btn" data-tool="hand" title="Hand / Pan (G or Space+drag)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 10-4 0v5"/><path d="M14 10V4a2 2 0 10-4 0v6"/><path d="M10 9.5V4a2 2 0 10-4 0v10"/><path d="M18 11a2 2 0 114 0v3a8 8 0 01-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.66-3.66a2 2 0 112.83-2.83L7 15"/></svg></button>
+          </div>
+        </div>
         <canvas id="wb-canvas" width="1200" height="600"></canvas>
         <canvas id="wb-grid" class="wb-grid-canvas" width="1200" height="600"></canvas>
         <div class="wb-ai-guess" id="wb-ai-guess"><span class="wb-ai-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M9.937 15.5A2 2 0 008.5 14.063l-6.135-1.582a.5.5 0 010-.962L8.5 9.936A2 2 0 009.937 8.5l1.582-6.135a.5.5 0 01.963 0L14.063 8.5A2 2 0 0015.5 9.937l6.135 1.581a.5.5 0 010 .964L15.5 14.063a2 2 0 00-1.437 1.437l-1.582 6.135a.5.5 0 01-.963 0z"/></svg></span><span id="wb-ai-guess-text"></span></div>
@@ -2172,7 +2252,7 @@ toggle.addEventListener('click', ()=>{
     panX = sx - (sx - panX) * scale;
     panY = sy - (sy - panY) * scale;
     zoom = newZoom;
-    render(); renderGrid(); updateZoomLabel();
+    render(); renderGrid(); updateZoomLabel(); repositionAllCursors();
   }
 
   function zoomCenter(factor){
@@ -2181,7 +2261,7 @@ toggle.addEventListener('click', ()=>{
 
   function resetView(){
     panX = 0; panY = 0; zoom = 1;
-    render(); renderGrid(); updateZoomLabel();
+    render(); renderGrid(); updateZoomLabel(); repositionAllCursors();
   }
 
   // --- Hit testing for object eraser ---
@@ -2448,7 +2528,7 @@ toggle.addEventListener('click', ()=>{
       const sp = getScreenPos(e);
       panX = panStartOffset.x + (sp.x - panStartMouse.x);
       panY = panStartOffset.y + (sp.y - panStartMouse.y);
-      render(); renderGrid(); updateZoomLabel();
+      render(); renderGrid(); updateZoomLabel(); repositionAllCursors();
       return;
     }
     if(textDragStart){ moveTextDrag(e); return; }
@@ -2510,15 +2590,94 @@ toggle.addEventListener('click', ()=>{
   }
 
   // Pointer capture for smooth drawing
+  // --- Multi-touch pinch/pan state ---
+  let activeTouches = new Map(); // pointerId → {x,y}
+  let pinchActive = false;
+  let pinchStartDist = 0;
+  let pinchStartZoom = 1;
+  let pinchStartMid = {x:0,y:0};
+  let pinchStartPanX = 0;
+  let pinchStartPanY = 0;
+
+  function getTouchDist(a, b){ return Math.hypot(a.x - b.x, a.y - b.y); }
+  function getTouchMid(a, b){ return { x:(a.x+b.x)/2, y:(a.y+b.y)/2 }; }
+
+  function screenPosFromClient(cx, cy){
+    const rect = canvas.getBoundingClientRect();
+    return { x: (cx - rect.left) * (W / rect.width), y: (cy - rect.top) * (H / rect.height) };
+  }
+
   canvas.addEventListener('pointerdown', (e)=>{
+    // Track touch points
+    if(e.pointerType === 'touch'){
+      activeTouches.set(e.pointerId, screenPosFromClient(e.clientX, e.clientY));
+      // Two fingers → start pinch, cancel any drawing
+      if(activeTouches.size === 2){
+        if(drawing){ drawing = false; currentObj = null; previewShape = null; render(); }
+        if(isPanning){ isPanning = false; area.classList.remove('panning-active'); }
+        const pts = [...activeTouches.values()];
+        pinchActive = true;
+        pinchStartDist = getTouchDist(pts[0], pts[1]);
+        pinchStartZoom = zoom;
+        pinchStartMid = getTouchMid(pts[0], pts[1]);
+        pinchStartPanX = panX;
+        pinchStartPanY = panY;
+        e.preventDefault();
+        return;
+      }
+      if(activeTouches.size > 2){ e.preventDefault(); return; }
+    }
     canvas.setPointerCapture(e.pointerId);
     onPointerDown(e);
   });
-  canvas.addEventListener('pointermove', onPointerMove);
+
+  canvas.addEventListener('pointermove', (e)=>{
+    broadcastCursor(e);
+    if(e.pointerType === 'touch' && activeTouches.has(e.pointerId)){
+      activeTouches.set(e.pointerId, screenPosFromClient(e.clientX, e.clientY));
+      if(pinchActive && activeTouches.size >= 2){
+        const pts = [...activeTouches.values()];
+        const dist = getTouchDist(pts[0], pts[1]);
+        const mid = getTouchMid(pts[0], pts[1]);
+        // Zoom
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, pinchStartZoom * (dist / pinchStartDist)));
+        const scale = newZoom / pinchStartZoom;
+        // Pan: follow midpoint + zoom around pinch center
+        panX = pinchStartPanX + (mid.x - pinchStartMid.x) - (pinchStartMid.x - pinchStartPanX) * (scale - 1);
+        panY = pinchStartPanY + (mid.y - pinchStartMid.y) - (pinchStartMid.y - pinchStartPanY) * (scale - 1);
+        zoom = newZoom;
+        render(); renderGrid(); updateZoomLabel(); repositionAllCursors();
+        e.preventDefault();
+        return;
+      }
+    }
+    if(!pinchActive) onPointerMove(e);
+  });
+
   canvas.addEventListener('pointerup', (e)=>{
+    if(e.pointerType === 'touch'){
+      activeTouches.delete(e.pointerId);
+      if(pinchActive){
+        if(activeTouches.size < 2) pinchActive = false;
+        e.preventDefault();
+        return;
+      }
+    }
     canvas.releasePointerCapture(e.pointerId);
     onPointerUp(e);
   });
+
+  canvas.addEventListener('pointercancel', (e)=>{
+    if(e.pointerType === 'touch'){
+      activeTouches.delete(e.pointerId);
+      if(pinchActive){
+        if(activeTouches.size < 2) pinchActive = false;
+        return;
+      }
+    }
+    if(drawing||isPanning||textDragStart) onPointerUp(e);
+  });
+
   canvas.addEventListener('lostpointercapture', (e)=>{ if(drawing||isPanning||textDragStart) onPointerUp(e); });
   canvas.addEventListener('touchstart', e=>{ e.preventDefault(); }, {passive:false});
   canvas.addEventListener('touchmove', e=>{ e.preventDefault(); }, {passive:false});
@@ -2535,7 +2694,7 @@ toggle.addEventListener('click', ()=>{
       // Two-finger scroll → pan
       panX -= e.deltaX;
       panY -= e.deltaY;
-      render(); renderGrid(); updateZoomLabel();
+      render(); renderGrid(); updateZoomLabel(); repositionAllCursors();
     }
   }, {passive:false});
 
@@ -2699,10 +2858,16 @@ toggle.addEventListener('click', ()=>{
     link.click();
   });
 
-  // --- Zoom buttons ---
-  document.getElementById('wb-zoom-in').addEventListener('click', ()=> zoomCenter(1.25));
-  document.getElementById('wb-zoom-out').addEventListener('click', ()=> zoomCenter(1/1.25));
-  document.getElementById('wb-zoom-label').addEventListener('dblclick', resetView);
+  // --- More popover ---
+  const moreBtn = document.getElementById('wb-more-btn');
+  const morePopover = document.getElementById('wb-more-popover');
+  moreBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    morePopover.classList.toggle('visible');
+  });
+  document.addEventListener('click', (e)=>{
+    if(!morePopover.contains(e.target) && e.target !== moreBtn) morePopover.classList.remove('visible');
+  });
 
   // --- Fullscreen ---
   document.getElementById('wb-fullscreen-btn').addEventListener('click', ()=>{
@@ -3206,12 +3371,14 @@ Example — a star:
   let collabIsHost = false;
   let collabRoomId = null;   // internal ID (with suffix)
   let collabRoomName = null; // display name (without suffix)
+  let collabTotalPeers = 0;  // total people in the room (from host broadcasts)
 
   const roomInput = document.getElementById('wb-room-input');
   const connectBtn = document.getElementById('wb-connect-btn');
   const collabStatus = document.getElementById('wb-collab-status');
   const collabDot = document.getElementById('wb-collab-dot');
   const collabText = document.getElementById('wb-collab-text');
+  const collabHostIcon = document.getElementById('wb-host-icon');
   const collabPeersEl = document.getElementById('wb-collab-peers');
   const collabDisconnectBtn = document.getElementById('wb-disconnect-btn');
 
@@ -3294,10 +3461,12 @@ Example — a star:
   function collabUpdateUI(){
     const connected = collabPeer && !collabPeer.destroyed;
     collabStatus.style.display = connected ? 'inline-flex' : 'none';
-    collabDot.classList.toggle('on', connected && collabConns.length > 0);
-    collabText.textContent = connected ? (collabConns.length > 0 ? 'Connected' : 'Waiting...') : '';
-    collabPeersEl.style.display = collabConns.length > 0 ? 'inline' : 'none';
-    collabPeersEl.textContent = collabConns.length + ' peer' + (collabConns.length !== 1 ? 's' : '');
+    const peerCount = collabIsHost ? collabConns.length + 1 : collabTotalPeers;
+    collabDot.classList.toggle('on', connected && peerCount > 1);
+    collabHostIcon.style.display = connected && collabIsHost ? 'inline' : 'none';
+    collabText.textContent = "" // connected ? (collabIsHost ? (peerCount > 1 ? 'Host' : 'Hosting...') : (peerCount > 1 ? 'Connected' : 'Waiting...')) : '';
+    collabPeersEl.style.display = peerCount > 1 ? 'inline' : 'none';
+    collabPeersEl.textContent = peerCount + '';
     collabDisconnectBtn.style.display = connected ? 'flex' : 'none';
     connectBtn.style.display = connected ? 'none' : 'flex';
     roomInput.disabled = !!connected;
@@ -3345,27 +3514,46 @@ Example — a star:
       chatAppend(msg.nick || '?', msg.text || '', false);
     } else if(msg.type === 'join-announce'){
       chatAppend(null, msg.nick + ' joined', false, true);
+    } else if(msg.type === 'peers'){
+      collabTotalPeers = msg.count || 0;
+      collabUpdateUI();
+    } else if(msg.type === 'cursor'){
+      updateRemoteCursor(msg.id, msg.x, msg.y, msg.nick, msg.color);
     }
-    // Host relays to all other guests
-    if(collabIsHost){
+    // Host relays to all other guests (except peer count, host sends that itself)
+    if(collabIsHost && msg.type !== 'peers'){
       collabConns.forEach(c => {
         if(c !== fromConn) collabSend(c, msg);
       });
     }
   }
 
+  function broadcastPeerCount(){
+    if(!collabIsHost) return;
+    const count = collabConns.length + 1; // guests + host
+    collabBroadcast({type:'peers', count});
+  }
+
   function collabSetupConn(conn){
     collabConns.push(conn);
     collabUpdateUI();
+    broadcastPeerCount();
     conn.on('data', (data) => collabHandleMessage(data, conn));
     function onLost(){
       collabConns = collabConns.filter(c => c !== conn);
+      if(conn.peer) removeRemoteCursor(conn.peer);
       collabUpdateUI();
-      // Guest lost its only connection (to host) — auto-reconnect
-      if(!collabIsHost && collabConns.length === 0 && collabRoomId){
-        const name = collabRoomId;
-        chatAppend(null, 'Connection lost — reconnecting...', false, true);
-        setTimeout(() => connectToRoom(name), 1000);
+      broadcastPeerCount();
+      // Guest lost its only connection (to host) — auto-reconnect (max 3 tries)
+      if(!collabManualDisconnect && !collabIsHost && collabConns.length === 0 && collabRoomName){
+        collabReconnectCount++;
+        if(collabReconnectCount <= 3){
+          const name = collabRoomName;
+          chatAppend(null, 'Connection lost — reconnecting (' + collabReconnectCount + '/3)...', false, true);
+          setTimeout(() => connectToRoom(name), 1000);
+        } else {
+          chatAppend(null, 'Could not reconnect after 3 attempts.', false, true);
+        }
       }
     }
     conn.on('close', onLost);
@@ -3382,6 +3570,73 @@ Example — a star:
 
   let collabRetryTimer = null;
   let collabSettled = false; // true once successfully connected or hosting
+  let collabReconnectCount = 0; // track reconnection attempts for guests
+
+  // --- Remote cursors ---
+  const CURSOR_COLORS = ['#ef4444','#3b82f6','#22c55e','#f59e0b','#a855f7','#ec4899','#14b8a6','#f97316'];
+  let myColor = CURSOR_COLORS[Math.random() * CURSOR_COLORS.length | 0];
+  const remoteCursors = new Map(); // peerId → {el, timeout}
+  let lastCursorBroadcast = 0;
+
+  function worldToScreen(wx, wy){
+    const rect = canvas.getBoundingClientRect();
+    const sx = wx * zoom + panX;
+    const sy = wy * zoom + panY;
+    return { x: sx * (rect.width / W), y: sy * (rect.height / H) };
+  }
+
+  function updateRemoteCursor(id, wx, wy, nick, clr){
+    let entry = remoteCursors.get(id);
+    if(!entry){
+      const el = document.createElement('div');
+      el.className = 'wb-remote-cursor';
+      el.innerHTML = '<svg width="16" height="20" viewBox="0 0 16 20"><path d="M0 0l16 12-7 1-4 7z" fill="' + clr + '" stroke="#000" stroke-width="0.8"/></svg>'
+        + '<span class="wb-remote-cursor-label" style="background:' + clr + '"></span>';
+      area.appendChild(el);
+      entry = {el, timeout:null, wx:0, wy:0, nick:'', color:clr};
+      remoteCursors.set(id, entry);
+    }
+    entry.wx = wx; entry.wy = wy; entry.nick = nick; entry.color = clr;
+    const label = entry.el.querySelector('.wb-remote-cursor-label');
+    label.textContent = nick;
+    repositionCursor(entry);
+    // Hide after 5s of no updates
+    if(entry.timeout) clearTimeout(entry.timeout);
+    entry.timeout = setTimeout(()=>{ entry.el.style.display = 'none'; }, 5000);
+    entry.el.style.display = '';
+  }
+
+  function repositionCursor(entry){
+    const pos = worldToScreen(entry.wx, entry.wy);
+    entry.el.style.left = pos.x + 'px';
+    entry.el.style.top = pos.y + 'px';
+  }
+
+  function repositionAllCursors(){
+    remoteCursors.forEach(entry => repositionCursor(entry));
+  }
+
+  function removeRemoteCursor(id){
+    const entry = remoteCursors.get(id);
+    if(entry){
+      if(entry.timeout) clearTimeout(entry.timeout);
+      entry.el.remove();
+      remoteCursors.delete(id);
+    }
+  }
+
+  function removeAllRemoteCursors(){
+    remoteCursors.forEach((entry, id) => removeRemoteCursor(id));
+  }
+
+  function broadcastCursor(e){
+    if(!collabSettled || collabConns.length === 0) return;
+    const now = Date.now();
+    if(now - lastCursorBroadcast < 50) return; // throttle to ~20fps
+    lastCursorBroadcast = now;
+    const pos = getPos(e);
+    collabBroadcast({type:'cursor', x:pos.x, y:pos.y, nick:chatNick, color:myColor, id:collabPeer?.id || ''});
+  }
 
   function collabCleanup(){
     if(collabRetryTimer){ clearTimeout(collabRetryTimer); collabRetryTimer = null; }
@@ -3391,6 +3646,8 @@ Example — a star:
     collabPeer = null;
     collabIsHost = false;
     collabSettled = false;
+    collabTotalPeers = 0;
+    removeAllRemoteCursors();
   }
 
   // Attempt to join as guest. Calls onResult(true) if connected, onResult(false) if failed.
@@ -3408,6 +3665,7 @@ Example — a star:
       conn.on('open', () => {
         collabIsHost = false;
         collabSettled = true;
+        collabReconnectCount = 0;
         collabSetupConn(conn);
         collabSend(conn, {type:'join-announce', nick:chatNick});
         collabSaveSession();
@@ -3458,9 +3716,9 @@ Example — a star:
     });
     // If host loses signaling server connection, re-register
     collabPeer.on('disconnected', () => {
-      if(collabSettled && collabIsHost && collabRoomId){
+      if(collabSettled && collabIsHost && collabRoomName){
         try { collabPeer.reconnect(); } catch(e){
-          const n = collabRoomId;
+          const n = collabRoomName;
           chatAppend(null, 'Lost server — reconnecting...', false, true);
           setTimeout(() => connectToRoom(n), 1000);
         }
@@ -3472,7 +3730,8 @@ Example — a star:
   // Keep alternating join/host until one succeeds
   function connectToRoom(displayName){
     if(!displayName) return;
-    const peerId = displayName;
+    const peerId = displayName + '-atatomir-com';
+    collabManualDisconnect = false;
     collabCleanup();
     collabRoomName = displayName;
     collabRoomId = peerId;
@@ -3497,7 +3756,10 @@ Example — a star:
     cycle();
   }
 
+  let collabManualDisconnect = false;
+
   function collabDisconnect(){
+    collabManualDisconnect = true;
     if(collabRetryTimer){ clearTimeout(collabRetryTimer); collabRetryTimer = null; }
     collabCleanup();
     collabRoomId = null;
@@ -3520,9 +3782,8 @@ Example — a star:
 
   // Auto-connect on load
   {
-    const savedRoom = localStorage.getItem('wb-room') || 'main';
+    const savedRoom = localStorage.getItem('wb-room');
     roomInput.value = savedRoom;
-    connectToRoom(savedRoom);
   }
 
 })();
