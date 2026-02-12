@@ -340,15 +340,19 @@ footer{
 .wb-toolbar{
   display:flex;align-items:center;gap:6px;padding:10px 14px;
   border-bottom:1px solid rgba(255,255,255,0.08);
-  flex-wrap:wrap;background:rgba(0,0,0,0.15);
+  flex-wrap:nowrap;background:rgba(0,0,0,0.15);
+  overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-.wb-toolbar-group{display:flex;align-items:center;gap:3px;}
-.wb-sep{width:1px;height:22px;background:rgba(255,255,255,0.1);margin:0 6px;}
+.wb-toolbar::-webkit-scrollbar{display:none;}
+.wb-toolbar-group{display:flex;align-items:center;gap:3px;flex-shrink:0;}
+.wb-sep{width:1px;height:22px;background:rgba(255,255,255,0.1);margin:0 6px;flex-shrink:0;}
 .wb-btn{
   background:none;border:1px solid transparent;color:var(--muted);
   cursor:pointer;padding:5px 7px;border-radius:6px;transition:0.15s;
   display:flex;align-items:center;justify-content:center;font-size:14px;
-  min-width:30px;height:30px;
+  min-width:30px;height:30px;flex-shrink:0;
 }
 .wb-btn:hover{color:var(--ink);background:rgba(255,255,255,0.08);}
 .wb-btn.active{color:var(--accent);background:rgba(79,140,255,0.15);border-color:rgba(79,140,255,0.3);}
@@ -370,18 +374,25 @@ footer{
   width:14px;height:14px;border-radius:50%;
   background:var(--accent);cursor:pointer;border:none;
 }
-.wb-size-label{font-size:11px;color:var(--muted);min-width:22px;text-align:center;}
+.wb-size-label{font-size:11px;color:var(--muted);min-width:22px;text-align:center;flex-shrink:0;}
 .wb-canvas-area{
   position:relative;cursor:crosshair;background:#181b22;
   touch-action:none;
 }
 #wb-canvas{display:block;width:100%;height:auto;}
-.wb-wrap:fullscreen{
+.wb-wrap:fullscreen,
+.wb-wrap.wb-fake-fullscreen{
   display:flex;flex-direction:column;background:#0b0d10;width:100%;height:100%;
 }
-.wb-wrap:fullscreen .wb-canvas-area{flex:1;min-height:0;}
-.wb-wrap:fullscreen #wb-canvas{width:100%;height:100%;max-width:none;}
-.wb-toolbar-right{margin-left:auto;display:flex;align-items:center;gap:3px;}
+.wb-wrap:fullscreen .wb-canvas-area,
+.wb-wrap.wb-fake-fullscreen .wb-canvas-area{flex:1;min-height:0;}
+.wb-wrap:fullscreen #wb-canvas,
+.wb-wrap.wb-fake-fullscreen #wb-canvas{width:100%;height:100%;max-width:none;}
+.wb-wrap.wb-fake-fullscreen{
+  position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;
+  border-radius:0;border:none;margin:0;
+}
+.wb-toolbar-right{margin-left:auto;display:flex;align-items:center;gap:3px;flex-shrink:0;}
 .wb-fill-toggle{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;}
 .wb-fill-toggle input{accent-color:var(--accent);cursor:pointer;}
 .wb-color-picker{
@@ -458,6 +469,69 @@ footer{
 .wb-ai-guess .wb-ai-icon{margin-right:6px;}
 @keyframes wb-pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
 .wb-ai-guess.loading .wb-ai-icon{animation:wb-pulse 1s infinite;}
+/* Peer / Collab UI */
+.wb-peer-bar{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.wb-peer-btn{
+  background:none;border:1px solid transparent;color:var(--muted);
+  cursor:pointer;padding:4px 8px;border-radius:6px;transition:0.15s;
+  display:flex;align-items:center;gap:4px;font-size:12px;font-family:inherit;
+  height:30px;flex-shrink:0;
+}
+.wb-peer-btn:hover{color:var(--ink);background:rgba(255,255,255,0.08);}
+.wb-peer-btn.connected{color:#34d399;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.1);}
+.wb-peer-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;border-radius:9px;
+  background:rgba(79,140,255,0.2);color:var(--accent);
+  font-size:10px;font-weight:600;padding:0 4px;
+}
+.wb-peer-badge.host{background:rgba(250,204,21,0.2);color:#facc15;}
+.wb-peer-popover{
+  position:absolute;top:100%;right:0;margin-top:6px;z-index:20;
+  background:#1e2130;border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  padding:12px 14px;min-width:240px;box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  display:none;
+}
+.wb-peer-popover.visible{display:block;}
+.wb-peer-popover label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px;}
+.wb-peer-popover input[type="text"]{
+  width:100%;box-sizing:border-box;padding:6px 8px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.3);
+  color:var(--ink);font-size:12px;font-family:'Inter',monospace;outline:none;
+}
+.wb-peer-popover input[type="text"]:focus{border-color:var(--accent);}
+.wb-peer-popover .wb-peer-actions{display:flex;gap:6px;margin-top:8px;}
+.wb-peer-popover .wb-peer-action{
+  padding:4px 12px;border-radius:6px;border:none;
+  background:var(--accent);color:#fff;font-size:12px;cursor:pointer;font-family:inherit;
+  flex:1;text-align:center;
+}
+.wb-peer-popover .wb-peer-action:hover{opacity:0.85;}
+.wb-peer-popover .wb-peer-action.secondary{background:rgba(255,255,255,0.1);color:var(--ink);}
+.wb-peer-popover .wb-peer-status{font-size:10px;color:var(--muted);margin-top:6px;}
+.wb-peer-popover .wb-peer-list{margin-top:8px;font-size:11px;color:var(--muted);}
+.wb-peer-popover .wb-peer-list div{padding:2px 0;display:flex;align-items:center;gap:4px;}
+.wb-peer-popover .wb-peer-list .wb-host-tag{
+  font-size:9px;background:rgba(250,204,21,0.2);color:#facc15;
+  padding:1px 5px;border-radius:4px;font-weight:600;
+}
+.wb-peer-popover .wb-peer-list .wb-you-tag{
+  font-size:9px;background:rgba(79,140,255,0.2);color:var(--accent);
+  padding:1px 5px;border-radius:4px;font-weight:600;
+}
+/* Mobile whiteboard */
+@media (max-width:768px){
+  .wb-toolbar{padding:6px 8px;gap:4px;}
+  .wb-btn{min-width:28px;height:28px;padding:4px 5px;}
+  .wb-sep{margin:0 3px;height:18px;}
+  .wb-color-btn{width:18px;height:18px;}
+  .wb-size-slider{width:50px;}
+  .wb-opacity-slider{width:36px;}
+  .wb-fill-toggle{font-size:10px;}
+  .wb-toolbar-right{gap:2px;}
+}
 
 /* FULLSCREEN */
 .snake-canvas-wrap:fullscreen, .trade-panel:fullscreen{
@@ -476,6 +550,7 @@ footer{
   .games-row{flex-direction:column;align-items:center;}
 }
 </style>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" defer></script>
 </head>
 <body>
 
@@ -786,6 +861,23 @@ footer{
         <button class="wb-btn wb-zoom-btn" id="wb-zoom-in" title="Zoom In (Ctrl++)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
         <div class="wb-sep"></div>
         <button class="wb-btn" id="wb-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg></button>
+        <div class="wb-sep"></div>
+        <div style="position:relative" class="wb-peer-bar">
+          <button class="wb-peer-btn" id="wb-peer-btn" title="Collaborate">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            <span id="wb-peer-count" class="wb-peer-badge" style="display:none">1</span>
+          </button>
+          <div class="wb-peer-popover" id="wb-peer-popover">
+            <label>Room ID</label>
+            <input type="text" id="wb-peer-room" placeholder="Enter room ID or create one" spellcheck="false" autocomplete="off">
+            <div class="wb-peer-actions">
+              <button class="wb-peer-action" id="wb-peer-host">Host</button>
+              <button class="wb-peer-action secondary" id="wb-peer-join">Join</button>
+            </div>
+            <div class="wb-peer-status" id="wb-peer-status"></div>
+            <div class="wb-peer-list" id="wb-peer-list"></div>
+          </div>
+        </div>
         <div class="wb-sep"></div>
         <div style="position:relative">
           <button class="wb-btn wb-ai-btn" id="wb-ai-btn" title="AI Guess (live drawing recognition)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg></button>
