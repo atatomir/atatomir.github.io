@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local RAG</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Titlebar drag region -->
+  <div class="titlebar">
+    <span class="titlebar-title">Local RAG</span>
+    <div id="ollama-status" class="status-badge offline">Ollama offline</div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Pipelines</h2>
+        <button id="btn-new-pipeline" class="btn-icon" title="New pipeline">+</button>
+      </div>
+      <ul id="pipeline-list" class="pipeline-list"></ul>
+      <div class="sidebar-footer">
+        <button id="btn-manage-models" class="btn-secondary">Manage Models</button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content" id="main-content">
+      <!-- Welcome screen -->
+      <div id="view-welcome" class="view active">
+        <div class="welcome">
+          <h1>Local RAG</h1>
+          <p>Build private RAG pipelines using local models via Ollama.</p>
+          <div class="welcome-steps">
+            <div class="step">
+              <span class="step-num">1</span>
+              <span>Install & run <a href="#" onclick="return false">Ollama</a></span>
+            </div>
+            <div class="step">
+              <span class="step-num">2</span>
+              <span>Pull an embedding model (e.g. <code>nomic-embed-text</code>)</span>
+            </div>
+            <div class="step">
+              <span class="step-num">3</span>
+              <span>Pull a chat model (e.g. <code>llama3.2</code>)</span>
+            </div>
+            <div class="step">
+              <span class="step-num">4</span>
+              <span>Create a pipeline, add documents, and ask questions</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pipeline view -->
+      <div id="view-pipeline" class="view">
+        <div class="pipeline-header">
+          <div>
+            <h1 id="pipeline-name"></h1>
+            <div class="pipeline-meta">
+              <span id="pipeline-emb-model" class="tag"></span>
+              <span id="pipeline-chat-model" class="tag"></span>
+              <span id="pipeline-doc-count" class="tag"></span>
+            </div>
+          </div>
+          <div class="pipeline-actions">
+            <button id="btn-add-docs" class="btn-primary">Add Documents</button>
+            <button id="btn-delete-pipeline" class="btn-danger">Delete</button>
+          </div>
+        </div>
+
+        <!-- Documents panel -->
+        <div class="documents-panel" id="documents-panel">
+          <h3>Documents</h3>
+          <ul id="doc-list" class="doc-list"></ul>
+        </div>
+
+        <!-- Chat -->
+        <div class="chat-container">
+          <div id="chat-messages" class="chat-messages"></div>
+          <div class="chat-input-row">
+            <textarea id="chat-input" placeholder="Ask a question about your documents..." rows="1"></textarea>
+            <button id="btn-send" class="btn-primary">Send</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Create pipeline modal -->
+      <div id="modal-create" class="modal">
+        <div class="modal-content">
+          <h2>New Pipeline</h2>
+          <label>Name
+            <input type="text" id="input-pipeline-name" placeholder="My Knowledge Base">
+          </label>
+          <label>Embedding Model
+            <select id="select-emb-model"></select>
+          </label>
+          <label>Chat Model
+            <select id="select-chat-model"></select>
+          </label>
+          <div class="modal-actions">
+            <button id="btn-cancel-create" class="btn-secondary">Cancel</button>
+            <button id="btn-confirm-create" class="btn-primary">Create</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Models modal -->
+      <div id="modal-models" class="modal">
+        <div class="modal-content modal-wide">
+          <h2>Manage Models</h2>
+          <div class="model-pull-row">
+            <input type="text" id="input-pull-model" placeholder="e.g. nomic-embed-text or llama3.2">
+            <button id="btn-pull-model" class="btn-primary">Pull</button>
+          </div>
+          <div id="pull-status" class="pull-status"></div>
+          <h3>Installed Models</h3>
+          <ul id="model-list" class="model-list"></ul>
+          <div class="modal-actions">
+            <button id="btn-close-models" class="btn-secondary">Close</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
