@@ -1,0 +1,362 @@
+const { describe, it, before, after, beforeEach } = require('node:test');
+const assert = require('node:assert/strict');
+const path = require('path');
+const fs = require('fs');
+const os = require('os');
+
+const { VectorStore, cosineSimilarity, chunkText, RagEngine } = require('../src/rag-engine');
+
+// ── cosineSimilarity ──────────────────────────────────────────
+
+describe('cosineSimilarity', () => {
+  it('returns 1 for identical vectors', () => {
+    const v = [1, 2, 3, 4, 5];
+    const sim = cosineSimilarity(v, v);
+    assert.ok(Math.abs(sim - 1) < 1e-6, `Expected ~1, got ${sim}`);
+  });
+
+  it('returns 0 for orthogonal vectors', () => {
+    const a = [1, 0, 0];
+    const b = [0, 1, 0];
+    const sim = cosineSimilarity(a, b);
+    assert.ok(Math.abs(sim) < 1e-6, `Expected ~0, got ${sim}`);
+  });
+
+  it('returns -1 for opposite vectors', () => {
+    const a = [1, 0, 0];
+    const b = [-1, 0, 0];
+    const sim = cosineSimilarity(a, b);
+    assert.ok(Math.abs(sim + 1) < 1e-6, `Expected ~-1, got ${sim}`);
+  });
+
+  it('handles zero vectors gracefully', () => {
+    const sim = cosineSimilarity([0, 0, 0], [1, 2, 3]);
+    assert.equal(sim, 0);
+  });
+
+  it('handles null/undefined', () => {
+    assert.equal(cosineSimilarity(null, [1, 2]), 0);
+    assert.equal(cosineSimilarity([1, 2], undefined), 0);
+  });
+
+  it('handles mismatched lengths', () => {
+    assert.equal(cosineSimilarity([1, 2], [1, 2, 3]), 0);
+  });
+
+  it('computes known similarity', () => {
+    const a = [1, 2, 3];
+    const b = [4, 5, 6];
+    // dot = 32, |a| = sqrt(14), |b| = sqrt(77)
+    const expected = 32 / (Math.sqrt(14) * Math.sqrt(77));
+    const sim = cosineSimilarity(a, b);
+    assert.ok(Math.abs(sim - expected) < 1e-6);
+  });
+});
+
+// ── chunkText ─────────────────────────────────────────────────
+
+describe('chunkText', () => {
+  it('returns single chunk for short text', () => {
+    const chunks = chunkText('Hello world', 100, 10);
+    assert.equal(chunks.length, 1);
+    assert.equal(chunks[0], 'Hello world');
+  });
+
+  it('splits long text into multiple chunks', () => {
+    // Use sentences so sentence-boundary chunking can split
+    const sentences = Array.from({ length: 100 }, (_, i) => `This is sentence number ${i}.`);
+    const text = sentences.join(' ');
+    const chunks = chunkText(text, 30, 5);
+    assert.ok(chunks.length > 1, `Expected >1 chunks, got ${chunks.length}`);
+  });
+
+  it('preserves content - no words lost', () => {
+    const words = Array.from({ length: 50 }, (_, i) => `w${i}`);
+    const text = words.join('. ') + '.';
+    const chunks = chunkText(text, 15, 3);
+    // Every original word should appear in at least one chunk
+    for (const word of words) {
+      const found = chunks.some((c) => c.includes(word));
+      assert.ok(found, `Word "${word}" not found in any chunk`);
+    }
+  });
+
+  it('handles empty text', () => {
+    const chunks = chunkText('', 100, 10);
+    assert.equal(chunks.length, 0);
+  });
+
+  it('handles single-word text', () => {
+    const chunks = chunkText('hello', 100, 10);
+    assert.equal(chunks.length, 1);
+    assert.equal(chunks[0], 'hello');
+  });
+
+  it('respects sentence boundaries', () => {
+    const text =
+      'First sentence here. Second sentence here. Third sentence here. Fourth sentence here.';
+    const chunks = chunkText(text, 5, 2);
+    // Each chunk should tend to start at a sentence boundary
+    assert.ok(chunks.length >= 2);
+  });
+
+  it('handles text with no punctuation as single chunk', () => {
+    // Without sentence boundaries, all words form one "sentence"
+    // and get chunked only if they exceed chunkSize
+    const text = Array.from({ length: 100 }, (_, i) => `word${i}`).join(' ');
+    const chunks = chunkText(text, 20, 5);
+    // 100 words > chunkSize 20, so it should still produce a chunk
+    assert.ok(chunks.length >= 1, `Expected >=1 chunks, got ${chunks.length}`);
+    // All words should be present across all chunks
+    for (let i = 0; i < 100; i++) {
+      assert.ok(chunks.some((c) => c.includes(`word${i}`)), `word${i} missing`);
+    }
+  });
+});
+
+// ── VectorStore ───────────────────────────────────────────────
+
+describe('VectorStore', () => {
+  let tmpDir;
+  let vsPath;
+
+  before(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rag-test-'));
+    vsPath = path.join(tmpDir, 'vectors.json');
+  });
+
+  after(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('starts empty', () => {
+    const vs = new VectorStore(vsPath);
+    assert.equal(vs.count(), 0);
+    assert.deepEqual(vs.search([1, 0, 0]), []);
+  });
+
+  it('adds vectors and searches', () => {
+    const vs = new VectorStore(vsPath);
+    vs.add('a', [1, 0, 0], { text: 'right' });
+    vs.add('b', [0, 1, 0], { text: 'up' });
+    vs.add('c', [0, 0, 1], { text: 'forward' });
+
+    assert.equal(vs.count(), 3);
+
+    const results = vs.search([1, 0.1, 0], 2);
+    assert.equal(results.length, 2);
+    assert.equal(results[0].metadata.text, 'right');
+  });
+
+  it('saves and loads', () => {
+    const vs1 = new VectorStore(vsPath);
+    vs1.add('x', [1, 2, 3], { text: 'test' });
+    vs1.save();
+
+    const vs2 = new VectorStore(vsPath);
+    vs2.load();
+    assert.equal(vs2.count(), 1);
+    assert.equal(vs2.vectors[0].metadata.text, 'test');
+  });
+
+  it('removes by docId', () => {
+    const vs = new VectorStore(path.join(tmpDir, 'vs2.json'));
+    vs.add('a1', [1, 0], { docId: 'doc1', text: 'a' });
+    vs.add('a2', [0, 1], { docId: 'doc1', text: 'b' });
+    vs.add('b1', [1, 1], { docId: 'doc2', text: 'c' });
+
+    assert.equal(vs.count(), 3);
+    vs.removeByDocId('doc1');
+    assert.equal(vs.count(), 1);
+    assert.equal(vs.vectors[0].metadata.docId, 'doc2');
+  });
+
+  it('respects minScore filter', () => {
+    const vs = new VectorStore(path.join(tmpDir, 'vs3.json'));
+    vs.add('a', [1, 0, 0], { text: 'close' });
+    vs.add('b', [0, 1, 0], { text: 'orthogonal' });
+
+    const results = vs.search([1, 0, 0], 5, 0.5);
+    assert.equal(results.length, 1);
+    assert.equal(results[0].metadata.text, 'close');
+  });
+
+  it('handles loading non-existent file', () => {
+    const vs = new VectorStore(path.join(tmpDir, 'nonexistent.json'));
+    vs.load();
+    assert.equal(vs.count(), 0);
+  });
+
+  it('handles loading corrupt file', () => {
+    const corruptPath = path.join(tmpDir, 'corrupt.json');
+    fs.writeFileSync(corruptPath, 'not valid json{{{');
+    const vs = new VectorStore(corruptPath);
+    vs.load();
+    assert.equal(vs.count(), 0);
+  });
+});
+
+// ── RagEngine (CRUD - no Ollama needed) ───────────────────────
+
+describe('RagEngine (offline CRUD)', () => {
+  let tmpDir;
+  let engine;
+
+  before(async () => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rag-engine-test-'));
+    engine = new RagEngine(tmpDir);
+    await engine.init();
+  });
+
+  after(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('starts with no pipelines', () => {
+    const list = engine.listPipelines();
+    assert.equal(list.length, 0);
+  });
+
+  it('creates a pipeline', () => {
+    const p = engine.createPipeline('Test Pipeline', 'nomic-embed-text', 'llama3.2', {
+      chunkSize: 256,
+      topK: 3,
+    });
+    assert.ok(p.id);
+    assert.equal(p.name, 'Test Pipeline');
+    assert.equal(p.embeddingModel, 'nomic-embed-text');
+    assert.equal(p.chatModel, 'llama3.2');
+    assert.equal(p.chunkSize, 256);
+    assert.equal(p.topK, 3);
+  });
+
+  it('lists pipelines', () => {
+    const list = engine.listPipelines();
+    assert.equal(list.length, 1);
+    assert.equal(list[0].name, 'Test Pipeline');
+  });
+
+  it('gets pipeline by id', () => {
+    const list = engine.listPipelines();
+    const p = engine.getPipeline(list[0].id);
+    assert.equal(p.name, 'Test Pipeline');
+    assert.equal(p.chunkCount, 0);
+  });
+
+  it('renames pipeline', () => {
+    const list = engine.listPipelines();
+    const p = engine.renamePipeline(list[0].id, 'Renamed Pipeline');
+    assert.equal(p.name, 'Renamed Pipeline');
+  });
+
+  it('updates pipeline settings', () => {
+    const list = engine.listPipelines();
+    const p = engine.updatePipelineSettings(list[0].id, {
+      topK: 10,
+      chunkSize: 1024,
+    });
+    assert.equal(p.topK, 10);
+    assert.equal(p.chunkSize, 1024);
+  });
+
+  it('rejects unknown settings', () => {
+    const list = engine.listPipelines();
+    engine.updatePipelineSettings(list[0].id, { hackerField: 'evil' });
+    const p = engine.getPipeline(list[0].id);
+    assert.equal(p.hackerField, undefined);
+  });
+
+  it('chat history CRUD', () => {
+    const list = engine.listPipelines();
+    const id = list[0].id;
+
+    engine.saveChatHistory(id, [
+      { role: 'user', content: 'hello' },
+      { role: 'assistant', content: 'hi' },
+    ]);
+
+    const loaded = engine.loadChatHistory(id);
+    assert.equal(loaded.length, 2);
+    assert.equal(loaded[0].content, 'hello');
+
+    engine.clearChatHistory(id);
+    const cleared = engine.loadChatHistory(id);
+    assert.equal(cleared.length, 0);
+  });
+
+  it('returns null for nonexistent pipeline', () => {
+    assert.equal(engine.getPipeline('nonexistent-id'), null);
+  });
+
+  it('deletes pipeline', () => {
+    const list = engine.listPipelines();
+    engine.deletePipeline(list[0].id);
+    assert.equal(engine.listPipelines().length, 0);
+  });
+
+  it('persists across reloads', async () => {
+    engine.createPipeline('Persisted', 'emb', 'chat');
+    const engine2 = new RagEngine(tmpDir);
+    await engine2.init();
+    const list = engine2.listPipelines();
+    assert.equal(list.length, 1);
+    assert.equal(list[0].name, 'Persisted');
+    // Cleanup
+    engine2.deletePipeline(list[0].id);
+  });
+});
+
+// ── parseFile ─────────────────────────────────────────────────
+
+describe('parseFile', () => {
+  const { parseFile } = require('../src/rag-engine');
+  let tmpDir;
+
+  before(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'parse-test-'));
+  });
+
+  after(() => {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('parses .txt files', async () => {
+    const filePath = path.join(tmpDir, 'test.txt');
+    fs.writeFileSync(filePath, 'Hello from text file');
+    const text = await parseFile(filePath);
+    assert.equal(text, 'Hello from text file');
+  });
+
+  it('parses .md files', async () => {
+    const filePath = path.join(tmpDir, 'test.md');
+    fs.writeFileSync(filePath, '# Title\n\nSome markdown content');
+    const text = await parseFile(filePath);
+    assert.ok(text.includes('Title'));
+    assert.ok(text.includes('markdown content'));
+  });
+
+  it('parses .json files', async () => {
+    const filePath = path.join(tmpDir, 'test.json');
+    fs.writeFileSync(filePath, JSON.stringify({ key: 'value', num: 42 }));
+    const text = await parseFile(filePath);
+    const parsed = JSON.parse(text);
+    assert.equal(parsed.key, 'value');
+  });
+
+  it('parses .csv files into readable format', async () => {
+    const filePath = path.join(tmpDir, 'test.csv');
+    fs.writeFileSync(filePath, 'Name,Age,City\nAlice,30,NYC\nBob,25,LA');
+    const text = await parseFile(filePath);
+    assert.ok(text.includes('Name: Alice'));
+    assert.ok(text.includes('Age: 30'));
+    assert.ok(text.includes('City: NYC'));
+    assert.ok(text.includes('Name: Bob'));
+  });
+
+  it('handles unknown extensions as text', async () => {
+    const filePath = path.join(tmpDir, 'test.xyz');
+    fs.writeFileSync(filePath, 'unknown format content');
+    const text = await parseFile(filePath);
+    assert.equal(text, 'unknown format content');
+  });
+});

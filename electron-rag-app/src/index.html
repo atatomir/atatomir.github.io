@@ -3,24 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
   <title>Local RAG</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- Titlebar drag region -->
-  <div class="titlebar">
+  <div class="titlebar" role="banner">
     <span class="titlebar-title">Local RAG</span>
-    <div id="ollama-status" class="status-badge offline">Ollama offline</div>
+    <div id="ollama-status" class="status-badge offline" role="status" aria-live="polite">Ollama offline</div>
   </div>
 
   <div class="app-container">
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" role="navigation" aria-label="Pipelines">
       <div class="sidebar-header">
         <h2>Pipelines</h2>
-        <button id="btn-new-pipeline" class="btn-icon" title="New pipeline">+</button>
+        <button id="btn-new-pipeline" class="btn-icon" title="New pipeline (Cmd+N)" aria-label="Create new pipeline">+</button>
       </div>
-      <ul id="pipeline-list" class="pipeline-list"></ul>
+      <ul id="pipeline-list" class="pipeline-list" role="listbox" aria-label="Pipeline list"></ul>
       <div class="sidebar-footer">
         <button id="btn-manage-models" class="btn-secondary">Manage Models</button>
       </div>
@@ -31,12 +32,20 @@
       <!-- Welcome screen -->
       <div id="view-welcome" class="view active">
         <div class="welcome">
+          <div class="welcome-icon">
+            <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="url(#grad)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6c63ff"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+              <path d="M8 7h8M8 11h6"/>
+            </svg>
+          </div>
           <h1>Local RAG</h1>
-          <p>Build private RAG pipelines using local models via Ollama.</p>
+          <p>Build private RAG pipelines using local models via Ollama.<br>Everything runs on your machine. No data leaves your computer.</p>
           <div class="welcome-steps">
             <div class="step">
               <span class="step-num">1</span>
-              <span>Install & run <a href="#" onclick="return false">Ollama</a></span>
+              <span>Install & run <strong>Ollama</strong></span>
             </div>
             <div class="step">
               <span class="step-num">2</span>
@@ -51,6 +60,9 @@
               <span>Create a pipeline, add documents, and ask questions</span>
             </div>
           </div>
+          <div class="welcome-cta">
+            <button id="btn-welcome-models" class="btn-secondary" onclick="document.getElementById('btn-manage-models').click()">Manage Models</button>
+          </div>
         </div>
       </div>
 
@@ -58,73 +70,101 @@
       <div id="view-pipeline" class="view">
         <div class="pipeline-header">
           <div>
-            <h1 id="pipeline-name"></h1>
+            <h1 id="pipeline-name" title="Double-click to rename"></h1>
             <div class="pipeline-meta">
               <span id="pipeline-emb-model" class="tag"></span>
               <span id="pipeline-chat-model" class="tag"></span>
               <span id="pipeline-doc-count" class="tag"></span>
+              <span id="pipeline-chunk-count" class="tag"></span>
             </div>
           </div>
           <div class="pipeline-actions">
-            <button id="btn-add-docs" class="btn-primary">Add Documents</button>
-            <button id="btn-delete-pipeline" class="btn-danger">Delete</button>
+            <button id="btn-add-docs" class="btn-primary" title="Add documents (Cmd+O)">Add Documents</button>
+            <button id="btn-clear-chat" class="btn-secondary btn-compact" title="Clear chat history">Clear Chat</button>
+            <button id="btn-delete-pipeline" class="btn-danger" title="Delete pipeline">Delete</button>
           </div>
         </div>
 
+        <!-- Ingestion progress -->
+        <div id="ingest-status" class="ingest-status" role="status" aria-live="polite"></div>
+
         <!-- Documents panel -->
-        <div class="documents-panel" id="documents-panel">
-          <h3>Documents</h3>
-          <ul id="doc-list" class="doc-list"></ul>
-        </div>
+        <details class="documents-panel" id="documents-panel" open>
+          <summary><h3>Documents</h3></summary>
+          <ul id="doc-list" class="doc-list" role="list"></ul>
+        </details>
 
         <!-- Chat -->
         <div class="chat-container">
-          <div id="chat-messages" class="chat-messages"></div>
+          <div id="chat-messages" class="chat-messages" role="log" aria-label="Chat messages"></div>
           <div class="chat-input-row">
-            <textarea id="chat-input" placeholder="Ask a question about your documents..." rows="1"></textarea>
-            <button id="btn-send" class="btn-primary">Send</button>
+            <textarea id="chat-input" placeholder="Ask a question about your documents... (Enter to send, Shift+Enter for newline)" rows="1" aria-label="Chat input"></textarea>
+            <button id="btn-send" class="btn-primary" aria-label="Send message">Send</button>
           </div>
         </div>
       </div>
 
       <!-- Create pipeline modal -->
-      <div id="modal-create" class="modal">
+      <div id="modal-create" class="modal" role="dialog" aria-labelledby="modal-create-title" aria-modal="true">
         <div class="modal-content">
-          <h2>New Pipeline</h2>
+          <h2 id="modal-create-title">New Pipeline</h2>
           <label>Name
-            <input type="text" id="input-pipeline-name" placeholder="My Knowledge Base">
+            <input type="text" id="input-pipeline-name" placeholder="My Knowledge Base" autocomplete="off">
           </label>
           <label>Embedding Model
-            <select id="select-emb-model"></select>
+            <select id="select-emb-model" aria-label="Select embedding model"></select>
           </label>
           <label>Chat Model
-            <select id="select-chat-model"></select>
+            <select id="select-chat-model" aria-label="Select chat model"></select>
           </label>
+          <div class="modal-row">
+            <label class="half">Chunk Size (words)
+              <input type="number" id="input-chunk-size" value="512" min="64" max="2048">
+            </label>
+            <label class="half">Top-K Results
+              <input type="number" id="input-top-k" value="5" min="1" max="20">
+            </label>
+          </div>
           <div class="modal-actions">
-            <button id="btn-cancel-create" class="btn-secondary">Cancel</button>
+            <button id="btn-cancel-create" class="btn-secondary btn-compact">Cancel</button>
             <button id="btn-confirm-create" class="btn-primary">Create</button>
           </div>
         </div>
       </div>
 
       <!-- Models modal -->
-      <div id="modal-models" class="modal">
+      <div id="modal-models" class="modal" role="dialog" aria-labelledby="modal-models-title" aria-modal="true">
         <div class="modal-content modal-wide">
-          <h2>Manage Models</h2>
+          <h2 id="modal-models-title">Manage Models</h2>
           <div class="model-pull-row">
-            <input type="text" id="input-pull-model" placeholder="e.g. nomic-embed-text or llama3.2">
+            <input type="text" id="input-pull-model" placeholder="e.g. nomic-embed-text or llama3.2" aria-label="Model name to pull">
             <button id="btn-pull-model" class="btn-primary">Pull</button>
           </div>
-          <div id="pull-status" class="pull-status"></div>
+          <div id="pull-status" class="pull-status" role="status" aria-live="polite"></div>
           <h3>Installed Models</h3>
-          <ul id="model-list" class="model-list"></ul>
+          <ul id="model-list" class="model-list" role="list"></ul>
           <div class="modal-actions">
-            <button id="btn-close-models" class="btn-secondary">Close</button>
+            <button id="btn-close-models" class="btn-secondary btn-compact">Close</button>
           </div>
         </div>
       </div>
     </main>
   </div>
+
+  <!-- Drag overlay -->
+  <div id="drag-overlay" class="drag-overlay" aria-hidden="true">
+    <div class="drag-overlay-content">
+      <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <p>Drop files to add to pipeline</p>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <script src="renderer.js"></script>
 </body>

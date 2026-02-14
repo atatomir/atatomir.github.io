@@ -1,18 +1,17 @@
 {
   "name": "local-rag",
-  "version": "1.0.0",
-  "description": "Local RAG pipeline builder with local LLM and embeddings",
+  "version": "1.1.0",
+  "description": "Local RAG pipeline builder with local LLM and embeddings via Ollama",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "test": "node --test test/rag-engine.test.js",
     "build": "electron-builder --mac",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "electron-store": "^8.1.0",
     "pdf-parse": "^1.1.1",
-    "mammoth": "^1.6.0",
-    "hnswlib-node": "^3.0.0"
+    "mammoth": "^1.6.0"
   },
   "devDependencies": {
     "electron": "^28.1.0",
@@ -23,7 +22,8 @@
     "productName": "Local RAG",
     "mac": {
       "category": "public.app-category.productivity",
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "assets/icon.icns"
     },
     "files": [
       "src/**/*",

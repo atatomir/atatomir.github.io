@@ -1,6 +1,5 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
 const path = require('path');
-const fs = require('fs');
 const { RagEngine } = require('./rag-engine');
 
 let mainWindow;
@@ -24,11 +23,105 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 }
 
+function buildMenu() {
+  const template = [
+    {
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideOthers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' },
+      ],
+    },
+    {
+      label: 'File',
+      submenu: [
+        {
+          label: 'New Pipeline',
+          accelerator: 'CmdOrCtrl+N',
+          click: () => mainWindow?.webContents.send('menu:new-pipeline'),
+        },
+        {
+          label: 'Add Documents',
+          accelerator: 'CmdOrCtrl+O',
+          click: () => mainWindow?.webContents.send('menu:add-documents'),
+        },
+        { type: 'separator' },
+        { role: 'close' },
+      ],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' },
+      ],
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+      ],
+    },
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        { type: 'separator' },
+        { role: 'front' },
+      ],
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Ollama Website',
+          click: () => shell.openExternal('https://ollama.com'),
+        },
+      ],
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
+// Wrap IPC handlers with error handling
+function handle(channel, handler) {
+  ipcMain.handle(channel, async (event, ...args) => {
+    try {
+      return await handler(event, ...args);
+    } catch (err) {
+      throw new Error(err.message || String(err));
+    }
+  });
+}
+
 app.whenReady().then(async () => {
   const userDataPath = app.getPath('userData');
   ragEngine = new RagEngine(userDataPath);
   await ragEngine.init();
 
+  buildMenu();
   createWindow();
 
   app.on('activate', () => {
@@ -42,68 +135,65 @@ app.on('window-all-closed', () => {
 
 // ── IPC Handlers ──────────────────────────────────────────────
 
-// Ollama status
-ipcMain.handle('ollama:status', async () => {
-  return ragEngine.checkOllamaStatus();
-});
-
-ipcMain.handle('ollama:models', async () => {
-  return ragEngine.listModels();
-});
-
-ipcMain.handle('ollama:pull', async (_e, modelName) => {
-  return ragEngine.pullModel(modelName);
-});
+// Ollama
+handle('ollama:status', () => ragEngine.checkOllamaStatus());
+handle('ollama:models', () => ragEngine.listModels());
+handle('ollama:pull', (_e, modelName) => ragEngine.pullModel(modelName));
+handle('ollama:delete-model', (_e, modelName) => ragEngine.deleteModel(modelName));
 
 // Pipeline CRUD
-ipcMain.handle('pipeline:list', async () => {
-  return ragEngine.listPipelines();
-});
-
-ipcMain.handle('pipeline:create', async (_e, name, embeddingModel, chatModel) => {
-  return ragEngine.createPipeline(name, embeddingModel, chatModel);
-});
-
-ipcMain.handle('pipeline:delete', async (_e, id) => {
-  return ragEngine.deletePipeline(id);
-});
-
-ipcMain.handle('pipeline:get', async (_e, id) => {
-  return ragEngine.getPipeline(id);
-});
+handle('pipeline:list', () => ragEngine.listPipelines());
+handle('pipeline:create', (_e, name, embeddingModel, chatModel, opts) =>
+  ragEngine.createPipeline(name, embeddingModel, chatModel, opts)
+);
+handle('pipeline:delete', (_e, id) => ragEngine.deletePipeline(id));
+handle('pipeline:get', (_e, id) => ragEngine.getPipeline(id));
+handle('pipeline:rename', (_e, id, name) => ragEngine.renamePipeline(id, name));
+handle('pipeline:update-settings', (_e, id, settings) =>
+  ragEngine.updatePipelineSettings(id, settings)
+);
 
 // Document management
-ipcMain.handle('pipeline:add-files', async (_e, pipelineId) => {
+handle('pipeline:add-files', async (_e, pipelineId) => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile', 'multiSelections'],
     filters: [
-      { name: 'Documents', extensions: ['pdf', 'txt', 'md', 'docx', 'json', 'csv'] },
+      {
+        name: 'Documents',
+        extensions: ['pdf', 'txt', 'md', 'docx', 'json', 'csv'],
+      },
     ],
   });
   if (result.canceled) return { canceled: true };
-  return ragEngine.ingestFiles(pipelineId, result.filePaths);
+
+  return ragEngine.ingestFiles(pipelineId, result.filePaths, (progress) => {
+    mainWindow?.webContents.send('pipeline:ingest-progress', progress);
+  });
 });
 
-ipcMain.handle('pipeline:documents', async (_e, pipelineId) => {
-  return ragEngine.listDocuments(pipelineId);
+handle('pipeline:add-file-paths', async (_e, pipelineId, filePaths) => {
+  return ragEngine.ingestFiles(pipelineId, filePaths, (progress) => {
+    mainWindow?.webContents.send('pipeline:ingest-progress', progress);
+  });
 });
 
-ipcMain.handle('pipeline:remove-document', async (_e, pipelineId, docId) => {
-  return ragEngine.removeDocument(pipelineId, docId);
-});
+handle('pipeline:documents', (_e, pipelineId) => ragEngine.listDocuments(pipelineId));
+handle('pipeline:remove-document', (_e, pipelineId, docId) =>
+  ragEngine.removeDocument(pipelineId, docId)
+);
 
-// Query
-ipcMain.handle('pipeline:query', async (_e, pipelineId, question) => {
-  return ragEngine.query(pipelineId, question);
-});
+// Chat history
+handle('chat:load', (_e, pipelineId) => ragEngine.loadChatHistory(pipelineId));
+handle('chat:save', (_e, pipelineId, messages) => ragEngine.saveChatHistory(pipelineId, messages));
+handle('chat:clear', (_e, pipelineId) => ragEngine.clearChatHistory(pipelineId));
 
 // Streaming query
-ipcMain.on('pipeline:query-stream', async (event, pipelineId, question) => {
+ipcMain.on('pipeline:query-stream', async (event, pipelineId, question, chatMessages) => {
   try {
-    await ragEngine.queryStream(pipelineId, question, (chunk) => {
+    const result = await ragEngine.queryStream(pipelineId, question, chatMessages, (chunk) => {
       event.reply('pipeline:query-stream-chunk', chunk);
     });
-    event.reply('pipeline:query-stream-done');
+    event.reply('pipeline:query-stream-done', result.sources);
   } catch (err) {
     event.reply('pipeline:query-stream-error', err.message);
   }
