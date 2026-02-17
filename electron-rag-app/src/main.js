@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
 const path = require('path');
-const { RagEngine } = require('./rag-engine');
+const { RagEngine, DOC_PRESETS } = require('./rag-engine');
 
 let mainWindow;
 let ragEngine;
@@ -134,6 +134,9 @@ app.on('window-all-closed', () => {
 });
 
 // ── IPC Handlers ──────────────────────────────────────────────
+
+// Presets
+handle('presets:list', () => DOC_PRESETS);
 
 // Ollama
 handle('ollama:status', () => ragEngine.checkOllamaStatus());

@@ -94,6 +94,50 @@
           <ul id="doc-list" class="doc-list" role="list"></ul>
         </details>
 
+        <!-- Settings panel -->
+        <details class="documents-panel" id="settings-panel">
+          <summary><h3>RAG Settings</h3></summary>
+          <div class="settings-grid">
+            <label class="settings-field">
+              <span>Preset</span>
+              <select id="settings-preset" aria-label="Document type preset"></select>
+            </label>
+            <label class="settings-field">
+              <span>Chunk Size</span>
+              <input type="number" id="settings-chunk-size" min="64" max="2048">
+            </label>
+            <label class="settings-field">
+              <span>Overlap</span>
+              <input type="number" id="settings-chunk-overlap" min="0" max="512">
+            </label>
+            <label class="settings-field">
+              <span>Top-K</span>
+              <input type="number" id="settings-top-k" min="1" max="20">
+            </label>
+            <label class="settings-field">
+              <span>Temperature</span>
+              <input type="number" id="settings-temperature" min="0" max="2" step="0.1">
+            </label>
+            <label class="settings-field">
+              <span>Min Similarity</span>
+              <input type="number" id="settings-min-score" min="0" max="1" step="0.05">
+            </label>
+            <label class="settings-field">
+              <span>Chat History</span>
+              <input type="number" id="settings-context-window" min="0" max="20">
+            </label>
+            <label class="settings-field settings-field-wide">
+              <span>System Prompt</span>
+              <textarea id="settings-system-prompt" rows="4"></textarea>
+            </label>
+            <div class="settings-actions">
+              <button id="btn-save-settings" class="btn-primary btn-compact">Save Settings</button>
+              <button id="btn-reset-preset" class="btn-secondary btn-compact">Reset to Preset</button>
+              <span id="settings-save-status" class="settings-save-status"></span>
+            </div>
+          </div>
+        </details>
+
         <!-- Chat -->
         <div class="chat-container">
           <div id="chat-messages" class="chat-messages" role="log" aria-label="Chat messages"></div>
@@ -111,6 +155,10 @@
           <label>Name
             <input type="text" id="input-pipeline-name" placeholder="My Knowledge Base" autocomplete="off">
           </label>
+          <label>Document Type Preset
+            <select id="select-preset" aria-label="Select document type preset"></select>
+            <span class="field-hint" id="preset-hint">Balanced settings for most documents</span>
+          </label>
           <label>Embedding Model
             <select id="select-emb-model" aria-label="Select embedding model"></select>
           </label>
@@ -121,8 +169,24 @@
             <label class="half">Chunk Size (words)
               <input type="number" id="input-chunk-size" value="512" min="64" max="2048">
             </label>
+            <label class="half">Chunk Overlap (words)
+              <input type="number" id="input-chunk-overlap" value="64" min="0" max="512">
+            </label>
+          </div>
+          <div class="modal-row">
             <label class="half">Top-K Results
               <input type="number" id="input-top-k" value="5" min="1" max="20">
+            </label>
+            <label class="half">Temperature
+              <input type="number" id="input-temperature" value="0.1" min="0" max="2" step="0.1">
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Min Similarity (0-1)
+              <input type="number" id="input-min-score" value="0.3" min="0" max="1" step="0.05">
+            </label>
+            <label class="half">Chat History (msgs)
+              <input type="number" id="input-context-window" value="6" min="0" max="20">
             </label>
           </div>
           <div class="modal-actions">

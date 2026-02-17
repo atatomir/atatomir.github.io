@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const { VectorStore, cosineSimilarity, chunkText, RagEngine } = require('../src/rag-engine');
+const { VectorStore, cosineSimilarity, chunkText, RagEngine, DOC_PRESETS } = require('../src/rag-engine');
 
 // ── cosineSimilarity ──────────────────────────────────────────
 
@@ -217,7 +217,7 @@ describe('RagEngine (offline CRUD)', () => {
     assert.equal(list.length, 0);
   });
 
-  it('creates a pipeline', () => {
+  it('creates a pipeline with defaults from general preset', () => {
     const p = engine.createPipeline('Test Pipeline', 'nomic-embed-text', 'llama3.2', {
       chunkSize: 256,
       topK: 3,
@@ -228,6 +228,25 @@ describe('RagEngine (offline CRUD)', () => {
     assert.equal(p.chatModel, 'llama3.2');
     assert.equal(p.chunkSize, 256);
     assert.equal(p.topK, 3);
+    // New fields should have defaults from general preset
+    assert.equal(p.temperature, DOC_PRESETS.general.temperature);
+    assert.equal(p.minScore, DOC_PRESETS.general.minScore);
+    assert.equal(p.contextWindow, DOC_PRESETS.general.contextWindow);
+    assert.equal(p.preset, 'general');
+  });
+
+  it('creates a pipeline with a specific preset', () => {
+    const p = engine.createPipeline('Code Pipeline', 'nomic-embed-text', 'llama3.2', {
+      preset: 'code',
+    });
+    assert.equal(p.chunkSize, DOC_PRESETS.code.chunkSize);
+    assert.equal(p.chunkOverlap, DOC_PRESETS.code.chunkOverlap);
+    assert.equal(p.topK, DOC_PRESETS.code.topK);
+    assert.equal(p.temperature, DOC_PRESETS.code.temperature);
+    assert.equal(p.minScore, DOC_PRESETS.code.minScore);
+    assert.equal(p.preset, 'code');
+    // Cleanup
+    engine.deletePipeline(p.id);
   });
 
   it('lists pipelines', () => {
@@ -254,9 +273,15 @@ describe('RagEngine (offline CRUD)', () => {
     const p = engine.updatePipelineSettings(list[0].id, {
       topK: 10,
       chunkSize: 1024,
+      temperature: 0.5,
+      minScore: 0.4,
+      contextWindow: 8,
     });
     assert.equal(p.topK, 10);
     assert.equal(p.chunkSize, 1024);
+    assert.equal(p.temperature, 0.5);
+    assert.equal(p.minScore, 0.4);
+    assert.equal(p.contextWindow, 8);
   });
 
   it('rejects unknown settings', () => {
@@ -358,5 +383,40 @@ describe('parseFile', () => {
     fs.writeFileSync(filePath, 'unknown format content');
     const text = await parseFile(filePath);
     assert.equal(text, 'unknown format content');
+  });
+});
+
+// ── DOC_PRESETS ───────────────────────────────────────────────
+
+describe('DOC_PRESETS', () => {
+  it('has all expected presets', () => {
+    const expected = ['general', 'technical', 'legal', 'code', 'research', 'csv'];
+    for (const key of expected) {
+      assert.ok(DOC_PRESETS[key], `Missing preset: ${key}`);
+    }
+  });
+
+  it('each preset has required fields', () => {
+    const requiredFields = ['label', 'description', 'chunkSize', 'chunkOverlap', 'topK', 'temperature', 'minScore', 'contextWindow', 'systemPrompt'];
+    for (const [key, preset] of Object.entries(DOC_PRESETS)) {
+      for (const field of requiredFields) {
+        assert.ok(preset[field] !== undefined, `Preset "${key}" missing field "${field}"`);
+      }
+    }
+  });
+
+  it('all presets have context-only instructions in system prompt', () => {
+    for (const [key, preset] of Object.entries(DOC_PRESETS)) {
+      assert.ok(
+        preset.systemPrompt.includes('STRICTLY') || preset.systemPrompt.includes('ONLY'),
+        `Preset "${key}" system prompt should enforce context-only answers`
+      );
+    }
+  });
+
+  it('temperature values are in valid range', () => {
+    for (const [key, preset] of Object.entries(DOC_PRESETS)) {
+      assert.ok(preset.temperature >= 0 && preset.temperature <= 2, `Preset "${key}" temperature out of range: ${preset.temperature}`);
+    }
   });
 });

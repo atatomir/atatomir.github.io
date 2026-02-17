@@ -28,10 +28,29 @@ const ingestStatus = $('#ingest-status');
 
 const modalCreate = $('#modal-create');
 const inputPipelineName = $('#input-pipeline-name');
+const selectPreset = $('#select-preset');
+const presetHint = $('#preset-hint');
 const selectEmbModel = $('#select-emb-model');
 const selectChatModel = $('#select-chat-model');
 const inputChunkSize = $('#input-chunk-size');
+const inputChunkOverlap = $('#input-chunk-overlap');
 const inputTopK = $('#input-top-k');
+const inputTemperature = $('#input-temperature');
+const inputMinScore = $('#input-min-score');
+const inputContextWindow = $('#input-context-window');
+
+// Settings panel refs
+const settingsPreset = $('#settings-preset');
+const settingsChunkSize = $('#settings-chunk-size');
+const settingsChunkOverlap = $('#settings-chunk-overlap');
+const settingsTopK = $('#settings-top-k');
+const settingsTemperature = $('#settings-temperature');
+const settingsMinScore = $('#settings-min-score');
+const settingsContextWindow = $('#settings-context-window');
+const settingsSystemPrompt = $('#settings-system-prompt');
+const btnSaveSettings = $('#btn-save-settings');
+const btnResetPreset = $('#btn-reset-preset');
+const settingsSaveStatus = $('#settings-save-status');
 
 const modalModels = $('#modal-models');
 const modelList = $('#model-list');
@@ -92,6 +111,39 @@ function formatFileSize(bytes) {
   return (bytes / 1e9).toFixed(1) + ' GB';
 }
 
+// ── Presets ───────────────────────────────────────────────────
+
+let docPresets = {};
+
+async function loadPresets() {
+  docPresets = await window.api.listPresets();
+}
+
+function populatePresetSelect(selectEl, selectedValue) {
+  selectEl.innerHTML = '';
+  for (const [key, preset] of Object.entries(docPresets)) {
+    const opt = new Option(preset.label, key);
+    selectEl.add(opt);
+  }
+  if (selectedValue && docPresets[selectedValue]) {
+    selectEl.value = selectedValue;
+  }
+}
+
+function applyPresetToCreateModal(presetKey) {
+  const preset = docPresets[presetKey];
+  if (!preset) return;
+  inputChunkSize.value = preset.chunkSize;
+  inputChunkOverlap.value = preset.chunkOverlap;
+  inputTopK.value = preset.topK;
+  inputTemperature.value = preset.temperature;
+  inputMinScore.value = preset.minScore;
+  inputContextWindow.value = preset.contextWindow;
+  presetHint.textContent = preset.description;
+}
+
+loadPresets();
+
 // ── Ollama Status ─────────────────────────────────────────────
 
 let ollamaOnline = false;
@@ -151,6 +203,17 @@ async function openPipeline(id) {
   pipelineChatModel.textContent = `Chat: ${p.chatModel}`;
   pipelineDocCount.textContent = `${p.documents.length} docs`;
   pipelineChunkCount.textContent = `${p.chunkCount || 0} chunks`;
+
+  // Populate settings panel
+  populatePresetSelect(settingsPreset, p.preset || 'general');
+  settingsChunkSize.value = p.chunkSize || 512;
+  settingsChunkOverlap.value = p.chunkOverlap || 64;
+  settingsTopK.value = p.topK || 5;
+  settingsTemperature.value = p.temperature !== undefined ? p.temperature : 0.1;
+  settingsMinScore.value = p.minScore !== undefined ? p.minScore : 0.3;
+  settingsContextWindow.value = p.contextWindow || 6;
+  settingsSystemPrompt.value = p.systemPrompt || '';
+  settingsSaveStatus.textContent = '';
 
   await refreshDocuments();
 
@@ -472,12 +535,19 @@ async function openCreateModal() {
   );
   if (chatDefault) selectChatModel.value = chatDefault.name;
 
+  // Populate presets and apply default
+  populatePresetSelect(selectPreset, 'general');
+  applyPresetToCreateModal('general');
+
   inputPipelineName.value = '';
-  inputChunkSize.value = '512';
-  inputTopK.value = '5';
   modalCreate.classList.add('active');
   inputPipelineName.focus();
 }
+
+// Preset change in create modal
+selectPreset.addEventListener('change', () => {
+  applyPresetToCreateModal(selectPreset.value);
+});
 
 $('#btn-new-pipeline').addEventListener('click', openCreateModal);
 
@@ -492,16 +562,74 @@ $('#btn-confirm-create').addEventListener('click', async () => {
   if (!embModel || !chatModel) return;
 
   const chunkSize = parseInt(inputChunkSize.value) || 512;
+  const chunkOverlap = parseInt(inputChunkOverlap.value) || 64;
   const topK = parseInt(inputTopK.value) || 5;
+  const temperature = parseFloat(inputTemperature.value);
+  const minScore = parseFloat(inputMinScore.value);
+  const contextWindow = parseInt(inputContextWindow.value) || 6;
+  const preset = selectPreset.value;
 
   const p = await window.api.createPipeline(name, embModel, chatModel, {
+    preset,
     chunkSize: Math.max(64, Math.min(2048, chunkSize)),
+    chunkOverlap: Math.max(0, Math.min(512, chunkOverlap)),
     topK: Math.max(1, Math.min(20, topK)),
+    temperature: Math.max(0, Math.min(2, isNaN(temperature) ? 0.1 : temperature)),
+    minScore: Math.max(0, Math.min(1, isNaN(minScore) ? 0.3 : minScore)),
+    contextWindow: Math.max(0, Math.min(20, contextWindow)),
   });
   modalCreate.classList.remove('active');
   showToast(`Pipeline "${name}" created`, 'success');
   await refreshPipelines();
   openPipeline(p.id);
+});
+
+// ── Pipeline Settings ──────────────────────────────────────────
+
+btnSaveSettings.addEventListener('click', async () => {
+  if (!currentPipelineId) return;
+  const settings = {
+    preset: settingsPreset.value,
+    chunkSize: Math.max(64, Math.min(2048, parseInt(settingsChunkSize.value) || 512)),
+    chunkOverlap: Math.max(0, Math.min(512, parseInt(settingsChunkOverlap.value) || 64)),
+    topK: Math.max(1, Math.min(20, parseInt(settingsTopK.value) || 5)),
+    temperature: Math.max(0, Math.min(2, parseFloat(settingsTemperature.value) || 0)),
+    minScore: Math.max(0, Math.min(1, parseFloat(settingsMinScore.value) || 0)),
+    contextWindow: Math.max(0, Math.min(20, parseInt(settingsContextWindow.value) || 6)),
+    systemPrompt: settingsSystemPrompt.value,
+  };
+  await window.api.updatePipelineSettings(currentPipelineId, settings);
+  settingsSaveStatus.textContent = 'Saved!';
+  settingsSaveStatus.className = 'settings-save-status success';
+  showToast('Settings saved. Changes apply to new queries.', 'success');
+  setTimeout(() => { settingsSaveStatus.textContent = ''; }, 3000);
+});
+
+btnResetPreset.addEventListener('click', () => {
+  const presetKey = settingsPreset.value;
+  const preset = docPresets[presetKey];
+  if (!preset) return;
+  settingsChunkSize.value = preset.chunkSize;
+  settingsChunkOverlap.value = preset.chunkOverlap;
+  settingsTopK.value = preset.topK;
+  settingsTemperature.value = preset.temperature;
+  settingsMinScore.value = preset.minScore;
+  settingsContextWindow.value = preset.contextWindow;
+  settingsSystemPrompt.value = preset.systemPrompt;
+  showToast(`Reset to "${preset.label}" defaults. Click Save to apply.`, 'info');
+});
+
+settingsPreset.addEventListener('change', () => {
+  const presetKey = settingsPreset.value;
+  const preset = docPresets[presetKey];
+  if (!preset) return;
+  settingsChunkSize.value = preset.chunkSize;
+  settingsChunkOverlap.value = preset.chunkOverlap;
+  settingsTopK.value = preset.topK;
+  settingsTemperature.value = preset.temperature;
+  settingsMinScore.value = preset.minScore;
+  settingsContextWindow.value = preset.contextWindow;
+  settingsSystemPrompt.value = preset.systemPrompt;
 });
 
 // ── Delete Pipeline ───────────────────────────────────────────

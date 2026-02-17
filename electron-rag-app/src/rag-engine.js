@@ -212,6 +212,122 @@ async function parseFile(filePath) {
   }
 }
 
+// ── Document Type Presets ─────────────────────────────────────
+
+const DOC_PRESETS = {
+  general: {
+    label: 'General',
+    description: 'Balanced settings for most documents',
+    chunkSize: 512,
+    chunkOverlap: 64,
+    topK: 5,
+    temperature: 0.1,
+    minScore: 0.3,
+    contextWindow: 6,
+    systemPrompt:
+      'You are a precise assistant that answers questions STRICTLY based on the provided context.\n\n' +
+      'CRITICAL RULES:\n' +
+      '1. ONLY use information explicitly stated in the Context below.\n' +
+      '2. NEVER use your training knowledge or make assumptions beyond what the context provides.\n' +
+      '3. If the context does not contain enough information to answer, say: "The provided documents do not contain enough information to answer this question."\n' +
+      '4. Quote or closely paraphrase the source text when possible.\n' +
+      '5. Cite sources using [n] notation corresponding to the context chunk numbers.\n' +
+      '6. If the question is partially answerable, answer only the parts supported by the context and note what is missing.',
+  },
+  technical: {
+    label: 'Technical Docs',
+    description: 'API docs, manuals, specs — smaller chunks, more results',
+    chunkSize: 256,
+    chunkOverlap: 48,
+    topK: 8,
+    temperature: 0.0,
+    minScore: 0.25,
+    contextWindow: 4,
+    systemPrompt:
+      'You are a technical documentation assistant that answers questions STRICTLY based on the provided context.\n\n' +
+      'CRITICAL RULES:\n' +
+      '1. ONLY use information explicitly stated in the Context below.\n' +
+      '2. NEVER use your training knowledge, external references, or make assumptions beyond the context.\n' +
+      '3. If the context does not contain the answer, say: "This is not covered in the provided documentation."\n' +
+      '4. Be precise and use exact terminology from the documents.\n' +
+      '5. Cite sources using [n] notation.\n' +
+      '6. When describing procedures, follow the exact steps from the documentation.',
+  },
+  legal: {
+    label: 'Legal / Contracts',
+    description: 'Legal docs, contracts — large chunks to preserve clauses',
+    chunkSize: 1024,
+    chunkOverlap: 128,
+    topK: 4,
+    temperature: 0.0,
+    minScore: 0.3,
+    contextWindow: 4,
+    systemPrompt:
+      'You are a legal document assistant that answers questions STRICTLY based on the provided context.\n\n' +
+      'CRITICAL RULES:\n' +
+      '1. ONLY use information explicitly stated in the Context below.\n' +
+      '2. NEVER use your training knowledge or legal reasoning beyond what the documents state.\n' +
+      '3. If the context does not contain the answer, say: "The provided documents do not address this question."\n' +
+      '4. Quote exact language from the documents when possible.\n' +
+      '5. Cite sources using [n] notation.\n' +
+      '6. Do NOT provide legal advice or interpretation beyond what is explicitly in the text.',
+  },
+  code: {
+    label: 'Source Code',
+    description: 'Code files — small chunks, high overlap for functions',
+    chunkSize: 192,
+    chunkOverlap: 48,
+    topK: 10,
+    temperature: 0.0,
+    minScore: 0.2,
+    contextWindow: 4,
+    systemPrompt:
+      'You are a code assistant that answers questions STRICTLY based on the provided source code context.\n\n' +
+      'CRITICAL RULES:\n' +
+      '1. ONLY reference code, functions, classes, and logic explicitly present in the Context below.\n' +
+      '2. NEVER infer behavior from common library patterns or your training knowledge.\n' +
+      '3. If the context does not contain relevant code, say: "The provided code does not contain this information."\n' +
+      '4. Reference specific function/class names from the context.\n' +
+      '5. Cite sources using [n] notation.',
+  },
+  research: {
+    label: 'Research Papers',
+    description: 'Academic papers — medium chunks, more overlap for citations',
+    chunkSize: 384,
+    chunkOverlap: 96,
+    topK: 6,
+    temperature: 0.1,
+    minScore: 0.25,
+    contextWindow: 6,
+    systemPrompt:
+      'You are a research assistant that answers questions STRICTLY based on the provided paper excerpts.\n\n' +
+      'CRITICAL RULES:\n' +
+      '1. ONLY use information explicitly stated in the Context below.\n' +
+      '2. NEVER use your general knowledge about the topic or cite papers not in the context.\n' +
+      '3. If the context does not contain the answer, say: "The provided papers do not address this question."\n' +
+      '4. Distinguish between findings, methods, and conclusions as presented in the text.\n' +
+      '5. Cite sources using [n] notation.',
+  },
+  csv: {
+    label: 'Data / CSV',
+    description: 'Structured data, spreadsheets — small chunks, many results',
+    chunkSize: 256,
+    chunkOverlap: 32,
+    topK: 12,
+    temperature: 0.0,
+    minScore: 0.2,
+    contextWindow: 4,
+    systemPrompt:
+      'You are a data analysis assistant that answers questions STRICTLY based on the provided data context.\n\n' +
+      'CRITICAL RULES:\n' +
+      '1. ONLY use data explicitly present in the Context below.\n' +
+      '2. NEVER fabricate data points, statistics, or trends not in the context.\n' +
+      '3. If the context does not contain enough data, say: "The provided data does not contain this information."\n' +
+      '4. When summarizing data, be precise with numbers and labels from the source.\n' +
+      '5. Cite sources using [n] notation.',
+  },
+};
+
 // ── Chunking ──────────────────────────────────────────────────
 
 function chunkText(text, chunkSize = 512, overlap = 64) {
@@ -370,8 +486,12 @@ class RagEngine {
     return embeddings;
   }
 
-  async _chatStream(model, messages, onToken) {
-    await ollamaFetchStream('/api/chat', { model, messages, stream: true }, (obj) => {
+  async _chatStream(model, messages, onToken, options = {}) {
+    const body = { model, messages, stream: true };
+    if (options.temperature !== undefined) {
+      body.options = { temperature: options.temperature };
+    }
+    await ollamaFetchStream('/api/chat', body, (obj) => {
       if (obj.message?.content) {
         onToken(obj.message.content);
       }
@@ -393,16 +513,20 @@ class RagEngine {
     const pipelineDir = path.join(this.pipelinesDir, id);
     fs.mkdirSync(pipelineDir, { recursive: true });
 
+    const preset = DOC_PRESETS[opts.preset] || DOC_PRESETS.general;
+
     this.pipelines[id] = {
       name,
       embeddingModel,
       chatModel,
-      chunkSize: opts.chunkSize || 512,
-      chunkOverlap: opts.chunkOverlap || 64,
-      topK: opts.topK || 5,
-      systemPrompt:
-        opts.systemPrompt ||
-        'You are a helpful assistant that answers questions based on the provided context. Use ONLY the context below to answer. If the context doesn\'t contain the answer, say so clearly. Cite sources using [n] notation.',
+      preset: opts.preset || 'general',
+      chunkSize: opts.chunkSize || preset.chunkSize,
+      chunkOverlap: opts.chunkOverlap || preset.chunkOverlap,
+      topK: opts.topK || preset.topK,
+      temperature: opts.temperature !== undefined ? opts.temperature : preset.temperature,
+      minScore: opts.minScore !== undefined ? opts.minScore : preset.minScore,
+      contextWindow: opts.contextWindow || preset.contextWindow,
+      systemPrompt: opts.systemPrompt || preset.systemPrompt,
       documents: [],
       createdAt: new Date().toISOString(),
     };
@@ -443,7 +567,10 @@ class RagEngine {
 
   updatePipelineSettings(id, settings) {
     if (!this.pipelines[id]) return null;
-    const allowed = ['chatModel', 'embeddingModel', 'chunkSize', 'chunkOverlap', 'topK', 'systemPrompt'];
+    const allowed = [
+      'chatModel', 'embeddingModel', 'chunkSize', 'chunkOverlap',
+      'topK', 'temperature', 'minScore', 'contextWindow', 'systemPrompt', 'preset',
+    ];
     for (const key of allowed) {
       if (settings[key] !== undefined) {
         this.pipelines[id][key] = settings[key];
@@ -554,11 +681,16 @@ class RagEngine {
       throw new Error('No documents in this pipeline. Add some documents first.');
     }
 
+    const minScore = pipeline.minScore !== undefined ? pipeline.minScore : 0.3;
+    const topK = pipeline.topK || 5;
+    const contextWindow = pipeline.contextWindow || 6;
+    const temperature = pipeline.temperature !== undefined ? pipeline.temperature : 0.1;
+
     const queryEmbedding = await this._embed(pipeline.embeddingModel, question);
-    const results = vs.search(queryEmbedding, pipeline.topK || 5, 0.1);
+    const results = vs.search(queryEmbedding, topK, minScore);
 
     if (results.length === 0) {
-      throw new Error('No relevant chunks found for your query.');
+      throw new Error('No relevant chunks found for your query. Try lowering the minimum similarity score in settings.');
     }
 
     // Deduplicate near-identical chunks
@@ -571,13 +703,13 @@ class RagEngine {
     });
 
     const context = dedupedResults
-      .map((r, i) => `[${i + 1}] (${r.metadata.fileName}) ${r.metadata.text}`)
+      .map((r, i) => `[${i + 1}] (${r.metadata.fileName}, score: ${(r.score * 100).toFixed(1)}%) ${r.metadata.text}`)
       .join('\n\n');
 
     const systemPrompt = `${pipeline.systemPrompt}\n\nContext:\n${context}`;
 
-    // Include recent chat history for conversational context (last 6 messages)
-    const recentHistory = (chatMessages || []).slice(-6);
+    // Include recent chat history for conversational context
+    const recentHistory = (chatMessages || []).slice(-contextWindow);
 
     const messages = [
       { role: 'system', content: systemPrompt },
@@ -585,7 +717,7 @@ class RagEngine {
       { role: 'user', content: question },
     ];
 
-    await this._chatStream(pipeline.chatModel, messages, onToken);
+    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature });
 
     return {
       sources: dedupedResults.map((r) => ({
@@ -598,4 +730,4 @@ class RagEngine {
   }
 }
 
-module.exports = { RagEngine, VectorStore, cosineSimilarity, chunkText, parseFile, OllamaError };
+module.exports = { RagEngine, VectorStore, cosineSimilarity, chunkText, parseFile, OllamaError, DOC_PRESETS };

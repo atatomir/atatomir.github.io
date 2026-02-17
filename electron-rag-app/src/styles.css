@@ -448,6 +448,88 @@ pre code { background: none; padding: 0; }
 .doc-item:hover .btn-remove-doc { opacity: 1; }
 .btn-remove-doc:hover { background: var(--danger); color: white; }
 
+/* ── Settings Panel ──────────────────────────────────────── */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 0 24px 16px;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.settings-field span {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-size: 10px;
+}
+
+.settings-field input,
+.settings-field select,
+.settings-field textarea {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transition);
+  font-family: inherit;
+}
+
+.settings-field input:focus,
+.settings-field select:focus,
+.settings-field textarea:focus {
+  border-color: var(--accent);
+}
+
+.settings-field select {
+  appearance: none;
+  cursor: pointer;
+}
+
+.settings-field textarea {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.4;
+}
+
+.settings-field-wide {
+  grid-column: 1 / -1;
+}
+
+.settings-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.settings-save-status {
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.settings-save-status.success {
+  color: var(--success);
+}
+
+.field-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+  font-style: italic;
+}
+
 /* ── Chat ────────────────────────────────────────────────── */
 .chat-container {
   flex: 1;

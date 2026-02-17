@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
+  // Presets
+  listPresets: () => ipcRenderer.invoke('presets:list'),
+
   // Ollama
   ollamaStatus: () => ipcRenderer.invoke('ollama:status'),
   ollamaModels: () => ipcRenderer.invoke('ollama:models'),
