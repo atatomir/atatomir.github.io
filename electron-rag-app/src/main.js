@@ -4,6 +4,7 @@ const { RagEngine, DOC_PRESETS } = require('./rag-engine');
 
 let mainWindow;
 let ragEngine;
+let activeQueryAbort = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -17,6 +18,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: false,
     },
   });
 
@@ -192,12 +194,46 @@ handle('chat:clear', (_e, pipelineId) => ragEngine.clearChatHistory(pipelineId))
 
 // Streaming query
 ipcMain.on('pipeline:query-stream', async (event, pipelineId, question, chatMessages) => {
+  activeQueryAbort = new AbortController();
+  const { signal } = activeQueryAbort;
   try {
     const result = await ragEngine.queryStream(pipelineId, question, chatMessages, (chunk) => {
-      event.reply('pipeline:query-stream-chunk', chunk);
-    });
-    event.reply('pipeline:query-stream-done', result.sources);
+      if (!signal.aborted) event.reply('pipeline:query-stream-chunk', chunk);
+    }, signal);
+    if (signal.aborted) {
+      event.reply('pipeline:query-stream-done', []);
+    } else {
+      event.reply('pipeline:query-stream-done', result.sources);
+    }
   } catch (err) {
-    event.reply('pipeline:query-stream-error', err.message);
+    if (!signal.aborted) event.reply('pipeline:query-stream-error', err.message);
+  } finally {
+    activeQueryAbort = null;
   }
+});
+
+// Streaming deep query (deep thinking mode)
+ipcMain.on('pipeline:query-stream-deep', async (event, pipelineId, question, chatMessages) => {
+  activeQueryAbort = new AbortController();
+  const { signal } = activeQueryAbort;
+  try {
+    const result = await ragEngine.queryStreamDeep(pipelineId, question, chatMessages, (chunk) => {
+      if (!signal.aborted) event.reply('pipeline:query-stream-chunk', chunk);
+    }, (thinking) => {
+      if (!signal.aborted) event.reply('pipeline:query-stream-thinking', thinking);
+    }, signal);
+    if (signal.aborted) {
+      event.reply('pipeline:query-stream-done', [], null);
+    } else {
+      event.reply('pipeline:query-stream-done', result.sources, result.subQueries);
+    }
+  } catch (err) {
+    if (!signal.aborted) event.reply('pipeline:query-stream-error', err.message);
+  } finally {
+    activeQueryAbort = null;
+  }
+});
+
+ipcMain.on('pipeline:query-abort', () => {
+  if (activeQueryAbort) activeQueryAbort.abort();
 });

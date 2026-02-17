@@ -42,6 +42,7 @@ contextBridge.exposeInMainWorld('api', {
   clearChatHistory: (pipelineId) => ipcRenderer.invoke('chat:clear', pipelineId),
 
   // Streaming query
+  abortQuery: () => ipcRenderer.send('pipeline:query-abort'),
   queryStream: (pipelineId, question, chatMessages, onChunk, onDone, onError) => {
     const chunkHandler = (_e, chunk) => onChunk(chunk);
     const doneHandler = (_e, sources) => {
@@ -61,6 +62,32 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.on('pipeline:query-stream-done', doneHandler);
     ipcRenderer.on('pipeline:query-stream-error', errorHandler);
     ipcRenderer.send('pipeline:query-stream', pipelineId, question, chatMessages);
+    return cleanup;
+  },
+
+  // Streaming deep query (deep thinking mode)
+  queryStreamDeep: (pipelineId, question, chatMessages, onChunk, onDone, onError, onThinking) => {
+    const chunkHandler = (_e, chunk) => onChunk(chunk);
+    const thinkingHandler = (_e, status) => onThinking(status);
+    const doneHandler = (_e, sources, subQueries) => {
+      cleanup();
+      onDone(sources, subQueries);
+    };
+    const errorHandler = (_e, msg) => {
+      cleanup();
+      onError(msg);
+    };
+    const cleanup = () => {
+      ipcRenderer.removeListener('pipeline:query-stream-chunk', chunkHandler);
+      ipcRenderer.removeListener('pipeline:query-stream-done', doneHandler);
+      ipcRenderer.removeListener('pipeline:query-stream-error', errorHandler);
+      ipcRenderer.removeListener('pipeline:query-stream-thinking', thinkingHandler);
+    };
+    ipcRenderer.on('pipeline:query-stream-chunk', chunkHandler);
+    ipcRenderer.on('pipeline:query-stream-done', doneHandler);
+    ipcRenderer.on('pipeline:query-stream-error', errorHandler);
+    ipcRenderer.on('pipeline:query-stream-thinking', thinkingHandler);
+    ipcRenderer.send('pipeline:query-stream-deep', pipelineId, question, chatMessages);
     return cleanup;
   },
 

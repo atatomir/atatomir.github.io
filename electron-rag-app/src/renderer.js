@@ -3,6 +3,7 @@ let currentPipelineId = null;
 let chatHistory = {};
 let isQuerying = false;
 let cleanupIngestProgress = null;
+let deepThinkingEnabled = false;
 
 // ── DOM refs ──────────────────────────────────────────────────
 const $ = (s) => document.querySelector(s);
@@ -56,6 +57,8 @@ const modalModels = $('#modal-models');
 const modelList = $('#model-list');
 const inputPullModel = $('#input-pull-model');
 const pullStatus = $('#pull-status');
+
+const btnDeepThink = $('#btn-deep-think');
 
 const toastContainer = $('#toast-container');
 const dragOverlay = $('#drag-overlay');
@@ -430,53 +433,114 @@ async function sendMessage() {
   let fullText = '';
 
   isQuerying = true;
-  btnSend.disabled = true;
+  btnSend.disabled = false;
   chatInput.disabled = true;
-  btnSend.innerHTML = '<span class="spinner-small"></span>';
+  btnSend.textContent = 'Stop';
+  btnSend.classList.add('stop-btn');
 
   // Build chat history for context (exclude sources)
   const historyForContext = (chatHistory[currentPipelineId] || [])
     .filter((m) => m.role === 'user' || m.role === 'assistant')
     .map((m) => ({ role: m.role, content: m.content }));
 
+  const onChunk = (chunk) => {
+    fullText += chunk;
+    contentEl.innerHTML = renderMarkdown(fullText);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  };
+
+  const onDone = (sources, resolve) => {
+    if (sources && sources.length > 0) {
+      let sourcesHtml = '<div class="bubble-sources"><strong>Sources:</strong>';
+      for (const s of sources) {
+        sourcesHtml += `<div class="source-item">
+          <span class="source-file">${escapeHtml(s.fileName)}</span>
+          <span class="source-chunk">chunk ${s.chunkIndex !== undefined ? s.chunkIndex : '?'}</span>
+          <span class="source-score">${(s.score * 100).toFixed(1)}%</span>
+        </div>`;
+      }
+      sourcesHtml += '</div>';
+      bubble.insertAdjacentHTML('beforeend', sourcesHtml);
+    }
+
+    if (!chatHistory[currentPipelineId]) chatHistory[currentPipelineId] = [];
+    chatHistory[currentPipelineId].push({
+      role: 'assistant',
+      content: fullText,
+      sources,
+    });
+    window.api.saveChatHistory(currentPipelineId, chatHistory[currentPipelineId]);
+    resolve();
+  };
+
   try {
     await new Promise((resolve, reject) => {
-      window.api.queryStream(
-        currentPipelineId,
-        question,
-        historyForContext.slice(-6),
-        (chunk) => {
-          fullText += chunk;
-          contentEl.innerHTML = renderMarkdown(fullText);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        },
-        (sources) => {
-          // Add sources to the bubble
-          if (sources && sources.length > 0) {
-            let sourcesHtml = '<div class="bubble-sources"><strong>Sources:</strong>';
-            for (const s of sources) {
-              sourcesHtml += `<div class="source-item">
-                <span class="source-file">${escapeHtml(s.fileName)}</span>
-                <span class="source-chunk">chunk ${s.chunkIndex !== undefined ? s.chunkIndex : '?'}</span>
-                <span class="source-score">${(s.score * 100).toFixed(1)}%</span>
-              </div>`;
-            }
-            sourcesHtml += '</div>';
-            bubble.insertAdjacentHTML('beforeend', sourcesHtml);
-          }
+      if (deepThinkingEnabled) {
+        // Deep thinking mode — show reasoning, then stream answer below it
+        let thinkingEl = null;
+        let answerStarted = false;
 
-          // Save to history
-          if (!chatHistory[currentPipelineId]) chatHistory[currentPipelineId] = [];
-          chatHistory[currentPipelineId].push({
-            role: 'assistant',
-            content: fullText,
-            sources,
-          });
-          window.api.saveChatHistory(currentPipelineId, chatHistory[currentPipelineId]);
-          resolve();
-        },
-        (err) => reject(new Error(err))
-      );
+        window.api.queryStreamDeep(
+          currentPipelineId,
+          question,
+          historyForContext.slice(-6),
+          (chunk) => {
+            // On first chunk, finalize reasoning block and start answer below it
+            if (!answerStarted) {
+              answerStarted = true;
+              // Remove the spinner from the last thinking status line
+              if (thinkingEl) {
+                const spinner = thinkingEl.querySelector('.thinking-status:last-of-type .spinner-small');
+                if (spinner) spinner.remove();
+              }
+              // Create a separator and fresh content area for the answer
+              const separator = document.createElement('div');
+              separator.className = 'thinking-separator';
+              contentEl.appendChild(separator);
+              const answerEl = document.createElement('div');
+              answerEl.className = 'thinking-answer';
+              contentEl.appendChild(answerEl);
+            }
+            fullText += chunk;
+            const answerEl = contentEl.querySelector('.thinking-answer');
+            if (answerEl) {
+              answerEl.innerHTML = renderMarkdown(fullText);
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          },
+          (sources) => onDone(sources, resolve),
+          (err) => reject(new Error(err)),
+          (thinking) => {
+            // Show thinking status in the bubble
+            if (!thinkingEl) {
+              contentEl.innerHTML = '';
+              thinkingEl = document.createElement('div');
+              thinkingEl.className = 'thinking-status-container';
+              contentEl.appendChild(thinkingEl);
+            }
+            let html = `<div class="thinking-status"><span class="spinner-small"></span>${escapeHtml(thinking.message)}</div>`;
+            if (thinking.subQueries && thinking.subQueries.length > 0) {
+              html += '<ul class="thinking-sub-queries">';
+              for (const sq of thinking.subQueries) {
+                html += `<li>${escapeHtml(sq)}</li>`;
+              }
+              html += '</ul>';
+            }
+            thinkingEl.innerHTML = html;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        );
+      } else {
+        // Normal mode
+        window.api.queryStream(
+          currentPipelineId,
+          question,
+          historyForContext.slice(-6),
+          onChunk,
+          (sources) => onDone(sources, resolve),
+          (err) => reject(new Error(err))
+        );
+      }
     });
   } catch (err) {
     contentEl.innerHTML = `<span class="error">Error: ${escapeHtml(err.message)}</span>`;
@@ -487,10 +551,21 @@ async function sendMessage() {
   btnSend.disabled = false;
   chatInput.disabled = false;
   btnSend.textContent = 'Send';
+  btnSend.classList.remove('stop-btn');
   chatInput.focus();
 }
 
-btnSend.addEventListener('click', sendMessage);
+function stopQuery() {
+  window.api.abortQuery();
+}
+
+btnSend.addEventListener('click', () => {
+  if (isQuerying) {
+    stopQuery();
+  } else {
+    sendMessage();
+  }
+});
 chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -501,6 +576,13 @@ chatInput.addEventListener('keydown', (e) => {
 chatInput.addEventListener('input', () => {
   chatInput.style.height = 'auto';
   chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + 'px';
+});
+
+// Deep thinking toggle
+btnDeepThink.addEventListener('click', () => {
+  deepThinkingEnabled = !deepThinkingEnabled;
+  btnDeepThink.classList.toggle('active', deepThinkingEnabled);
+  showToast(deepThinkingEnabled ? 'Deep thinking mode enabled' : 'Deep thinking mode disabled', 'info', 2000);
 });
 
 // Clear chat

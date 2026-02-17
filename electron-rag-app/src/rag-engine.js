@@ -59,8 +59,10 @@ function ollamaFetch(urlPath, opts = {}) {
   });
 }
 
-function ollamaFetchStream(urlPath, body, onChunk) {
+function ollamaFetchStream(urlPath, body, onChunk, signal) {
   return new Promise((resolve, reject) => {
+    if (signal?.aborted) { resolve(); return; }
+
     const url = new URL(urlPath, OLLAMA_BASE);
     const reqOpts = {
       hostname: url.hostname,
@@ -105,8 +107,14 @@ function ollamaFetchStream(urlPath, body, onChunk) {
       });
     });
     req.on('error', (err) => {
+      if (signal?.aborted) { resolve(); return; }
       reject(new OllamaError(`Connection failed: ${err.message}`, 0));
     });
+
+    if (signal) {
+      signal.addEventListener('abort', () => { req.destroy(); resolve(); }, { once: true });
+    }
+
     req.write(JSON.stringify(body));
     req.end();
   });
@@ -464,26 +472,32 @@ class RagEngine {
   }
 
   async _embed(model, text) {
-    const res = await ollamaFetch('/api/embeddings', {
+    const res = await ollamaFetch('/api/embed', {
       method: 'POST',
-      body: { model, prompt: text },
+      body: { model, input: text },
     });
-    if (!res.data.embedding) {
+    if (!res.data.embeddings || !res.data.embeddings[0]) {
       throw new OllamaError('No embedding returned. Is this an embedding model?', 0);
     }
-    return res.data.embedding;
+    return res.data.embeddings[0];
   }
 
   async _embedBatch(model, texts) {
-    const embeddings = [];
-    // Ollama doesn't support batch embeddings natively, so we parallelize with concurrency limit
-    const CONCURRENCY = 4;
-    for (let i = 0; i < texts.length; i += CONCURRENCY) {
-      const batch = texts.slice(i, i + CONCURRENCY);
-      const results = await Promise.all(batch.map((t) => this._embed(model, t)));
-      embeddings.push(...results);
+    const res = await ollamaFetch('/api/embed', {
+      method: 'POST',
+      body: { model, input: texts },
+    });
+    if (!res.data.embeddings || res.data.embeddings.length !== texts.length) {
+      throw new OllamaError('Batch embedding failed. Is this an embedding model?', 0);
     }
-    return embeddings;
+    return res.data.embeddings;
+  }
+
+  async _chat(model, messages, options = {}) {
+    const body = { model, messages, stream: false };
+    if (options.temperature !== undefined) body.options = { temperature: options.temperature };
+    const res = await ollamaFetch('/api/chat', { method: 'POST', body });
+    return res.data.message?.content || '';
   }
 
   async _chatStream(model, messages, onToken, options = {}) {
@@ -495,7 +509,7 @@ class RagEngine {
       if (obj.message?.content) {
         onToken(obj.message.content);
       }
-    });
+    }, options.signal);
   }
 
   // ── Pipeline CRUD ─────────────────────────────────────────
@@ -671,7 +685,7 @@ class RagEngine {
 
   // ── Query ─────────────────────────────────────────────────
 
-  async queryStream(pipelineId, question, chatMessages, onToken) {
+  async queryStream(pipelineId, question, chatMessages, onToken, signal) {
     const pipeline = this.pipelines[pipelineId];
     if (!pipeline) throw new Error('Pipeline not found');
 
@@ -714,12 +728,125 @@ class RagEngine {
     const messages = [
       { role: 'system', content: systemPrompt },
       ...recentHistory,
+      { role: 'user', content: `Based ONLY on the Context provided in the system message, answer this question: ${question}` },
+    ];
+
+    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature, signal });
+
+    return {
+      sources: dedupedResults.map((r) => ({
+        fileName: r.metadata.fileName,
+        chunkIndex: r.metadata.chunkIndex,
+        text: r.metadata.text.length > 200 ? r.metadata.text.substring(0, 200) + '...' : r.metadata.text,
+        score: r.score,
+      })),
+    };
+  }
+
+  async queryStreamDeep(pipelineId, question, chatMessages, onToken, onThinking, signal) {
+    const pipeline = this.pipelines[pipelineId];
+    if (!pipeline) throw new Error('Pipeline not found');
+
+    const vs = this.vectorStores[pipelineId];
+
+    if (vs.count() === 0) {
+      throw new Error('No documents in this pipeline. Add some documents first.');
+    }
+
+    const minScore = pipeline.minScore !== undefined ? pipeline.minScore : 0.3;
+    const topK = pipeline.topK || 5;
+    const contextWindow = pipeline.contextWindow || 6;
+    const temperature = pipeline.temperature !== undefined ? pipeline.temperature : 0.1;
+
+    // Step 1: Analyze the question into sub-queries
+    if (signal?.aborted) return { sources: [] };
+
+    onThinking({ phase: 'analyzing', message: 'Analyzing question...' });
+
+    const analysisPrompt = [
+      { role: 'system', content: 'You are a search query decomposer. Break the user\'s question into 2-5 diverse search queries that together cover all aspects of the question. Each query should target a DIFFERENT concept, keyword, or angle so that searching a document collection with them retrieves a broader set of relevant passages than the original question alone. Only output a JSON array of strings, nothing else. Example: ["specific term A", "related concept B", "detail C"]' },
       { role: 'user', content: question },
     ];
 
-    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature });
+    const analysisRaw = await this._chat(pipeline.chatModel, analysisPrompt, { temperature: 0 });
+
+    if (signal?.aborted) return { sources: [] };
+
+    // Parse sub-queries from the LLM response
+    let subQueries;
+    try {
+      // Extract JSON array from the response (handle markdown code blocks)
+      const jsonMatch = analysisRaw.match(/\[[\s\S]*?\]/);
+      subQueries = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    } catch {
+      subQueries = [];
+    }
+
+    if (!Array.isArray(subQueries)) subQueries = [];
+    subQueries = subQueries.slice(0, 5);
+
+    // Always include the original question to guarantee baseline retrieval
+    subQueries = [question, ...subQueries.filter((q) => q !== question)];
+
+    onThinking({ phase: 'searching', message: `Searching with ${subQueries.length} sub-queries...`, subQueries });
+
+    // Step 2: Embed each sub-query and search the vector store
+    const allResults = new Map(); // chunkId -> result (keeping highest score)
+
+    for (let i = 0; i < subQueries.length; i++) {
+      if (signal?.aborted) return { sources: [] };
+
+      const sq = subQueries[i];
+      const embedding = await this._embed(pipeline.embeddingModel, sq);
+      const results = vs.search(embedding, topK, minScore);
+
+      for (const r of results) {
+        const existing = allResults.get(r.id);
+        if (!existing || r.score > existing.score) {
+          allResults.set(r.id, r);
+        }
+      }
+    }
+
+    if (signal?.aborted) return { sources: [] };
+
+    if (allResults.size === 0) {
+      throw new Error('No relevant chunks found for your query. Try lowering the minimum similarity score in settings.');
+    }
+
+    // Step 3: Merge, deduplicate, and sort by score
+    const mergedResults = Array.from(allResults.values());
+    mergedResults.sort((a, b) => b.score - a.score);
+
+    const seen = new Set();
+    const dedupedResults = mergedResults.filter((r) => {
+      const key = r.metadata.text.substring(0, 100);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    onThinking({ phase: 'answering', message: `Found ${dedupedResults.length} relevant chunks. Generating answer...` });
+
+    // Step 4: Build context and stream the final answer
+    const context = dedupedResults
+      .map((r, i) => `[${i + 1}] (${r.metadata.fileName}, score: ${(r.score * 100).toFixed(1)}%) ${r.metadata.text}`)
+      .join('\n\n');
+
+    const systemPrompt = `${pipeline.systemPrompt}\n\nContext:\n${context}`;
+
+    const recentHistory = (chatMessages || []).slice(-contextWindow);
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...recentHistory,
+      { role: 'user', content: `Based ONLY on the Context provided in the system message, answer this question: ${question}` },
+    ];
+
+    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature, signal });
 
     return {
+      subQueries,
       sources: dedupedResults.map((r) => ({
         fileName: r.metadata.fileName,
         chunkIndex: r.metadata.chunkIndex,

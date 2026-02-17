@@ -214,6 +214,9 @@ pre code { background: none; padding: 0; }
 
 .btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
+.stop-btn { background: var(--danger); }
+.stop-btn:hover { background: #c94444; }
+
 /* ── Main Content ────────────────────────────────────────── */
 .main-content {
   flex: 1;
@@ -908,6 +911,60 @@ pre code { background: none; padding: 0; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #3a3a4a; }
+
+/* ── Deep Thinking Toggle ────────────────────────────────── */
+#btn-deep-think {
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+
+#btn-deep-think.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+#btn-deep-think.active:hover {
+  background: var(--accent-hover);
+}
+
+/* Thinking status in chat bubble */
+.thinking-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--accent);
+  padding: 4px 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.thinking-status .spinner-small {
+  border-color: rgba(108, 99, 255, 0.3);
+  border-top-color: var(--accent);
+}
+
+.thinking-sub-queries {
+  margin-top: 4px;
+  padding-left: 22px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.thinking-sub-queries li {
+  list-style: disc;
+  margin: 2px 0;
+}
+
+.thinking-separator {
+  border-top: 1px solid var(--border);
+  margin: 10px 0;
+}
+
+.thinking-answer {
+  /* answer text flows naturally below the reasoning */
+}
 
 /* ── Focus ───────────────────────────────────────────────── */
 :focus-visible {
