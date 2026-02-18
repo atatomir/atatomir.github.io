@@ -333,14 +333,25 @@ document.addEventListener('drop', async (e) => {
   e.preventDefault();
   dragCounter = 0;
   dragOverlay.classList.remove('visible');
-  if (!currentPipelineId) return;
-
-  const paths = [];
-  for (const file of e.dataTransfer.files) {
-    if (file.path) paths.push(file.path);
+  if (!currentPipelineId) {
+    showToast('Open a pipeline first before dropping files.', 'error');
+    return;
   }
 
-  if (paths.length === 0) return;
+  // Use preload-based path extraction (reliable with contextIsolation)
+  let paths = window.api.getDroppedPaths();
+
+  // Fallback: try renderer-side file.path
+  if (paths.length === 0 && e.dataTransfer?.files) {
+    for (const file of e.dataTransfer.files) {
+      if (file.path) paths.push(file.path);
+    }
+  }
+
+  if (paths.length === 0) {
+    showToast('Could not read file paths. Try using the Add Documents button instead.', 'error');
+    return;
+  }
 
   btnAddDocs.disabled = true;
   btnAddDocs.textContent = 'Ingesting...';
@@ -396,12 +407,17 @@ function addChatBubble(role, content, sources) {
   let html = `<div class="bubble-content">${renderMarkdown(content)}</div>`;
   if (sources && sources.length > 0) {
     html += '<div class="bubble-sources"><strong>Sources:</strong>';
-    for (const s of sources) {
+    for (let si = 0; si < sources.length; si++) {
+      const s = sources[si];
       html += `<div class="source-item">
+        <span class="source-badge">[${si + 1}]</span>
         <span class="source-file">${escapeHtml(s.fileName)}</span>
         <span class="source-chunk">chunk ${s.chunkIndex !== undefined ? s.chunkIndex : '?'}</span>
         <span class="source-score">${(s.score * 100).toFixed(1)}%</span>
       </div>`;
+      if (s.text) {
+        html += `<div class="source-text">${escapeHtml(s.text)}</div>`;
+      }
     }
     html += '</div>';
   }
@@ -452,12 +468,17 @@ async function sendMessage() {
   const onDone = (sources, resolve) => {
     if (sources && sources.length > 0) {
       let sourcesHtml = '<div class="bubble-sources"><strong>Sources:</strong>';
-      for (const s of sources) {
+      for (let si = 0; si < sources.length; si++) {
+        const s = sources[si];
         sourcesHtml += `<div class="source-item">
+          <span class="source-badge">[${si + 1}]</span>
           <span class="source-file">${escapeHtml(s.fileName)}</span>
           <span class="source-chunk">chunk ${s.chunkIndex !== undefined ? s.chunkIndex : '?'}</span>
           <span class="source-score">${(s.score * 100).toFixed(1)}%</span>
         </div>`;
+        if (s.text) {
+          sourcesHtml += `<div class="source-text">${escapeHtml(s.text)}</div>`;
+        }
       }
       sourcesHtml += '</div>';
       bubble.insertAdjacentHTML('beforeend', sourcesHtml);

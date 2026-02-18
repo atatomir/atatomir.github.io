@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const { VectorStore, cosineSimilarity, chunkText, RagEngine, DOC_PRESETS } = require('../src/rag-engine');
+const { VectorStore, cosineSimilarity, chunkText, RagEngine, DOC_PRESETS, parseCSVRow } = require('../src/rag-engine');
 
 // ── cosineSimilarity ──────────────────────────────────────────
 
@@ -368,7 +368,7 @@ describe('parseFile', () => {
     assert.equal(parsed.key, 'value');
   });
 
-  it('parses .csv files into readable format', async () => {
+  it('parses .csv files into readable row format', async () => {
     const filePath = path.join(tmpDir, 'test.csv');
     fs.writeFileSync(filePath, 'Name,Age,City\nAlice,30,NYC\nBob,25,LA');
     const text = await parseFile(filePath);
@@ -376,6 +376,18 @@ describe('parseFile', () => {
     assert.ok(text.includes('Age: 30'));
     assert.ok(text.includes('City: NYC'));
     assert.ok(text.includes('Name: Bob'));
+    assert.ok(text.includes('Row 1:'), 'Should include row labels');
+    assert.ok(text.includes('Row 2:'), 'Should include row labels');
+  });
+
+  it('parses .csv with quoted fields correctly', async () => {
+    const filePath = path.join(tmpDir, 'quoted.csv');
+    fs.writeFileSync(filePath, 'Name,Location,Note\n"Smith, John","New York, NY","He said ""hello"""\nJane,LA,Simple');
+    const text = await parseFile(filePath);
+    assert.ok(text.includes('Name: Smith, John'), `Should preserve comma in quotes. Got: ${text}`);
+    assert.ok(text.includes('Location: New York, NY'), 'Should preserve comma in quoted location');
+    assert.ok(text.includes('Note: He said "hello"'), 'Should handle escaped quotes');
+    assert.ok(text.includes('Name: Jane'));
   });
 
   it('handles unknown extensions as text', async () => {
@@ -418,5 +430,45 @@ describe('DOC_PRESETS', () => {
     for (const [key, preset] of Object.entries(DOC_PRESETS)) {
       assert.ok(preset.temperature >= 0 && preset.temperature <= 2, `Preset "${key}" temperature out of range: ${preset.temperature}`);
     }
+  });
+});
+
+// ── parseCSVRow ───────────────────────────────────────────────
+
+describe('parseCSVRow', () => {
+  it('parses simple CSV row', () => {
+    assert.deepEqual(parseCSVRow('a,b,c'), ['a', 'b', 'c']);
+  });
+
+  it('handles quoted fields with commas', () => {
+    assert.deepEqual(parseCSVRow('"Smith, John",30,"New York, NY"'), ['Smith, John', '30', 'New York, NY']);
+  });
+
+  it('handles escaped quotes in quoted fields', () => {
+    assert.deepEqual(parseCSVRow('"He said ""hello""",plain'), ['He said "hello"', 'plain']);
+  });
+
+  it('handles empty fields', () => {
+    assert.deepEqual(parseCSVRow('a,,c'), ['a', '', 'c']);
+  });
+
+  it('handles single field', () => {
+    assert.deepEqual(parseCSVRow('hello'), ['hello']);
+  });
+});
+
+// ── CJK chunking ─────────────────────────────────────────────
+
+describe('chunkText (CJK)', () => {
+  it('splits on CJK sentence delimiters', () => {
+    const text = 'First sentence here. 这是第一句。这是第二句。This is third.';
+    const chunks = chunkText(text, 5, 1);
+    assert.ok(chunks.length >= 2, `Expected >=2 chunks, got ${chunks.length}`);
+  });
+
+  it('handles Japanese sentence endings', () => {
+    const text = 'これは最初の文です。これは二番目の文です。三番目の文です。';
+    const chunks = chunkText(text, 3, 1);
+    assert.ok(chunks.length >= 1, `Should produce chunks for Japanese text`);
   });
 });

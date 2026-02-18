@@ -183,6 +183,36 @@ function cosineSimilarity(a, b) {
 
 // ── Document Parsers ──────────────────────────────────────────
 
+function parseCSVRow(line) {
+  const fields = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        fields.push(current.trim());
+        current = '';
+      } else {
+        current += ch;
+      }
+    }
+  }
+  fields.push(current.trim());
+  return fields;
+}
+
 async function parseFile(filePath) {
   const ext = path.extname(filePath).toLowerCase();
   const raw = fs.readFileSync(filePath);
@@ -206,12 +236,13 @@ async function parseFile(filePath) {
       const text = raw.toString('utf-8');
       const lines = text.split('\n').filter((l) => l.trim());
       if (lines.length === 0) return '';
-      const headers = lines[0].split(',').map((h) => h.trim());
-      const rows = lines.slice(1).map((line) => {
-        const vals = line.split(',');
-        return headers.map((h, i) => `${h}: ${(vals[i] || '').trim()}`).join(', ');
+      const headers = parseCSVRow(lines[0]);
+      const rows = lines.slice(1).map((line, rowIdx) => {
+        const vals = parseCSVRow(line);
+        const fields = headers.map((h, i) => `${h}: ${(vals[i] || '').trim()}`).join('\n  ');
+        return `Row ${rowIdx + 1}:\n  ${fields}`;
       });
-      return rows.join('\n');
+      return rows.join('\n\n');
     }
     case '.txt':
     case '.md':
@@ -339,8 +370,8 @@ const DOC_PRESETS = {
 // ── Chunking ──────────────────────────────────────────────────
 
 function chunkText(text, chunkSize = 512, overlap = 64) {
-  // Prefer splitting on sentence boundaries, falling back to word-level
-  const sentences = text.match(/[^.!?\n]+[.!?\n]+|[^.!?\n]+$/g) || [text];
+  // Prefer splitting on sentence boundaries, including CJK delimiters (。！？)
+  const sentences = text.match(/[^.!?\n。！？]+[.!?\n。！？]+|[^.!?\n。！？]+$/g) || [text];
   const chunks = [];
   let current = [];
   let currentLen = 0;
@@ -737,7 +768,7 @@ class RagEngine {
       sources: dedupedResults.map((r) => ({
         fileName: r.metadata.fileName,
         chunkIndex: r.metadata.chunkIndex,
-        text: r.metadata.text.length > 200 ? r.metadata.text.substring(0, 200) + '...' : r.metadata.text,
+        text: r.metadata.text.length > 400 ? r.metadata.text.substring(0, 400) + '...' : r.metadata.text,
         score: r.score,
       })),
     };
@@ -850,11 +881,11 @@ class RagEngine {
       sources: dedupedResults.map((r) => ({
         fileName: r.metadata.fileName,
         chunkIndex: r.metadata.chunkIndex,
-        text: r.metadata.text.length > 200 ? r.metadata.text.substring(0, 200) + '...' : r.metadata.text,
+        text: r.metadata.text.length > 400 ? r.metadata.text.substring(0, 400) + '...' : r.metadata.text,
         score: r.score,
       })),
     };
   }
 }
 
-module.exports = { RagEngine, VectorStore, cosineSimilarity, chunkText, parseFile, OllamaError, DOC_PRESETS };
+module.exports = { RagEngine, VectorStore, cosineSimilarity, chunkText, parseFile, parseCSVRow, OllamaError, DOC_PRESETS };

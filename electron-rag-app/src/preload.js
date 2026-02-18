@@ -1,6 +1,28 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+// Drag-and-drop: extract file paths in preload context where file.path is reliably available.
+// With contextIsolation, the renderer's File objects may not have .path populated.
+let _lastDroppedPaths = [];
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('drop', (e) => {
+    _lastDroppedPaths = [];
+    if (e.dataTransfer && e.dataTransfer.files) {
+      for (const file of e.dataTransfer.files) {
+        if (file.path) _lastDroppedPaths.push(file.path);
+      }
+    }
+  }, true); // Use capture phase to run before renderer handlers
+});
+
 contextBridge.exposeInMainWorld('api', {
+  // Drag-and-drop file paths (extracted in preload where file.path is reliable)
+  getDroppedPaths: () => {
+    const paths = [..._lastDroppedPaths];
+    _lastDroppedPaths = [];
+    return paths;
+  },
+
   // Presets
   listPresets: () => ipcRenderer.invoke('presets:list'),
 

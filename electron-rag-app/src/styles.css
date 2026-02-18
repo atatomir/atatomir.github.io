@@ -623,9 +623,30 @@ pre code { background: none; padding: 0; }
   align-items: center;
 }
 
+.source-badge {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
 .source-file { color: var(--accent); font-weight: 500; }
 .source-chunk { color: var(--text-dim); font-size: 11px; }
 .source-score { color: var(--text-dim); font-size: 11px; }
+
+.source-text {
+  margin: 2px 0 8px 0;
+  padding: 6px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 80px;
+  overflow-y: auto;
+}
 
 /* Typing indicator */
 .typing-indicator {
