@@ -789,10 +789,10 @@ class RagEngine {
     const contextWindow = pipeline.contextWindow || 6;
     const temperature = pipeline.temperature !== undefined ? pipeline.temperature : 0.1;
 
-    // Step 1: Analyze the question into sub-queries
+    // Step 1: Decompose the question into sub-queries
     if (signal?.aborted) return { sources: [] };
 
-    onThinking({ phase: 'analyzing', message: 'Analyzing question...' });
+    onThinking({ step: 'decompose', status: 'running', message: 'Decomposing question into sub-queries...' });
 
     const analysisPrompt = [
       { role: 'system', content: 'You are a search query decomposer. Break the user\'s question into 2-5 diverse search queries that together cover all aspects of the question. Each query should target a DIFFERENT concept, keyword, or angle so that searching a document collection with them retrieves a broader set of relevant passages than the original question alone. Only output a JSON array of strings, nothing else. Example: ["specific term A", "related concept B", "detail C"]' },
@@ -806,7 +806,6 @@ class RagEngine {
     // Parse sub-queries from the LLM response
     let subQueries;
     try {
-      // Extract JSON array from the response (handle markdown code blocks)
       const jsonMatch = analysisRaw.match(/\[[\s\S]*?\]/);
       subQueries = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
     } catch {
@@ -814,54 +813,89 @@ class RagEngine {
     }
 
     if (!Array.isArray(subQueries)) subQueries = [];
-    subQueries = subQueries.slice(0, 5);
+    subQueries = subQueries.filter((q) => typeof q === 'string' && q.trim()).slice(0, 5);
 
     // Always include the original question to guarantee baseline retrieval
     subQueries = [question, ...subQueries.filter((q) => q !== question)];
 
-    onThinking({ phase: 'searching', message: `Searching with ${subQueries.length} sub-queries...`, subQueries });
+    onThinking({ step: 'decompose', status: 'done', message: `Generated ${subQueries.length} sub-queries`, subQueries });
 
-    // Step 2: Embed each sub-query and search the vector store
-    const allResults = new Map(); // chunkId -> result (keeping highest score)
+    // Step 2: Retrieve chunks for each sub-query independently
+    // Track per-query ranked lists for reciprocal rank fusion
+    const queryRankLists = []; // array of arrays, each sorted by score desc
 
     for (let i = 0; i < subQueries.length; i++) {
       if (signal?.aborted) return { sources: [] };
 
       const sq = subQueries[i];
+      onThinking({ step: 'retrieve', status: 'running', message: `Searching: "${sq}"`, subQueryIndex: i, totalSubQueries: subQueries.length });
+
       const embedding = await this._embed(pipeline.embeddingModel, sq);
       const results = vs.search(embedding, topK, minScore);
+      queryRankLists.push(results);
 
-      for (const r of results) {
-        const existing = allResults.get(r.id);
-        if (!existing || r.score > existing.score) {
-          allResults.set(r.id, r);
-        }
-      }
+      onThinking({ step: 'retrieve', status: 'done', message: `"${sq}" → ${results.length} chunks`, subQueryIndex: i, totalSubQueries: subQueries.length, chunksFound: results.length });
     }
 
     if (signal?.aborted) return { sources: [] };
 
-    if (allResults.size === 0) {
+    // Step 3: Reciprocal Rank Fusion (RRF) to merge and rerank results
+    // RRF score: Σ 1/(k + rank_i) where k=60, rank_i is 1-based rank in query i
+    const RRF_K = 60;
+    const rrfScores = new Map(); // chunkId -> { rrfScore, result }
+
+    onThinking({ step: 'rerank', status: 'running', message: 'Reranking chunks with reciprocal rank fusion...' });
+
+    for (const rankedList of queryRankLists) {
+      for (let rank = 0; rank < rankedList.length; rank++) {
+        const r = rankedList[rank];
+        const existing = rrfScores.get(r.id);
+        const rrfContribution = 1 / (RRF_K + rank + 1);
+        if (existing) {
+          existing.rrfScore += rrfContribution;
+          // Keep the highest cosine similarity score for display
+          if (r.score > existing.result.score) {
+            existing.result = r;
+          }
+        } else {
+          rrfScores.set(r.id, { rrfScore: rrfContribution, result: r });
+        }
+      }
+    }
+
+    // Sort by RRF score descending
+    const rerankedEntries = Array.from(rrfScores.values());
+    rerankedEntries.sort((a, b) => b.rrfScore - a.rrfScore);
+
+    // Deduplicate near-identical chunks
+    const seen = new Set();
+    const dedupedResults = [];
+    for (const entry of rerankedEntries) {
+      const key = entry.result.metadata.text.substring(0, 100);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      dedupedResults.push({ ...entry.result, rrfScore: entry.rrfScore });
+    }
+
+    // Take top results (use topK * 2 to get more context from multiple queries)
+    const maxResults = Math.min(dedupedResults.length, topK * 2);
+    const finalResults = dedupedResults.slice(0, maxResults);
+
+    if (finalResults.length === 0) {
       throw new Error('No relevant chunks found for your query. Try lowering the minimum similarity score in settings.');
     }
 
-    // Step 3: Merge, deduplicate, and sort by score
-    const mergedResults = Array.from(allResults.values());
-    mergedResults.sort((a, b) => b.score - a.score);
-
-    const seen = new Set();
-    const dedupedResults = mergedResults.filter((r) => {
-      const key = r.metadata.text.substring(0, 100);
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
+    onThinking({
+      step: 'rerank', status: 'done',
+      message: `Reranked ${rerankedEntries.length} chunks → top ${finalResults.length} selected`,
+      totalChunks: rerankedEntries.length, finalChunks: finalResults.length,
     });
 
-    onThinking({ phase: 'answering', message: `Found ${dedupedResults.length} relevant chunks. Generating answer...` });
+    // Step 4: Generate the final answer
+    onThinking({ step: 'answer', status: 'running', message: `Generating answer from ${finalResults.length} chunks...` });
 
-    // Step 4: Build context and stream the final answer
-    const context = dedupedResults
-      .map((r, i) => `[${i + 1}] (${r.metadata.fileName}, score: ${(r.score * 100).toFixed(1)}%) ${r.metadata.text}`)
+    const context = finalResults
+      .map((r, i) => `[${i + 1}] (${r.metadata.fileName}, score: ${(r.score * 100).toFixed(1)}%, rrf: ${r.rrfScore.toFixed(4)}) ${r.metadata.text}`)
       .join('\n\n');
 
     const systemPrompt = `${pipeline.systemPrompt}\n\nContext:\n${context}`;
@@ -878,11 +912,12 @@ class RagEngine {
 
     return {
       subQueries,
-      sources: dedupedResults.map((r) => ({
+      sources: finalResults.map((r) => ({
         fileName: r.metadata.fileName,
         chunkIndex: r.metadata.chunkIndex,
         text: r.metadata.text.length > 400 ? r.metadata.text.substring(0, 400) + '...' : r.metadata.text,
         score: r.score,
+        rrfScore: r.rrfScore,
       })),
     };
   }

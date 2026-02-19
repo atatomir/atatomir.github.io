@@ -497,24 +497,26 @@ async function sendMessage() {
   try {
     await new Promise((resolve, reject) => {
       if (deepThinkingEnabled) {
-        // Deep thinking mode — show reasoning, then stream answer below it
+        // Deep thinking mode — show progressive reasoning steps, then stream answer
         let thinkingEl = null;
         let answerStarted = false;
+        const thinkingSteps = new Map(); // step key -> DOM element
 
         window.api.queryStreamDeep(
           currentPipelineId,
           question,
           historyForContext.slice(-6),
           (chunk) => {
-            // On first chunk, finalize reasoning block and start answer below it
+            // On first answer chunk, finalize all thinking steps and start answer area
             if (!answerStarted) {
               answerStarted = true;
-              // Remove the spinner from the last thinking status line
+              // Mark all spinners as done
               if (thinkingEl) {
-                const spinner = thinkingEl.querySelector('.thinking-status:last-of-type .spinner-small');
-                if (spinner) spinner.remove();
+                for (const stepEl of thinkingEl.querySelectorAll('.thinking-step.running')) {
+                  stepEl.classList.remove('running');
+                  stepEl.classList.add('done');
+                }
               }
-              // Create a separator and fresh content area for the answer
               const separator = document.createElement('div');
               separator.className = 'thinking-separator';
               contentEl.appendChild(separator);
@@ -532,22 +534,55 @@ async function sendMessage() {
           (sources) => onDone(sources, resolve),
           (err) => reject(new Error(err)),
           (thinking) => {
-            // Show thinking status in the bubble
+            // Initialize thinking container on first event
             if (!thinkingEl) {
               contentEl.innerHTML = '';
               thinkingEl = document.createElement('div');
               thinkingEl.className = 'thinking-status-container';
+              const header = document.createElement('div');
+              header.className = 'thinking-header';
+              header.textContent = 'Deep Thinking';
+              thinkingEl.appendChild(header);
               contentEl.appendChild(thinkingEl);
             }
-            let html = `<div class="thinking-status"><span class="spinner-small"></span>${escapeHtml(thinking.message)}</div>`;
-            if (thinking.subQueries && thinking.subQueries.length > 0) {
-              html += '<ul class="thinking-sub-queries">';
-              for (const sq of thinking.subQueries) {
-                html += `<li>${escapeHtml(sq)}</li>`;
+
+            const stepKey = thinking.step + (thinking.subQueryIndex !== undefined ? `-${thinking.subQueryIndex}` : '');
+
+            if (thinking.status === 'running') {
+              // Create new step element
+              const stepEl = document.createElement('div');
+              stepEl.className = 'thinking-step running';
+              stepEl.innerHTML = `<span class="thinking-step-icon"><span class="spinner-small"></span></span><span class="thinking-step-text">${escapeHtml(thinking.message)}</span>`;
+              thinkingSteps.set(stepKey, stepEl);
+              thinkingEl.appendChild(stepEl);
+            } else if (thinking.status === 'done') {
+              // Update existing step to done, or create if missing
+              let stepEl = thinkingSteps.get(stepKey);
+              if (stepEl) {
+                stepEl.classList.remove('running');
+                stepEl.classList.add('done');
+                stepEl.querySelector('.thinking-step-text').textContent = thinking.message;
+              } else {
+                stepEl = document.createElement('div');
+                stepEl.className = 'thinking-step done';
+                stepEl.innerHTML = `<span class="thinking-step-icon"></span><span class="thinking-step-text">${escapeHtml(thinking.message)}</span>`;
+                thinkingSteps.set(stepKey, stepEl);
+                thinkingEl.appendChild(stepEl);
               }
-              html += '</ul>';
+
+              // Show sub-queries list after decompose step completes
+              if (thinking.step === 'decompose' && thinking.subQueries && thinking.subQueries.length > 0) {
+                const sqList = document.createElement('ul');
+                sqList.className = 'thinking-sub-queries';
+                for (const sq of thinking.subQueries) {
+                  const li = document.createElement('li');
+                  li.textContent = sq;
+                  sqList.appendChild(li);
+                }
+                thinkingEl.appendChild(sqList);
+              }
             }
-            thinkingEl.innerHTML = html;
+
             chatMessages.scrollTop = chatMessages.scrollHeight;
           }
         );
