@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, shell } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { RagEngine, DOC_PRESETS } = require('./rag-engine');
 
 let mainWindow;
@@ -140,6 +141,10 @@ app.on('window-all-closed', () => {
 // Presets
 handle('presets:list', () => DOC_PRESETS);
 
+// App Config
+handle('config:get', () => ragEngine.getConfig());
+handle('config:save', (_e, cfg) => ragEngine.saveConfig(cfg));
+
 // Ollama
 handle('ollama:status', () => ragEngine.checkOllamaStatus());
 handle('ollama:models', () => ragEngine.listModels());
@@ -186,6 +191,36 @@ handle('pipeline:documents', (_e, pipelineId) => ragEngine.listDocuments(pipelin
 handle('pipeline:remove-document', (_e, pipelineId, docId) =>
   ragEngine.removeDocument(pipelineId, docId)
 );
+
+// Document chunks viewer
+handle('pipeline:document-chunks', (_e, pipelineId, docId) =>
+  ragEngine.getDocumentChunks(pipelineId, docId)
+);
+
+// Export / Import
+handle('pipeline:export', async (_e, pipelineId) => {
+  const data = ragEngine.exportPipeline(pipelineId);
+  if (!data) throw new Error('Pipeline not found');
+  const pipeline = ragEngine.getPipeline(pipelineId);
+  const result = await dialog.showSaveDialog(mainWindow, {
+    defaultPath: `${(pipeline?.name || 'pipeline').replace(/[^a-zA-Z0-9]/g, '_')}.rag.json`,
+    filters: [{ name: 'RAG Pipeline', extensions: ['rag.json', 'json'] }],
+  });
+  if (result.canceled) return { canceled: true };
+  fs.writeFileSync(result.filePath, JSON.stringify(data, null, 2));
+  return { filePath: result.filePath };
+});
+
+handle('pipeline:import', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openFile'],
+    filters: [{ name: 'RAG Pipeline', extensions: ['rag.json', 'json'] }],
+  });
+  if (result.canceled) return { canceled: true };
+  const raw = fs.readFileSync(result.filePaths[0], 'utf-8');
+  const data = JSON.parse(raw);
+  return ragEngine.importPipeline(data);
+});
 
 // Chat history
 handle('chat:load', (_e, pipelineId) => ragEngine.loadChatHistory(pipelineId));

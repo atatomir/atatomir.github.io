@@ -33,6 +33,10 @@ const selectPreset = $('#select-preset');
 const presetHint = $('#preset-hint');
 const selectEmbModel = $('#select-emb-model');
 const selectChatModel = $('#select-chat-model');
+const selectEmbProvider = $('#select-emb-provider');
+const selectChatProvider = $('#select-chat-provider');
+const inputEmbModelOpenai = $('#input-emb-model-openai');
+const inputChatModelOpenai = $('#input-chat-model-openai');
 const inputChunkSize = $('#input-chunk-size');
 const inputChunkOverlap = $('#input-chunk-overlap');
 const inputTopK = $('#input-top-k');
@@ -40,8 +44,13 @@ const inputTemperature = $('#input-temperature');
 const inputMinScore = $('#input-min-score');
 const inputContextWindow = $('#input-context-window');
 
-// Settings panel refs
+// Settings modal refs
+const modalSettings = $('#modal-settings');
 const settingsPreset = $('#settings-preset');
+const settingsEmbProvider = $('#settings-emb-provider');
+const settingsChatProvider = $('#settings-chat-provider');
+const settingsEmbModel = $('#settings-emb-model');
+const settingsChatModel = $('#settings-chat-model');
 const settingsChunkSize = $('#settings-chunk-size');
 const settingsChunkOverlap = $('#settings-chunk-overlap');
 const settingsTopK = $('#settings-top-k');
@@ -52,11 +61,30 @@ const settingsSystemPrompt = $('#settings-system-prompt');
 const btnSaveSettings = $('#btn-save-settings');
 const btnResetPreset = $('#btn-reset-preset');
 const settingsSaveStatus = $('#settings-save-status');
+const btnPipelineSettings = $('#btn-pipeline-settings');
+const btnCancelSettings = $('#btn-cancel-settings');
 
+// Chunk viewer modal refs
+const modalChunks = $('#modal-chunks');
+const chunksDocName = $('#chunks-doc-name');
+const chunksList = $('#chunks-list');
+const btnCloseChunks = $('#btn-close-chunks');
+
+// Models modal refs
 const modalModels = $('#modal-models');
 const modelList = $('#model-list');
 const inputPullModel = $('#input-pull-model');
 const pullStatus = $('#pull-status');
+
+// OpenAI config refs
+const inputOpenaiKey = $('#input-openai-key');
+const inputOpenaiBase = $('#input-openai-base');
+const btnSaveOpenai = $('#btn-save-openai');
+const openaiSaveStatus = $('#openai-save-status');
+
+// Export/Import refs
+const btnExportPipeline = $('#btn-export-pipeline');
+const btnImportPipeline = $('#btn-import-pipeline');
 
 const btnDeepThink = $('#btn-deep-think');
 
@@ -207,17 +235,6 @@ async function openPipeline(id) {
   pipelineDocCount.textContent = `${p.documents.length} docs`;
   pipelineChunkCount.textContent = `${p.chunkCount || 0} chunks`;
 
-  // Populate settings panel
-  populatePresetSelect(settingsPreset, p.preset || 'general');
-  settingsChunkSize.value = p.chunkSize || 512;
-  settingsChunkOverlap.value = p.chunkOverlap || 64;
-  settingsTopK.value = p.topK || 5;
-  settingsTemperature.value = p.temperature !== undefined ? p.temperature : 0.1;
-  settingsMinScore.value = p.minScore !== undefined ? p.minScore : 0.3;
-  settingsContextWindow.value = p.contextWindow || 6;
-  settingsSystemPrompt.value = p.systemPrompt || '';
-  settingsSaveStatus.textContent = '';
-
   await refreshDocuments();
 
   // Load persisted chat history
@@ -250,6 +267,9 @@ async function refreshDocuments() {
       </svg>
       <span class="doc-name">${escapeHtml(doc.fileName)}</span>
       <span class="doc-chunks">${doc.chunks} chunks</span>
+      <button class="btn-view-chunks" data-id="${doc.id}" data-name="${escapeHtml(doc.fileName)}" title="View chunks">
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor"><path d="M8 3.5a4.5 4.5 0 00-4.35 3.37.5.5 0 000 .26A4.5 4.5 0 008 10.5a4.5 4.5 0 004.35-3.37.5.5 0 000-.26A4.5 4.5 0 008 3.5zM1.64 6.63A5.5 5.5 0 018 2.5a5.5 5.5 0 016.36 4.13.5.5 0 010 .24A5.5 5.5 0 018 11.5a5.5 5.5 0 01-6.36-4.13.5.5 0 010-.24V6.63zM8 5.5a2 2 0 100 4 2 2 0 000-4z"/></svg>
+      </button>
       <button class="btn-icon btn-remove-doc" data-id="${doc.id}" title="Remove document">&times;</button>
     `;
     li.querySelector('.btn-remove-doc').addEventListener('click', async (e) => {
@@ -262,9 +282,42 @@ async function refreshDocuments() {
       pipelineChunkCount.textContent = `${p.chunkCount || 0} chunks`;
       refreshPipelines();
     });
+    li.querySelector('.btn-view-chunks').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      await openChunkViewer(doc.id, doc.fileName);
+    });
     docList.appendChild(li);
   }
 }
+
+// ── Chunk Viewer ──────────────────────────────────────────────
+
+async function openChunkViewer(docId, fileName) {
+  chunksDocName.textContent = fileName;
+  chunksList.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:12px">Loading chunks...</div>';
+  modalChunks.classList.add('active');
+
+  try {
+    const chunks = await window.api.getDocumentChunks(currentPipelineId, docId);
+    chunksList.innerHTML = '';
+    if (chunks.length === 0) {
+      chunksList.innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:12px">No chunks found.</div>';
+      return;
+    }
+    for (const chunk of chunks) {
+      const div = document.createElement('div');
+      div.className = 'chunk-item';
+      div.innerHTML = `<div class="chunk-item-header">Chunk ${chunk.chunkIndex + 1}</div>${escapeHtml(chunk.text)}`;
+      chunksList.appendChild(div);
+    }
+  } catch (err) {
+    chunksList.innerHTML = `<div class="error">Error loading chunks: ${escapeHtml(err.message)}</div>`;
+  }
+}
+
+btnCloseChunks.addEventListener('click', () => {
+  modalChunks.classList.remove('active');
+});
 
 // Ingestion progress
 cleanupIngestProgress = window.api.onIngestProgress((progress) => {
@@ -652,32 +705,56 @@ btnClearChat.addEventListener('click', async () => {
 
 // ── Create Pipeline ───────────────────────────────────────────
 
+// Provider toggle helpers for create modal
+function updateCreateModelInputs() {
+  const embProv = selectEmbProvider.value;
+  const chatProv = selectChatProvider.value;
+
+  selectEmbModel.style.display = embProv === 'ollama' ? 'block' : 'none';
+  inputEmbModelOpenai.style.display = embProv === 'openai' ? 'block' : 'none';
+
+  selectChatModel.style.display = chatProv === 'ollama' ? 'block' : 'none';
+  inputChatModelOpenai.style.display = chatProv === 'openai' ? 'block' : 'none';
+}
+
+selectEmbProvider.addEventListener('change', updateCreateModelInputs);
+selectChatProvider.addEventListener('change', updateCreateModelInputs);
+
 async function openCreateModal() {
+  // Reset providers to ollama
+  selectEmbProvider.value = 'ollama';
+  selectChatProvider.value = 'ollama';
+  updateCreateModelInputs();
+
   const models = await window.api.ollamaModels();
-  if (models.length === 0) {
-    showToast('No models found. Pull models first via Manage Models.', 'error');
-    return;
-  }
   selectEmbModel.innerHTML = '';
   selectChatModel.innerHTML = '';
-  for (const m of models) {
-    const opt1 = new Option(m.name, m.name);
-    const opt2 = new Option(m.name, m.name);
-    selectEmbModel.add(opt1);
-    selectChatModel.add(opt2);
+
+  if (models.length > 0) {
+    for (const m of models) {
+      const opt1 = new Option(m.name, m.name);
+      const opt2 = new Option(m.name, m.name);
+      selectEmbModel.add(opt1);
+      selectChatModel.add(opt2);
+    }
+    const embDefault = models.find((m) => m.name.includes('embed'));
+    if (embDefault) selectEmbModel.value = embDefault.name;
+    const chatDefault = models.find(
+      (m) => m.name.includes('llama') || m.name.includes('mistral') || m.name.includes('gemma')
+    );
+    if (chatDefault) selectChatModel.value = chatDefault.name;
+  } else {
+    selectEmbModel.add(new Option('(no Ollama models)', ''));
+    selectChatModel.add(new Option('(no Ollama models)', ''));
   }
-  const embDefault = models.find((m) => m.name.includes('embed'));
-  if (embDefault) selectEmbModel.value = embDefault.name;
-  const chatDefault = models.find(
-    (m) => m.name.includes('llama') || m.name.includes('mistral') || m.name.includes('gemma')
-  );
-  if (chatDefault) selectChatModel.value = chatDefault.name;
 
   // Populate presets and apply default
   populatePresetSelect(selectPreset, 'general');
   applyPresetToCreateModal('general');
 
   inputPipelineName.value = '';
+  inputEmbModelOpenai.value = '';
+  inputChatModelOpenai.value = '';
   modalCreate.classList.add('active');
   inputPipelineName.focus();
 }
@@ -695,12 +772,19 @@ $('#btn-cancel-create').addEventListener('click', () => {
 
 $('#btn-confirm-create').addEventListener('click', async () => {
   const name = inputPipelineName.value.trim() || 'Untitled Pipeline';
-  const embModel = selectEmbModel.value;
-  const chatModel = selectChatModel.value;
-  if (!embModel || !chatModel) return;
 
-  const chunkSize = parseInt(inputChunkSize.value) || 512;
-  const chunkOverlap = parseInt(inputChunkOverlap.value) || 64;
+  const embProvider = selectEmbProvider.value;
+  const chatProvider = selectChatProvider.value;
+  const embModel = embProvider === 'openai' ? inputEmbModelOpenai.value.trim() : selectEmbModel.value;
+  const chatModel = chatProvider === 'openai' ? inputChatModelOpenai.value.trim() : selectChatModel.value;
+
+  if (!embModel || !chatModel) {
+    showToast('Please specify both embedding and chat models.', 'error');
+    return;
+  }
+
+  const chunkSize = parseInt(inputChunkSize.value) || 2000;
+  const chunkOverlap = parseInt(inputChunkOverlap.value) || 200;
   const topK = parseInt(inputTopK.value) || 5;
   const temperature = parseFloat(inputTemperature.value);
   const minScore = parseFloat(inputMinScore.value);
@@ -709,8 +793,10 @@ $('#btn-confirm-create').addEventListener('click', async () => {
 
   const p = await window.api.createPipeline(name, embModel, chatModel, {
     preset,
-    chunkSize: Math.max(64, Math.min(2048, chunkSize)),
-    chunkOverlap: Math.max(0, Math.min(512, chunkOverlap)),
+    embeddingProvider: embProvider,
+    chatProvider: chatProvider,
+    chunkSize: Math.max(100, Math.min(10000, chunkSize)),
+    chunkOverlap: Math.max(0, Math.min(2000, chunkOverlap)),
     topK: Math.max(1, Math.min(20, topK)),
     temperature: Math.max(0, Math.min(2, isNaN(temperature) ? 0.1 : temperature)),
     minScore: Math.max(0, Math.min(1, isNaN(minScore) ? 0.3 : minScore)),
@@ -722,14 +808,45 @@ $('#btn-confirm-create').addEventListener('click', async () => {
   openPipeline(p.id);
 });
 
-// ── Pipeline Settings ──────────────────────────────────────────
+// ── Pipeline Settings Modal ──────────────────────────────────
+
+btnPipelineSettings.addEventListener('click', async () => {
+  if (!currentPipelineId) return;
+  const p = await window.api.getPipeline(currentPipelineId);
+  if (!p) return;
+
+  // Populate fields
+  populatePresetSelect(settingsPreset, p.preset || 'general');
+  settingsEmbProvider.value = p.embeddingProvider || 'ollama';
+  settingsChatProvider.value = p.chatProvider || 'ollama';
+  settingsEmbModel.value = p.embeddingModel || '';
+  settingsChatModel.value = p.chatModel || '';
+  settingsChunkSize.value = p.chunkSize || 2000;
+  settingsChunkOverlap.value = p.chunkOverlap || 200;
+  settingsTopK.value = p.topK || 5;
+  settingsTemperature.value = p.temperature !== undefined ? p.temperature : 0.1;
+  settingsMinScore.value = p.minScore !== undefined ? p.minScore : 0.3;
+  settingsContextWindow.value = p.contextWindow || 6;
+  settingsSystemPrompt.value = p.systemPrompt || '';
+  settingsSaveStatus.textContent = '';
+
+  modalSettings.classList.add('active');
+});
+
+btnCancelSettings.addEventListener('click', () => {
+  modalSettings.classList.remove('active');
+});
 
 btnSaveSettings.addEventListener('click', async () => {
   if (!currentPipelineId) return;
   const settings = {
     preset: settingsPreset.value,
-    chunkSize: Math.max(64, Math.min(2048, parseInt(settingsChunkSize.value) || 512)),
-    chunkOverlap: Math.max(0, Math.min(512, parseInt(settingsChunkOverlap.value) || 64)),
+    embeddingProvider: settingsEmbProvider.value,
+    chatProvider: settingsChatProvider.value,
+    embeddingModel: settingsEmbModel.value.trim(),
+    chatModel: settingsChatModel.value.trim(),
+    chunkSize: Math.max(100, Math.min(10000, parseInt(settingsChunkSize.value) || 2000)),
+    chunkOverlap: Math.max(0, Math.min(2000, parseInt(settingsChunkOverlap.value) || 200)),
     topK: Math.max(1, Math.min(20, parseInt(settingsTopK.value) || 5)),
     temperature: Math.max(0, Math.min(2, parseFloat(settingsTemperature.value) || 0)),
     minScore: Math.max(0, Math.min(1, parseFloat(settingsMinScore.value) || 0)),
@@ -737,6 +854,11 @@ btnSaveSettings.addEventListener('click', async () => {
     systemPrompt: settingsSystemPrompt.value,
   };
   await window.api.updatePipelineSettings(currentPipelineId, settings);
+
+  // Update header tags
+  pipelineEmbModel.textContent = `Embed: ${settings.embeddingModel}`;
+  pipelineChatModel.textContent = `Chat: ${settings.chatModel}`;
+
   settingsSaveStatus.textContent = 'Saved!';
   settingsSaveStatus.className = 'settings-save-status success';
   showToast('Settings saved. Changes apply to new queries.', 'success');
@@ -768,6 +890,33 @@ settingsPreset.addEventListener('change', () => {
   settingsMinScore.value = preset.minScore;
   settingsContextWindow.value = preset.contextWindow;
   settingsSystemPrompt.value = preset.systemPrompt;
+});
+
+// ── Export / Import Pipeline ──────────────────────────────────
+
+btnExportPipeline.addEventListener('click', async () => {
+  if (!currentPipelineId) return;
+  try {
+    const result = await window.api.exportPipeline(currentPipelineId);
+    if (result && !result.canceled) {
+      showToast('Pipeline exported successfully', 'success');
+    }
+  } catch (err) {
+    showToast(`Export error: ${err.message}`, 'error');
+  }
+});
+
+btnImportPipeline.addEventListener('click', async () => {
+  try {
+    const result = await window.api.importPipeline();
+    if (result && !result.canceled) {
+      showToast(`Pipeline "${result.name}" imported (${result.chunkCount || 0} chunks)`, 'success');
+      await refreshPipelines();
+      openPipeline(result.id);
+    }
+  } catch (err) {
+    showToast(`Import error: ${err.message}`, 'error');
+  }
 });
 
 // ── Delete Pipeline ───────────────────────────────────────────
@@ -828,6 +977,14 @@ pipelineName.addEventListener('dblclick', () => {
 // ── Models Modal ──────────────────────────────────────────────
 
 $('#btn-manage-models').addEventListener('click', async () => {
+  // Load OpenAI config
+  try {
+    const config = await window.api.getConfig();
+    inputOpenaiKey.value = config.openaiApiKey || '';
+    inputOpenaiBase.value = config.openaiBaseUrl || 'https://api.openai.com';
+  } catch {
+    // ignore
+  }
   await refreshModelList();
   modalModels.classList.add('active');
 });
@@ -891,6 +1048,24 @@ async function pullModel() {
   $('#btn-pull-model').disabled = false;
 }
 
+// ── OpenAI Config Save ────────────────────────────────────────
+
+btnSaveOpenai.addEventListener('click', async () => {
+  const apiKey = inputOpenaiKey.value.trim();
+  const baseUrl = inputOpenaiBase.value.trim() || 'https://api.openai.com';
+  try {
+    await window.api.saveConfig({ openaiApiKey: apiKey, openaiBaseUrl: baseUrl });
+    openaiSaveStatus.textContent = 'Saved!';
+    openaiSaveStatus.className = 'settings-save-status success';
+    showToast('OpenAI configuration saved', 'success');
+    setTimeout(() => { openaiSaveStatus.textContent = ''; }, 3000);
+  } catch (err) {
+    openaiSaveStatus.textContent = 'Error!';
+    openaiSaveStatus.className = 'settings-save-status error';
+    showToast(`Error saving config: ${err.message}`, 'error');
+  }
+});
+
 // ── Menu shortcuts ────────────────────────────────────────────
 window.api.onMenuNewPipeline(openCreateModal);
 window.api.onMenuAddDocuments(addDocuments);
@@ -901,6 +1076,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     modalCreate.classList.remove('active');
     modalModels.classList.remove('active');
+    modalSettings.classList.remove('active');
+    modalChunks.classList.remove('active');
   }
 });
 
@@ -910,6 +1087,12 @@ modalCreate.addEventListener('click', (e) => {
 });
 modalModels.addEventListener('click', (e) => {
   if (e.target === modalModels) modalModels.classList.remove('active');
+});
+modalSettings.addEventListener('click', (e) => {
+  if (e.target === modalSettings) modalSettings.classList.remove('active');
+});
+modalChunks.addEventListener('click', (e) => {
+  if (e.target === modalChunks) modalChunks.classList.remove('active');
 });
 
 // ── Init ──────────────────────────────────────────────────────

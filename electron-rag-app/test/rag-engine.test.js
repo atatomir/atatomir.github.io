@@ -63,17 +63,19 @@ describe('chunkText', () => {
   });
 
   it('splits long text into multiple chunks', () => {
-    // Use sentences so sentence-boundary chunking can split
+    // Use sentences so recursive text splitter can split on '. '
     const sentences = Array.from({ length: 100 }, (_, i) => `This is sentence number ${i}.`);
     const text = sentences.join(' ');
-    const chunks = chunkText(text, 30, 5);
+    // Character-based chunk size — each sentence is ~30 chars, use 200 chars per chunk
+    const chunks = chunkText(text, 200, 20);
     assert.ok(chunks.length > 1, `Expected >1 chunks, got ${chunks.length}`);
   });
 
   it('preserves content - no words lost', () => {
     const words = Array.from({ length: 50 }, (_, i) => `w${i}`);
     const text = words.join('. ') + '.';
-    const chunks = chunkText(text, 15, 3);
+    // Character-based: text is ~200 chars, use 50-char chunks
+    const chunks = chunkText(text, 50, 10);
     // Every original word should appear in at least one chunk
     for (const word of words) {
       const found = chunks.some((c) => c.includes(word));
@@ -95,17 +97,17 @@ describe('chunkText', () => {
   it('respects sentence boundaries', () => {
     const text =
       'First sentence here. Second sentence here. Third sentence here. Fourth sentence here.';
-    const chunks = chunkText(text, 5, 2);
+    // Character-based: text is ~88 chars, use 45-char chunks
+    const chunks = chunkText(text, 45, 5);
     // Each chunk should tend to start at a sentence boundary
-    assert.ok(chunks.length >= 2);
+    assert.ok(chunks.length >= 2, `Expected >=2 chunks, got ${chunks.length}`);
   });
 
-  it('handles text with no punctuation as single chunk', () => {
-    // Without sentence boundaries, all words form one "sentence"
-    // and get chunked only if they exceed chunkSize
+  it('handles text with no punctuation', () => {
+    // Without sentence boundaries, the recursive splitter falls through to space/char separators
     const text = Array.from({ length: 100 }, (_, i) => `word${i}`).join(' ');
-    const chunks = chunkText(text, 20, 5);
-    // 100 words > chunkSize 20, so it should still produce a chunk
+    // Character-based: text is ~600 chars, use 100-char chunks
+    const chunks = chunkText(text, 100, 20);
     assert.ok(chunks.length >= 1, `Expected >=1 chunks, got ${chunks.length}`);
     // All words should be present across all chunks
     for (let i = 0; i < 100; i++) {
@@ -193,6 +195,35 @@ describe('VectorStore', () => {
     const vs = new VectorStore(corruptPath);
     vs.load();
     assert.equal(vs.count(), 0);
+  });
+
+  it('getByDocId returns matching vectors', () => {
+    const vs = new VectorStore(path.join(tmpDir, 'vs4.json'));
+    vs.add('a1', [1, 0], { docId: 'doc1', text: 'a' });
+    vs.add('a2', [0, 1], { docId: 'doc1', text: 'b' });
+    vs.add('b1', [1, 1], { docId: 'doc2', text: 'c' });
+
+    const doc1Vecs = vs.getByDocId('doc1');
+    assert.equal(doc1Vecs.length, 2);
+    assert.ok(doc1Vecs.every((v) => v.metadata.docId === 'doc1'));
+  });
+
+  it('toJSON returns vectors array', () => {
+    const vs = new VectorStore(path.join(tmpDir, 'vs5.json'));
+    vs.add('x', [1, 2], { text: 'hello' });
+    const json = vs.toJSON();
+    assert.ok(Array.isArray(json));
+    assert.equal(json.length, 1);
+    assert.equal(json[0].metadata.text, 'hello');
+  });
+
+  it('loadFromData replaces vectors', () => {
+    const vs = new VectorStore(path.join(tmpDir, 'vs6.json'));
+    vs.add('old', [1, 0], { text: 'old' });
+    assert.equal(vs.count(), 1);
+    vs.loadFromData([{ id: 'new', embedding: [0, 1], metadata: { text: 'new' } }]);
+    assert.equal(vs.count(), 1);
+    assert.equal(vs.vectors[0].metadata.text, 'new');
   });
 });
 
@@ -329,6 +360,55 @@ describe('RagEngine (offline CRUD)', () => {
     // Cleanup
     engine2.deletePipeline(list[0].id);
   });
+
+  it('creates pipeline with provider options', () => {
+    const p = engine.createPipeline('OpenAI Pipeline', 'text-embedding-3-small', 'gpt-4o-mini', {
+      embeddingProvider: 'openai',
+      chatProvider: 'openai',
+    });
+    assert.equal(p.embeddingProvider, 'openai');
+    assert.equal(p.chatProvider, 'openai');
+    assert.equal(p.embeddingModel, 'text-embedding-3-small');
+    assert.equal(p.chatModel, 'gpt-4o-mini');
+    engine.deletePipeline(p.id);
+  });
+
+  it('saves and loads config', () => {
+    engine.saveConfig({ openaiApiKey: 'test-key', openaiBaseUrl: 'https://custom.api.com' });
+    const config = engine.getConfig();
+    assert.equal(config.openaiApiKey, 'test-key');
+    assert.equal(config.openaiBaseUrl, 'https://custom.api.com');
+    // Clean up
+    engine.saveConfig({ openaiApiKey: '', openaiBaseUrl: 'https://api.openai.com' });
+  });
+
+  it('exports and imports pipeline', () => {
+    const p = engine.createPipeline('Export Test', 'emb', 'chat', { chunkSize: 500 });
+
+    const exported = engine.exportPipeline(p.id);
+    assert.equal(exported.version, 2);
+    assert.equal(exported.pipeline.name, 'Export Test');
+    assert.ok(exported.exportedAt);
+    assert.ok(Array.isArray(exported.vectors));
+    assert.ok(Array.isArray(exported.chatHistory));
+
+    const imported = engine.importPipeline(exported);
+    assert.ok(imported.id);
+    assert.notEqual(imported.id, p.id); // New ID
+    assert.equal(imported.name, 'Export Test');
+    assert.equal(imported.chunkSize, 500);
+
+    // Cleanup
+    engine.deletePipeline(p.id);
+    engine.deletePipeline(imported.id);
+  });
+
+  it('getDocumentChunks returns empty for pipeline with no docs', () => {
+    const p = engine.createPipeline('Empty', 'emb', 'chat');
+    const chunks = engine.getDocumentChunks(p.id, 'nonexistent-doc');
+    assert.deepEqual(chunks, []);
+    engine.deletePipeline(p.id);
+  });
 });
 
 // ── parseFile ─────────────────────────────────────────────────
@@ -462,13 +542,15 @@ describe('parseCSVRow', () => {
 describe('chunkText (CJK)', () => {
   it('splits on CJK sentence delimiters', () => {
     const text = 'First sentence here. 这是第一句。这是第二句。This is third.';
-    const chunks = chunkText(text, 5, 1);
+    // Character-based: text is ~55 chars, use 25-char chunks
+    const chunks = chunkText(text, 25, 5);
     assert.ok(chunks.length >= 2, `Expected >=2 chunks, got ${chunks.length}`);
   });
 
   it('handles Japanese sentence endings', () => {
     const text = 'これは最初の文です。これは二番目の文です。三番目の文です。';
-    const chunks = chunkText(text, 3, 1);
+    // Character-based: text is ~30 chars, use 15-char chunks
+    const chunks = chunkText(text, 15, 3);
     assert.ok(chunks.length >= 1, `Should produce chunks for Japanese text`);
   });
 });

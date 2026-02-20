@@ -2,11 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const http = require('http');
+const https = require('https');
 
-// ── Helpers ────────────────────────────────────────────────────
-
+// ── Constants ────────────────────────────────────────────────
 const OLLAMA_BASE = 'http://127.0.0.1:11434';
 const REQUEST_TIMEOUT = 120_000;
+const DEFAULT_OPENAI_BASE = 'https://api.openai.com';
 
 class OllamaError extends Error {
   constructor(message, status) {
@@ -15,6 +16,8 @@ class OllamaError extends Error {
     this.status = status;
   }
 }
+
+// ── Ollama HTTP helpers ──────────────────────────────────────
 
 function ollamaFetch(urlPath, opts = {}) {
   return new Promise((resolve, reject) => {
@@ -120,7 +123,114 @@ function ollamaFetchStream(urlPath, body, onChunk, signal) {
   });
 }
 
-// ── Vector Store (cosine similarity, no native deps) ──────────
+// ── OpenAI-compatible HTTP helpers ───────────────────────────
+
+function _makeRequest(fullUrl, body, apiKey, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) { resolve(null); return; }
+    const parsed = new URL(fullUrl);
+    const transport = parsed.protocol === 'https:' ? https : http;
+    const reqOpts = {
+      hostname: parsed.hostname,
+      port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+      path: parsed.pathname + parsed.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
+      },
+      timeout: REQUEST_TIMEOUT,
+    };
+    const req = transport.request(reqOpts, (res) => {
+      let data = '';
+      res.on('data', (c) => (data += c));
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (res.statusCode >= 400) {
+            reject(new OllamaError(parsed.error?.message || parsed.error || `HTTP ${res.statusCode}`, res.statusCode));
+          } else {
+            resolve(parsed);
+          }
+        } catch {
+          reject(new OllamaError(`HTTP ${res.statusCode}: ${data}`, res.statusCode));
+        }
+      });
+    });
+    req.on('timeout', () => { req.destroy(); reject(new OllamaError('Request timed out', 0)); });
+    req.on('error', (err) => {
+      if (signal?.aborted) { resolve(null); return; }
+      reject(new OllamaError(`Connection failed: ${err.message}`, 0));
+    });
+    if (signal) {
+      signal.addEventListener('abort', () => { req.destroy(); resolve(null); }, { once: true });
+    }
+    req.write(JSON.stringify(body));
+    req.end();
+  });
+}
+
+function _makeStreamRequest(fullUrl, body, apiKey, onChunk, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) { resolve(); return; }
+    const parsed = new URL(fullUrl);
+    const transport = parsed.protocol === 'https:' ? https : http;
+    const reqOpts = {
+      hostname: parsed.hostname,
+      port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+      path: parsed.pathname + parsed.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {}),
+      },
+    };
+    const req = transport.request(reqOpts, (res) => {
+      if (res.statusCode >= 400) {
+        let data = '';
+        res.on('data', (c) => (data += c));
+        res.on('end', () => {
+          try {
+            const p = JSON.parse(data);
+            reject(new OllamaError(p.error?.message || p.error || `HTTP ${res.statusCode}`, res.statusCode));
+          } catch {
+            reject(new OllamaError(`HTTP ${res.statusCode}`, res.statusCode));
+          }
+        });
+        return;
+      }
+      let buffer = '';
+      res.on('data', (chunk) => {
+        buffer += chunk;
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith('data: ')) continue;
+          const payload = trimmed.slice(6);
+          if (payload === '[DONE]') continue;
+          try {
+            const obj = JSON.parse(payload);
+            const content = obj.choices?.[0]?.delta?.content;
+            if (content) onChunk(content);
+          } catch {}
+        }
+      });
+      res.on('end', () => resolve());
+    });
+    req.on('error', (err) => {
+      if (signal?.aborted) { resolve(); return; }
+      reject(new OllamaError(`Connection failed: ${err.message}`, 0));
+    });
+    if (signal) {
+      signal.addEventListener('abort', () => { req.destroy(); resolve(); }, { once: true });
+    }
+    req.write(JSON.stringify({ ...body, stream: true }));
+    req.end();
+  });
+}
+
+// ── Vector Store (cosine similarity, no native deps) ─────────
 
 class VectorStore {
   constructor(filePath) {
@@ -165,6 +275,18 @@ class VectorStore {
     scored.sort((a, b) => b.score - a.score);
     return scored.filter((s) => s.score >= minScore).slice(0, topK);
   }
+
+  getByDocId(docId) {
+    return this.vectors.filter((v) => v.metadata.docId === docId);
+  }
+
+  toJSON() {
+    return this.vectors;
+  }
+
+  loadFromData(data) {
+    this.vectors = data || [];
+  }
 }
 
 function cosineSimilarity(a, b) {
@@ -181,7 +303,7 @@ function cosineSimilarity(a, b) {
   return denom === 0 ? 0 : dot / denom;
 }
 
-// ── Document Parsers ──────────────────────────────────────────
+// ── Document Parsers ─────────────────────────────────────────
 
 function parseCSVRow(line) {
   const fields = [];
@@ -251,60 +373,60 @@ async function parseFile(filePath) {
   }
 }
 
-// ── Document Type Presets ─────────────────────────────────────
+// ── Document Type Presets (character-based chunk sizes) ───────
 
 const DOC_PRESETS = {
   general: {
     label: 'General',
     description: 'Balanced settings for most documents',
-    chunkSize: 512,
-    chunkOverlap: 64,
+    chunkSize: 2000,
+    chunkOverlap: 200,
     topK: 5,
     temperature: 0.1,
     minScore: 0.3,
     contextWindow: 6,
     systemPrompt:
-      'You are a precise assistant that answers questions STRICTLY based on the provided context.\n\n' +
-      'CRITICAL RULES:\n' +
-      '1. ONLY use information explicitly stated in the Context below.\n' +
+      'You are a precise assistant. Answer questions using ONLY the provided Context.\n\n' +
+      'Rules:\n' +
+      '1. Use ONLY information explicitly stated in the Context below.\n' +
       '2. NEVER use your training knowledge or make assumptions beyond what the context provides.\n' +
-      '3. If the context does not contain enough information to answer, say: "The provided documents do not contain enough information to answer this question."\n' +
+      '3. If the context does not contain enough information, say: "The provided documents do not contain enough information to answer this question."\n' +
       '4. Quote or closely paraphrase the source text when possible.\n' +
-      '5. Cite sources using [n] notation corresponding to the context chunk numbers.\n' +
-      '6. If the question is partially answerable, answer only the parts supported by the context and note what is missing.',
+      '5. Cite sources using [n] notation corresponding to context chunk numbers.\n' +
+      '6. If partially answerable, answer only the supported parts and note what is missing.',
   },
   technical: {
     label: 'Technical Docs',
     description: 'API docs, manuals, specs — smaller chunks, more results',
-    chunkSize: 256,
-    chunkOverlap: 48,
+    chunkSize: 1000,
+    chunkOverlap: 150,
     topK: 8,
     temperature: 0.0,
     minScore: 0.25,
     contextWindow: 4,
     systemPrompt:
-      'You are a technical documentation assistant that answers questions STRICTLY based on the provided context.\n\n' +
-      'CRITICAL RULES:\n' +
-      '1. ONLY use information explicitly stated in the Context below.\n' +
-      '2. NEVER use your training knowledge, external references, or make assumptions beyond the context.\n' +
+      'You are a technical documentation assistant. Answer questions using ONLY the provided Context.\n\n' +
+      'Rules:\n' +
+      '1. Use ONLY information explicitly stated in the Context below.\n' +
+      '2. NEVER use your training knowledge, external references, or assumptions.\n' +
       '3. If the context does not contain the answer, say: "This is not covered in the provided documentation."\n' +
-      '4. Be precise and use exact terminology from the documents.\n' +
+      '4. Use exact terminology from the documents.\n' +
       '5. Cite sources using [n] notation.\n' +
       '6. When describing procedures, follow the exact steps from the documentation.',
   },
   legal: {
     label: 'Legal / Contracts',
     description: 'Legal docs, contracts — large chunks to preserve clauses',
-    chunkSize: 1024,
-    chunkOverlap: 128,
+    chunkSize: 4000,
+    chunkOverlap: 400,
     topK: 4,
     temperature: 0.0,
     minScore: 0.3,
     contextWindow: 4,
     systemPrompt:
-      'You are a legal document assistant that answers questions STRICTLY based on the provided context.\n\n' +
-      'CRITICAL RULES:\n' +
-      '1. ONLY use information explicitly stated in the Context below.\n' +
+      'You are a legal document assistant. Answer questions using ONLY the provided Context.\n\n' +
+      'Rules:\n' +
+      '1. Use ONLY information explicitly stated in the Context below.\n' +
       '2. NEVER use your training knowledge or legal reasoning beyond what the documents state.\n' +
       '3. If the context does not contain the answer, say: "The provided documents do not address this question."\n' +
       '4. Quote exact language from the documents when possible.\n' +
@@ -314,15 +436,15 @@ const DOC_PRESETS = {
   code: {
     label: 'Source Code',
     description: 'Code files — small chunks, high overlap for functions',
-    chunkSize: 192,
-    chunkOverlap: 48,
+    chunkSize: 800,
+    chunkOverlap: 100,
     topK: 10,
     temperature: 0.0,
     minScore: 0.2,
     contextWindow: 4,
     systemPrompt:
-      'You are a code assistant that answers questions STRICTLY based on the provided source code context.\n\n' +
-      'CRITICAL RULES:\n' +
+      'You are a code assistant. Answer questions using ONLY the provided source code Context.\n\n' +
+      'Rules:\n' +
       '1. ONLY reference code, functions, classes, and logic explicitly present in the Context below.\n' +
       '2. NEVER infer behavior from common library patterns or your training knowledge.\n' +
       '3. If the context does not contain relevant code, say: "The provided code does not contain this information."\n' +
@@ -332,77 +454,144 @@ const DOC_PRESETS = {
   research: {
     label: 'Research Papers',
     description: 'Academic papers — medium chunks, more overlap for citations',
-    chunkSize: 384,
-    chunkOverlap: 96,
+    chunkSize: 1500,
+    chunkOverlap: 300,
     topK: 6,
     temperature: 0.1,
     minScore: 0.25,
     contextWindow: 6,
     systemPrompt:
-      'You are a research assistant that answers questions STRICTLY based on the provided paper excerpts.\n\n' +
-      'CRITICAL RULES:\n' +
-      '1. ONLY use information explicitly stated in the Context below.\n' +
+      'You are a research assistant. Answer questions using ONLY the provided paper excerpts.\n\n' +
+      'Rules:\n' +
+      '1. Use ONLY information explicitly stated in the Context below.\n' +
       '2. NEVER use your general knowledge about the topic or cite papers not in the context.\n' +
       '3. If the context does not contain the answer, say: "The provided papers do not address this question."\n' +
-      '4. Distinguish between findings, methods, and conclusions as presented in the text.\n' +
+      '4. Distinguish between findings, methods, and conclusions as presented.\n' +
       '5. Cite sources using [n] notation.',
   },
   csv: {
     label: 'Data / CSV',
     description: 'Structured data, spreadsheets — small chunks, many results',
-    chunkSize: 256,
-    chunkOverlap: 32,
+    chunkSize: 1000,
+    chunkOverlap: 100,
     topK: 12,
     temperature: 0.0,
     minScore: 0.2,
     contextWindow: 4,
     systemPrompt:
-      'You are a data analysis assistant that answers questions STRICTLY based on the provided data context.\n\n' +
-      'CRITICAL RULES:\n' +
-      '1. ONLY use data explicitly present in the Context below.\n' +
+      'You are a data analysis assistant. Answer questions using ONLY the provided data Context.\n\n' +
+      'Rules:\n' +
+      '1. Use ONLY data explicitly present in the Context below.\n' +
       '2. NEVER fabricate data points, statistics, or trends not in the context.\n' +
       '3. If the context does not contain enough data, say: "The provided data does not contain this information."\n' +
-      '4. When summarizing data, be precise with numbers and labels from the source.\n' +
+      '4. Be precise with numbers and labels from the source.\n' +
       '5. Cite sources using [n] notation.',
   },
 };
 
-// ── Chunking ──────────────────────────────────────────────────
+// ── Recursive Text Splitter (state-of-the-art chunking) ──────
 
-function chunkText(text, chunkSize = 512, overlap = 64) {
-  // Prefer splitting on sentence boundaries, including CJK delimiters (。！？)
-  const sentences = text.match(/[^.!?\n。！？]+[.!?\n。！？]+|[^.!?\n。！？]+$/g) || [text];
-  const chunks = [];
-  let current = [];
-  let currentLen = 0;
+const DEFAULT_SEPARATORS = ['\n\n', '\n', '. ', '! ', '? ', '。', '！', '？', '; ', ', ', ' ', ''];
 
-  for (const sentence of sentences) {
-    const words = sentence.trim().split(/\s+/);
-    if (currentLen + words.length > chunkSize && current.length > 0) {
-      chunks.push(current.join(' '));
-      // Keep overlap worth of words from the end
-      const overlapWords = current.slice(-overlap);
-      current = overlapWords;
-      currentLen = overlapWords.length;
-    }
-    current.push(...words);
-    currentLen += words.length;
-  }
-
-  if (current.length > 0) {
-    const text = current.join(' ').trim();
-    if (text) chunks.push(text);
-  }
-
-  // If no chunks were created (e.g., very short text), use the whole text
-  if (chunks.length === 0 && text.trim()) {
-    chunks.push(text.trim());
-  }
-
-  return chunks;
+function chunkText(text, chunkSize = 2000, chunkOverlap = 200) {
+  if (!text || !text.trim()) return [];
+  const trimmed = text.trim();
+  if (trimmed.length <= chunkSize) return [trimmed];
+  const chunks = _splitRecursive(trimmed, DEFAULT_SEPARATORS, chunkSize, chunkOverlap);
+  return chunks.filter((c) => c.trim());
 }
 
-// ── RAG Engine ────────────────────────────────────────────────
+function _splitRecursive(text, separators, chunkSize, chunkOverlap) {
+  if (text.length <= chunkSize) return [text];
+  if (separators.length === 0) {
+    // Hard split by character count with overlap
+    const chunks = [];
+    const step = Math.max(1, chunkSize - chunkOverlap);
+    for (let i = 0; i < text.length; i += step) {
+      chunks.push(text.slice(i, i + chunkSize));
+      if (i + chunkSize >= text.length) break;
+    }
+    return chunks;
+  }
+
+  // Find the first separator that exists in the text
+  let useSep = null;
+  let nextSeps = [];
+  for (let i = 0; i < separators.length; i++) {
+    const sep = separators[i];
+    if (sep === '') {
+      useSep = sep;
+      nextSeps = [];
+      break;
+    }
+    if (text.includes(sep)) {
+      useSep = sep;
+      nextSeps = separators.slice(i + 1);
+      break;
+    }
+  }
+
+  // If no separator found, try empty string (char-level)
+  if (useSep === null) {
+    useSep = '';
+    nextSeps = [];
+  }
+
+  // Split by chosen separator
+  const pieces = useSep === '' ? [...text] : text.split(useSep);
+
+  // Merge small pieces into chunks respecting chunkSize
+  const merged = [];
+  let currentPieces = [];
+  let currentLen = 0;
+
+  for (const piece of pieces) {
+    const sepLen = currentPieces.length > 0 ? useSep.length : 0;
+    const addLen = piece.length + sepLen;
+
+    if (currentLen + addLen > chunkSize && currentPieces.length > 0) {
+      // Flush current chunk
+      merged.push(currentPieces.join(useSep));
+
+      // Overlap: keep trailing pieces from the end that fit within chunkOverlap
+      let overlapLen = currentLen;
+      while (overlapLen > chunkOverlap && currentPieces.length > 1) {
+        const removed = currentPieces.shift();
+        overlapLen -= removed.length + useSep.length;
+      }
+      currentLen = currentPieces.reduce((s, p) => s + p.length, 0) +
+        Math.max(0, currentPieces.length - 1) * useSep.length;
+    }
+
+    currentPieces.push(piece);
+    currentLen += addLen;
+  }
+
+  if (currentPieces.length > 0) {
+    merged.push(currentPieces.join(useSep));
+  }
+
+  // Recursively split any chunks that are still too large
+  const result = [];
+  for (const chunk of merged) {
+    if (chunk.length > chunkSize && nextSeps.length > 0) {
+      result.push(..._splitRecursive(chunk, nextSeps, chunkSize, chunkOverlap));
+    } else if (chunk.length > chunkSize) {
+      // Last resort: hard character split
+      const step = Math.max(1, chunkSize - chunkOverlap);
+      for (let i = 0; i < chunk.length; i += step) {
+        result.push(chunk.slice(i, i + chunkSize));
+        if (i + chunkSize >= chunk.length) break;
+      }
+    } else {
+      result.push(chunk);
+    }
+  }
+
+  return result;
+}
+
+// ── RAG Engine ───────────────────────────────────────────────
 
 class RagEngine {
   constructor(dataDir) {
@@ -410,8 +599,10 @@ class RagEngine {
     this.pipelinesDir = path.join(this.dataDir, 'pipelines');
     this.metaPath = path.join(this.dataDir, 'pipelines.json');
     this.chatHistoryDir = path.join(this.dataDir, 'chat-history');
+    this.configPath = path.join(this.dataDir, 'config.json');
     this.pipelines = {};
     this.vectorStores = {};
+    this.config = { openaiApiKey: '', openaiBaseUrl: DEFAULT_OPENAI_BASE };
   }
 
   async init() {
@@ -430,10 +621,32 @@ class RagEngine {
       vs.load();
       this.vectorStores[id] = vs;
     }
+    this._loadConfig();
   }
 
   _saveMeta() {
     fs.writeFileSync(this.metaPath, JSON.stringify(this.pipelines, null, 2));
+  }
+
+  // ── App Config ──────────────────────────────────────────────
+
+  _loadConfig() {
+    if (fs.existsSync(this.configPath)) {
+      try {
+        const saved = JSON.parse(fs.readFileSync(this.configPath, 'utf-8'));
+        this.config = { ...this.config, ...saved };
+      } catch {}
+    }
+  }
+
+  getConfig() {
+    return { ...this.config };
+  }
+
+  saveConfig(cfg) {
+    this.config = { ...this.config, ...cfg };
+    fs.mkdirSync(path.dirname(this.configPath), { recursive: true });
+    fs.writeFileSync(this.configPath, JSON.stringify(this.config, null, 2));
   }
 
   // ── Chat History Persistence ────────────────────────────────
@@ -460,7 +673,7 @@ class RagEngine {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 
-  // ── Ollama ────────────────────────────────────────────────
+  // ── Ollama ──────────────────────────────────────────────────
 
   async checkOllamaStatus() {
     try {
@@ -502,7 +715,12 @@ class RagEngine {
     return res.data;
   }
 
-  async _embed(model, text) {
+  // ── Embedding (provider-aware) ──────────────────────────────
+
+  async _embed(model, text, provider = 'ollama') {
+    if (provider === 'openai') {
+      return this._openaiEmbed(model, text);
+    }
     const res = await ollamaFetch('/api/embed', {
       method: 'POST',
       body: { model, input: text },
@@ -513,7 +731,10 @@ class RagEngine {
     return res.data.embeddings[0];
   }
 
-  async _embedBatch(model, texts) {
+  async _embedBatch(model, texts, provider = 'ollama') {
+    if (provider === 'openai') {
+      return this._openaiEmbedBatch(model, texts);
+    }
     const res = await ollamaFetch('/api/embed', {
       method: 'POST',
       body: { model, input: texts },
@@ -524,14 +745,68 @@ class RagEngine {
     return res.data.embeddings;
   }
 
+  // ── OpenAI Embedding ────────────────────────────────────────
+
+  async _openaiEmbed(model, text) {
+    const baseUrl = this.config.openaiBaseUrl || DEFAULT_OPENAI_BASE;
+    const apiKey = this.config.openaiApiKey;
+    if (!apiKey) throw new OllamaError('OpenAI API key not configured. Set it in Settings.', 0);
+    const res = await _makeRequest(
+      `${baseUrl}/v1/embeddings`,
+      { model, input: [text] },
+      apiKey
+    );
+    if (!res?.data?.[0]?.embedding) {
+      throw new OllamaError('No embedding returned from OpenAI.', 0);
+    }
+    return res.data[0].embedding;
+  }
+
+  async _openaiEmbedBatch(model, texts) {
+    const baseUrl = this.config.openaiBaseUrl || DEFAULT_OPENAI_BASE;
+    const apiKey = this.config.openaiApiKey;
+    if (!apiKey) throw new OllamaError('OpenAI API key not configured. Set it in Settings.', 0);
+    const res = await _makeRequest(
+      `${baseUrl}/v1/embeddings`,
+      { model, input: texts },
+      apiKey
+    );
+    if (!res?.data || res.data.length !== texts.length) {
+      throw new OllamaError('Batch embedding failed from OpenAI.', 0);
+    }
+    // OpenAI returns data sorted by index
+    const sorted = res.data.sort((a, b) => a.index - b.index);
+    return sorted.map((d) => d.embedding);
+  }
+
+  // ── Chat (provider-aware) ──────────────────────────────────
+
   async _chat(model, messages, options = {}) {
+    const provider = options.provider || 'ollama';
+    if (provider === 'openai') {
+      return this._openaiChat(model, messages, options);
+    }
     const body = { model, messages, stream: false };
     if (options.temperature !== undefined) body.options = { temperature: options.temperature };
     const res = await ollamaFetch('/api/chat', { method: 'POST', body });
     return res.data.message?.content || '';
   }
 
+  async _openaiChat(model, messages, options = {}) {
+    const baseUrl = this.config.openaiBaseUrl || DEFAULT_OPENAI_BASE;
+    const apiKey = this.config.openaiApiKey;
+    if (!apiKey) throw new OllamaError('OpenAI API key not configured. Set it in Settings.', 0);
+    const body = { model, messages };
+    if (options.temperature !== undefined) body.temperature = options.temperature;
+    const res = await _makeRequest(`${baseUrl}/v1/chat/completions`, body, apiKey);
+    return res?.choices?.[0]?.message?.content || '';
+  }
+
   async _chatStream(model, messages, onToken, options = {}) {
+    const provider = options.provider || 'ollama';
+    if (provider === 'openai') {
+      return this._openaiChatStream(model, messages, onToken, options);
+    }
     const body = { model, messages, stream: true };
     if (options.temperature !== undefined) {
       body.options = { temperature: options.temperature };
@@ -543,7 +818,16 @@ class RagEngine {
     }, options.signal);
   }
 
-  // ── Pipeline CRUD ─────────────────────────────────────────
+  async _openaiChatStream(model, messages, onToken, options = {}) {
+    const baseUrl = this.config.openaiBaseUrl || DEFAULT_OPENAI_BASE;
+    const apiKey = this.config.openaiApiKey;
+    if (!apiKey) throw new OllamaError('OpenAI API key not configured. Set it in Settings.', 0);
+    const body = { model, messages };
+    if (options.temperature !== undefined) body.temperature = options.temperature;
+    await _makeStreamRequest(`${baseUrl}/v1/chat/completions`, body, apiKey, onToken, options.signal);
+  }
+
+  // ── Pipeline CRUD ──────────────────────────────────────────
 
   listPipelines() {
     return Object.entries(this.pipelines).map(([id, p]) => ({
@@ -564,6 +848,8 @@ class RagEngine {
       name,
       embeddingModel,
       chatModel,
+      embeddingProvider: opts.embeddingProvider || 'ollama',
+      chatProvider: opts.chatProvider || 'ollama',
       preset: opts.preset || 'general',
       chunkSize: opts.chunkSize || preset.chunkSize,
       chunkOverlap: opts.chunkOverlap || preset.chunkOverlap,
@@ -615,6 +901,7 @@ class RagEngine {
     const allowed = [
       'chatModel', 'embeddingModel', 'chunkSize', 'chunkOverlap',
       'topK', 'temperature', 'minScore', 'contextWindow', 'systemPrompt', 'preset',
+      'embeddingProvider', 'chatProvider',
     ];
     for (const key of allowed) {
       if (settings[key] !== undefined) {
@@ -625,7 +912,63 @@ class RagEngine {
     return this.getPipeline(id);
   }
 
-  // ── Document Ingestion ────────────────────────────────────
+  // ── Document Chunks Viewer ─────────────────────────────────
+
+  getDocumentChunks(pipelineId, docId) {
+    const vs = this.vectorStores[pipelineId];
+    if (!vs) return [];
+    return vs.getByDocId(docId).map((v) => ({
+      id: v.id,
+      chunkIndex: v.metadata.chunkIndex,
+      text: v.metadata.text,
+      fileName: v.metadata.fileName,
+    }));
+  }
+
+  // ── Export / Import ────────────────────────────────────────
+
+  exportPipeline(pipelineId) {
+    const pipeline = this.pipelines[pipelineId];
+    if (!pipeline) return null;
+    const vs = this.vectorStores[pipelineId];
+    const chatHistory = this.loadChatHistory(pipelineId);
+    return {
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      pipeline: { ...pipeline },
+      vectors: vs ? vs.toJSON() : [],
+      chatHistory,
+    };
+  }
+
+  importPipeline(data) {
+    if (!data || !data.pipeline) throw new Error('Invalid pipeline export file');
+    const id = crypto.randomUUID();
+    const pipelineDir = path.join(this.pipelinesDir, id);
+    fs.mkdirSync(pipelineDir, { recursive: true });
+
+    this.pipelines[id] = {
+      ...data.pipeline,
+      documents: data.pipeline.documents || [],
+      createdAt: new Date().toISOString(),
+    };
+    this._saveMeta();
+
+    const vs = new VectorStore(path.join(pipelineDir, 'vectors.json'));
+    if (data.vectors && Array.isArray(data.vectors)) {
+      vs.loadFromData(data.vectors);
+    }
+    vs.save();
+    this.vectorStores[id] = vs;
+
+    if (data.chatHistory && Array.isArray(data.chatHistory)) {
+      this.saveChatHistory(id, data.chatHistory);
+    }
+
+    return { id, ...this.pipelines[id], chunkCount: vs.count() };
+  }
+
+  // ── Document Ingestion ─────────────────────────────────────
 
   async ingestFiles(pipelineId, filePaths, onProgress) {
     const pipeline = this.pipelines[pipelineId];
@@ -634,6 +977,7 @@ class RagEngine {
     const vs = this.vectorStores[pipelineId];
     const results = [];
     const totalFiles = filePaths.length;
+    const embProvider = pipeline.embeddingProvider || 'ollama';
 
     for (let fileIdx = 0; fileIdx < totalFiles; fileIdx++) {
       const filePath = filePaths[fileIdx];
@@ -656,7 +1000,7 @@ class RagEngine {
       const BATCH = 8;
       for (let i = 0; i < chunks.length; i += BATCH) {
         const batch = chunks.slice(i, i + BATCH);
-        const embeddings = await this._embedBatch(pipeline.embeddingModel, batch);
+        const embeddings = await this._embedBatch(pipeline.embeddingModel, batch, embProvider);
         for (let j = 0; j < batch.length; j++) {
           vs.add(`${docId}_${i + j}`, embeddings[j], {
             docId,
@@ -714,7 +1058,7 @@ class RagEngine {
     this._saveMeta();
   }
 
-  // ── Query ─────────────────────────────────────────────────
+  // ── Query ──────────────────────────────────────────────────
 
   async queryStream(pipelineId, question, chatMessages, onToken, signal) {
     const pipeline = this.pipelines[pipelineId];
@@ -730,8 +1074,10 @@ class RagEngine {
     const topK = pipeline.topK || 5;
     const contextWindow = pipeline.contextWindow || 6;
     const temperature = pipeline.temperature !== undefined ? pipeline.temperature : 0.1;
+    const embProvider = pipeline.embeddingProvider || 'ollama';
+    const chatProvider = pipeline.chatProvider || 'ollama';
 
-    const queryEmbedding = await this._embed(pipeline.embeddingModel, question);
+    const queryEmbedding = await this._embed(pipeline.embeddingModel, question, embProvider);
     const results = vs.search(queryEmbedding, topK, minScore);
 
     if (results.length === 0) {
@@ -762,7 +1108,7 @@ class RagEngine {
       { role: 'user', content: `Based ONLY on the Context provided in the system message, answer this question: ${question}` },
     ];
 
-    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature, signal });
+    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature, signal, provider: chatProvider });
 
     return {
       sources: dedupedResults.map((r) => ({
@@ -788,6 +1134,8 @@ class RagEngine {
     const topK = pipeline.topK || 5;
     const contextWindow = pipeline.contextWindow || 6;
     const temperature = pipeline.temperature !== undefined ? pipeline.temperature : 0.1;
+    const embProvider = pipeline.embeddingProvider || 'ollama';
+    const chatProvider = pipeline.chatProvider || 'ollama';
 
     // Step 1: Decompose the question into sub-queries
     if (signal?.aborted) return { sources: [] };
@@ -799,7 +1147,7 @@ class RagEngine {
       { role: 'user', content: question },
     ];
 
-    const analysisRaw = await this._chat(pipeline.chatModel, analysisPrompt, { temperature: 0 });
+    const analysisRaw = await this._chat(pipeline.chatModel, analysisPrompt, { temperature: 0, provider: chatProvider });
 
     if (signal?.aborted) return { sources: [] };
 
@@ -821,8 +1169,7 @@ class RagEngine {
     onThinking({ step: 'decompose', status: 'done', message: `Generated ${subQueries.length} sub-queries`, subQueries });
 
     // Step 2: Retrieve chunks for each sub-query independently
-    // Track per-query ranked lists for reciprocal rank fusion
-    const queryRankLists = []; // array of arrays, each sorted by score desc
+    const queryRankLists = [];
 
     for (let i = 0; i < subQueries.length; i++) {
       if (signal?.aborted) return { sources: [] };
@@ -830,7 +1177,7 @@ class RagEngine {
       const sq = subQueries[i];
       onThinking({ step: 'retrieve', status: 'running', message: `Searching: "${sq}"`, subQueryIndex: i, totalSubQueries: subQueries.length });
 
-      const embedding = await this._embed(pipeline.embeddingModel, sq);
+      const embedding = await this._embed(pipeline.embeddingModel, sq, embProvider);
       const results = vs.search(embedding, topK, minScore);
       queryRankLists.push(results);
 
@@ -840,9 +1187,8 @@ class RagEngine {
     if (signal?.aborted) return { sources: [] };
 
     // Step 3: Reciprocal Rank Fusion (RRF) to merge and rerank results
-    // RRF score: Σ 1/(k + rank_i) where k=60, rank_i is 1-based rank in query i
     const RRF_K = 60;
-    const rrfScores = new Map(); // chunkId -> { rrfScore, result }
+    const rrfScores = new Map();
 
     onThinking({ step: 'rerank', status: 'running', message: 'Reranking chunks with reciprocal rank fusion...' });
 
@@ -853,7 +1199,6 @@ class RagEngine {
         const rrfContribution = 1 / (RRF_K + rank + 1);
         if (existing) {
           existing.rrfScore += rrfContribution;
-          // Keep the highest cosine similarity score for display
           if (r.score > existing.result.score) {
             existing.result = r;
           }
@@ -863,11 +1208,9 @@ class RagEngine {
       }
     }
 
-    // Sort by RRF score descending
     const rerankedEntries = Array.from(rrfScores.values());
     rerankedEntries.sort((a, b) => b.rrfScore - a.rrfScore);
 
-    // Deduplicate near-identical chunks
     const seen = new Set();
     const dedupedResults = [];
     for (const entry of rerankedEntries) {
@@ -877,7 +1220,6 @@ class RagEngine {
       dedupedResults.push({ ...entry.result, rrfScore: entry.rrfScore });
     }
 
-    // Take top results (use topK * 2 to get more context from multiple queries)
     const maxResults = Math.min(dedupedResults.length, topK * 2);
     const finalResults = dedupedResults.slice(0, maxResults);
 
@@ -908,7 +1250,7 @@ class RagEngine {
       { role: 'user', content: `Based ONLY on the Context provided in the system message, answer this question: ${question}` },
     ];
 
-    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature, signal });
+    await this._chatStream(pipeline.chatModel, messages, onToken, { temperature, signal, provider: chatProvider });
 
     return {
       subQueries,

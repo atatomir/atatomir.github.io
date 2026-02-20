@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.openai.com https://*.openai.com">
   <title>Local RAG</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,7 +19,12 @@
     <aside class="sidebar" role="navigation" aria-label="Pipelines">
       <div class="sidebar-header">
         <h2>Pipelines</h2>
-        <button id="btn-new-pipeline" class="btn-icon" title="New pipeline (Cmd+N)" aria-label="Create new pipeline">+</button>
+        <div style="display:flex;gap:4px">
+          <button id="btn-import-pipeline" class="btn-icon" title="Import pipeline" aria-label="Import pipeline">
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M3.5 13h9a.5.5 0 000-1h-9a.5.5 0 000 1zM8.354 2.146a.5.5 0 00-.708 0l-3.5 3.5a.5.5 0 10.708.708L7.5 3.707V9.5a.5.5 0 001 0V3.707l2.646 2.647a.5.5 0 00.708-.708l-3.5-3.5z"/></svg>
+          </button>
+          <button id="btn-new-pipeline" class="btn-icon" title="New pipeline (Cmd+N)" aria-label="Create new pipeline">+</button>
+        </div>
       </div>
       <ul id="pipeline-list" class="pipeline-list" role="listbox" aria-label="Pipeline list"></ul>
       <div class="sidebar-footer">
@@ -41,24 +46,12 @@
             </svg>
           </div>
           <h1>Local RAG</h1>
-          <p>Build private RAG pipelines using local models via Ollama.<br>Everything runs on your machine. No data leaves your computer.</p>
+          <p>Build private RAG pipelines using local models via Ollama or OpenAI.<br>Everything can run on your machine. No data leaves your computer.</p>
           <div class="welcome-steps">
-            <div class="step">
-              <span class="step-num">1</span>
-              <span>Install & run <strong>Ollama</strong></span>
-            </div>
-            <div class="step">
-              <span class="step-num">2</span>
-              <span>Pull an embedding model (e.g. <code>nomic-embed-text</code>)</span>
-            </div>
-            <div class="step">
-              <span class="step-num">3</span>
-              <span>Pull a chat model (e.g. <code>llama3.2</code>)</span>
-            </div>
-            <div class="step">
-              <span class="step-num">4</span>
-              <span>Create a pipeline, add documents, and ask questions</span>
-            </div>
+            <div class="step"><span class="step-num">1</span><span>Install & run <strong>Ollama</strong> (or configure an OpenAI API key)</span></div>
+            <div class="step"><span class="step-num">2</span><span>Pull an embedding model (e.g. <code>nomic-embed-text</code>)</span></div>
+            <div class="step"><span class="step-num">3</span><span>Pull a chat model (e.g. <code>llama3.2</code>)</span></div>
+            <div class="step"><span class="step-num">4</span><span>Create a pipeline, add documents, and ask questions</span></div>
           </div>
           <div class="welcome-cta">
             <button id="btn-welcome-models" class="btn-secondary" onclick="document.getElementById('btn-manage-models').click()">Manage Models</button>
@@ -80,6 +73,12 @@
           </div>
           <div class="pipeline-actions">
             <button id="btn-add-docs" class="btn-primary" title="Add documents (Cmd+O)">Add Documents</button>
+            <button id="btn-pipeline-settings" class="btn-icon btn-compact" title="Pipeline settings" aria-label="Pipeline settings">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M7.068.727c.243-.97 1.62-.97 1.864 0l.071.286a.96.96 0 001.622.434l.205-.211c.695-.719 1.845-.19 1.586.73l-.082.284a.96.96 0 00.949 1.239l.295.006c.98.02 1.35 1.31.51 1.781l-.255.143a.96.96 0 00-.122 1.626l.226.183c.752.61.375 1.807-.52 1.651l-.286-.05a.96.96 0 00-1.037.853l-.034.294c-.115.983-1.464 1.13-1.774.192l-.1-.285a.96.96 0 00-1.55-.477l-.218.196c-.735.66-1.83.052-1.514-.84l.1-.285a.96.96 0 00-.813-1.275l-.294-.042c-.984-.14-1.13-1.49-.192-1.8l.286-.098a.96.96 0 00.477-1.55l-.196-.218c-.66-.735-.052-1.83.84-1.514l.285.1A.96.96 0 007.068.727zM8 5.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z"/></svg>
+            </button>
+            <button id="btn-export-pipeline" class="btn-icon btn-compact" title="Export pipeline" aria-label="Export pipeline">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M3.5 13h9a.5.5 0 010 1h-9a.5.5 0 010-1zM8.354 2.146a.5.5 0 00-.708 0l-3.5 3.5a.5.5 0 10.708.708L7.5 3.707V9.5a.5.5 0 001 0V3.707l2.646 2.647a.5.5 0 00.708-.708l-3.5-3.5z"/></svg>
+            </button>
             <button id="btn-clear-chat" class="btn-secondary btn-compact" title="Clear chat history">Clear Chat</button>
             <button id="btn-delete-pipeline" class="btn-danger" title="Delete pipeline">Delete</button>
           </div>
@@ -94,56 +93,12 @@
           <ul id="doc-list" class="doc-list" role="list"></ul>
         </details>
 
-        <!-- Settings panel -->
-        <details class="documents-panel" id="settings-panel">
-          <summary><h3>RAG Settings</h3></summary>
-          <div class="settings-grid">
-            <label class="settings-field">
-              <span>Preset</span>
-              <select id="settings-preset" aria-label="Document type preset"></select>
-            </label>
-            <label class="settings-field">
-              <span>Chunk Size</span>
-              <input type="number" id="settings-chunk-size" min="64" max="2048">
-            </label>
-            <label class="settings-field">
-              <span>Overlap</span>
-              <input type="number" id="settings-chunk-overlap" min="0" max="512">
-            </label>
-            <label class="settings-field">
-              <span>Top-K</span>
-              <input type="number" id="settings-top-k" min="1" max="20">
-            </label>
-            <label class="settings-field">
-              <span>Temperature</span>
-              <input type="number" id="settings-temperature" min="0" max="2" step="0.1">
-            </label>
-            <label class="settings-field">
-              <span>Min Similarity</span>
-              <input type="number" id="settings-min-score" min="0" max="1" step="0.05">
-            </label>
-            <label class="settings-field">
-              <span>Chat History</span>
-              <input type="number" id="settings-context-window" min="0" max="20">
-            </label>
-            <label class="settings-field settings-field-wide">
-              <span>System Prompt</span>
-              <textarea id="settings-system-prompt" rows="4"></textarea>
-            </label>
-            <div class="settings-actions">
-              <button id="btn-save-settings" class="btn-primary btn-compact">Save Settings</button>
-              <button id="btn-reset-preset" class="btn-secondary btn-compact">Reset to Preset</button>
-              <span id="settings-save-status" class="settings-save-status"></span>
-            </div>
-          </div>
-        </details>
-
         <!-- Chat -->
         <div class="chat-container">
           <div id="chat-messages" class="chat-messages" role="log" aria-label="Chat messages"></div>
           <div class="chat-input-row">
             <textarea id="chat-input" placeholder="Ask a question about your documents... (Enter to send, Shift+Enter for newline)" rows="1" aria-label="Chat input"></textarea>
-            <button id="btn-deep-think" class="btn-icon btn-compact" title="Deep thinking mode — analyzes your question into sub-queries for better retrieval" aria-label="Toggle deep thinking mode">
+            <button id="btn-deep-think" class="btn-icon btn-compact" title="Deep thinking mode — sub-query decomposition + RRF reranking" aria-label="Toggle deep thinking mode">
               <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
                 <path d="M8 1a5 5 0 00-2 9.58V12a1 1 0 001 1h2a1 1 0 001-1v-1.42A5 5 0 008 1zm0 1.5a3.5 3.5 0 012.05 6.33.75.75 0 00-.3.6V11h-3.5V9.43a.75.75 0 00-.3-.6A3.5 3.5 0 018 2.5zM6.5 13.5h3v.5a1.5 1.5 0 01-3 0v-.5z"/>
               </svg>
@@ -164,18 +119,36 @@
             <select id="select-preset" aria-label="Select document type preset"></select>
             <span class="field-hint" id="preset-hint">Balanced settings for most documents</span>
           </label>
-          <label>Embedding Model
-            <select id="select-emb-model" aria-label="Select embedding model"></select>
-          </label>
-          <label>Chat Model
-            <select id="select-chat-model" aria-label="Select chat model"></select>
-          </label>
           <div class="modal-row">
-            <label class="half">Chunk Size (words)
-              <input type="number" id="input-chunk-size" value="512" min="64" max="2048">
+            <label class="half">Embedding Provider
+              <select id="select-emb-provider" aria-label="Embedding provider">
+                <option value="ollama">Ollama (local)</option>
+                <option value="openai">OpenAI</option>
+              </select>
             </label>
-            <label class="half">Chunk Overlap (words)
-              <input type="number" id="input-chunk-overlap" value="64" min="0" max="512">
+            <label class="half">Embedding Model
+              <select id="select-emb-model" aria-label="Select embedding model"></select>
+              <input type="text" id="input-emb-model-openai" placeholder="text-embedding-3-small" style="display:none">
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Chat Provider
+              <select id="select-chat-provider" aria-label="Chat provider">
+                <option value="ollama">Ollama (local)</option>
+                <option value="openai">OpenAI</option>
+              </select>
+            </label>
+            <label class="half">Chat Model
+              <select id="select-chat-model" aria-label="Select chat model"></select>
+              <input type="text" id="input-chat-model-openai" placeholder="gpt-4o-mini" style="display:none">
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Chunk Size (chars)
+              <input type="number" id="input-chunk-size" value="2000" min="100" max="10000">
+            </label>
+            <label class="half">Chunk Overlap (chars)
+              <input type="number" id="input-chunk-overlap" value="200" min="0" max="2000">
             </label>
           </div>
           <div class="modal-row">
@@ -201,17 +174,110 @@
         </div>
       </div>
 
+      <!-- Pipeline Settings modal -->
+      <div id="modal-settings" class="modal" role="dialog" aria-labelledby="modal-settings-title" aria-modal="true">
+        <div class="modal-content modal-wide">
+          <h2 id="modal-settings-title">Pipeline Settings</h2>
+          <label>Preset
+            <select id="settings-preset" aria-label="Document type preset"></select>
+            <span class="field-hint" id="settings-preset-hint"></span>
+          </label>
+          <div class="modal-row">
+            <label class="half">Embedding Provider
+              <select id="settings-emb-provider"><option value="ollama">Ollama</option><option value="openai">OpenAI</option></select>
+            </label>
+            <label class="half">Chat Provider
+              <select id="settings-chat-provider"><option value="ollama">Ollama</option><option value="openai">OpenAI</option></select>
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Embedding Model
+              <input type="text" id="settings-emb-model" placeholder="nomic-embed-text">
+            </label>
+            <label class="half">Chat Model
+              <input type="text" id="settings-chat-model" placeholder="llama3.2">
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Chunk Size (chars)
+              <input type="number" id="settings-chunk-size" min="100" max="10000">
+            </label>
+            <label class="half">Chunk Overlap (chars)
+              <input type="number" id="settings-chunk-overlap" min="0" max="2000">
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Top-K Results
+              <input type="number" id="settings-top-k" min="1" max="20">
+            </label>
+            <label class="half">Temperature
+              <input type="number" id="settings-temperature" min="0" max="2" step="0.1">
+            </label>
+          </div>
+          <div class="modal-row">
+            <label class="half">Min Similarity
+              <input type="number" id="settings-min-score" min="0" max="1" step="0.05">
+            </label>
+            <label class="half">Chat History
+              <input type="number" id="settings-context-window" min="0" max="20">
+            </label>
+          </div>
+          <label>System Prompt
+            <textarea id="settings-system-prompt" rows="5" style="display:block;width:100%;margin-top:4px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;color:var(--text-primary);font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:60px;line-height:1.4"></textarea>
+          </label>
+          <div class="modal-actions">
+            <button id="btn-reset-preset" class="btn-secondary btn-compact">Reset to Preset</button>
+            <span id="settings-save-status" class="settings-save-status"></span>
+            <button id="btn-cancel-settings" class="btn-secondary btn-compact">Cancel</button>
+            <button id="btn-save-settings" class="btn-primary">Save Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chunk Viewer modal -->
+      <div id="modal-chunks" class="modal" role="dialog" aria-labelledby="modal-chunks-title" aria-modal="true">
+        <div class="modal-content modal-wide">
+          <h2 id="modal-chunks-title">Chunks: <span id="chunks-doc-name"></span></h2>
+          <div id="chunks-list" class="chunks-list"></div>
+          <div class="modal-actions">
+            <button id="btn-close-chunks" class="btn-secondary btn-compact">Close</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Models modal -->
       <div id="modal-models" class="modal" role="dialog" aria-labelledby="modal-models-title" aria-modal="true">
         <div class="modal-content modal-wide">
           <h2 id="modal-models-title">Manage Models</h2>
-          <div class="model-pull-row">
-            <input type="text" id="input-pull-model" placeholder="e.g. nomic-embed-text or llama3.2" aria-label="Model name to pull">
-            <button id="btn-pull-model" class="btn-primary">Pull</button>
-          </div>
-          <div id="pull-status" class="pull-status" role="status" aria-live="polite"></div>
-          <h3>Installed Models</h3>
-          <ul id="model-list" class="model-list" role="list"></ul>
+
+          <!-- OpenAI Configuration -->
+          <details class="models-section" open>
+            <summary><h3>OpenAI Configuration</h3></summary>
+            <div class="openai-config">
+              <label>API Key
+                <input type="password" id="input-openai-key" placeholder="sk-..." autocomplete="off">
+              </label>
+              <label>Base URL
+                <input type="text" id="input-openai-base" placeholder="https://api.openai.com" autocomplete="off">
+              </label>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button id="btn-save-openai" class="btn-primary btn-compact">Save API Config</button>
+                <span id="openai-save-status" class="settings-save-status"></span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Ollama Models -->
+          <details class="models-section" open>
+            <summary><h3>Ollama Models</h3></summary>
+            <div class="model-pull-row">
+              <input type="text" id="input-pull-model" placeholder="e.g. nomic-embed-text or llama3.2" aria-label="Model name to pull">
+              <button id="btn-pull-model" class="btn-primary">Pull</button>
+            </div>
+            <div id="pull-status" class="pull-status" role="status" aria-live="polite"></div>
+            <ul id="model-list" class="model-list" role="list"></ul>
+          </details>
+
           <div class="modal-actions">
             <button id="btn-close-models" class="btn-secondary btn-compact">Close</button>
           </div>

@@ -1,7 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 // Drag-and-drop: extract file paths in preload context where file.path is reliably available.
-// With contextIsolation, the renderer's File objects may not have .path populated.
 let _lastDroppedPaths = [];
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -12,11 +11,11 @@ window.addEventListener('DOMContentLoaded', () => {
         if (file.path) _lastDroppedPaths.push(file.path);
       }
     }
-  }, true); // Use capture phase to run before renderer handlers
+  }, true);
 });
 
 contextBridge.exposeInMainWorld('api', {
-  // Drag-and-drop file paths (extracted in preload where file.path is reliable)
+  // Drag-and-drop file paths
   getDroppedPaths: () => {
     const paths = [..._lastDroppedPaths];
     _lastDroppedPaths = [];
@@ -25,6 +24,10 @@ contextBridge.exposeInMainWorld('api', {
 
   // Presets
   listPresets: () => ipcRenderer.invoke('presets:list'),
+
+  // App Config
+  getConfig: () => ipcRenderer.invoke('config:get'),
+  saveConfig: (cfg) => ipcRenderer.invoke('config:save', cfg),
 
   // Ollama
   ollamaStatus: () => ipcRenderer.invoke('ollama:status'),
@@ -49,6 +52,12 @@ contextBridge.exposeInMainWorld('api', {
   listDocuments: (pipelineId) => ipcRenderer.invoke('pipeline:documents', pipelineId),
   removeDocument: (pipelineId, docId) =>
     ipcRenderer.invoke('pipeline:remove-document', pipelineId, docId),
+  getDocumentChunks: (pipelineId, docId) =>
+    ipcRenderer.invoke('pipeline:document-chunks', pipelineId, docId),
+
+  // Export / Import
+  exportPipeline: (pipelineId) => ipcRenderer.invoke('pipeline:export', pipelineId),
+  importPipeline: () => ipcRenderer.invoke('pipeline:import'),
 
   // Ingestion progress
   onIngestProgress: (callback) => {
@@ -87,7 +96,7 @@ contextBridge.exposeInMainWorld('api', {
     return cleanup;
   },
 
-  // Streaming deep query (deep thinking mode)
+  // Streaming deep query
   queryStreamDeep: (pipelineId, question, chatMessages, onChunk, onDone, onError, onThinking) => {
     const chunkHandler = (_e, chunk) => onChunk(chunk);
     const thinkingHandler = (_e, status) => onThinking(status);
