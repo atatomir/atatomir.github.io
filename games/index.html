@@ -49,19 +49,6 @@ nav a{
   font-size:14px;
 }
 nav a:hover{color: var(--accent);}
-#lang-toggle{
-  margin-left:12px;
-  cursor:pointer;
-  background: var(--accent);
-  border:none;
-  border-radius:999px;
-  padding:6px 12px;
-  font-weight:600;
-  color:white;
-  font-size:13px;
-  transition:0.2s;
-}
-#lang-toggle:hover{background:#3570d1;}
 
 /* SECTIONS */
 section{
@@ -773,13 +760,12 @@ footer{
 <body>
 
 <nav>
-  <a href="/" data-en="Home" data-ro="Acasă">Home</a>
+  <a href="/">Home</a>
   <div class="nav-sep"></div>
-  <button class="game-tab active" data-tab="0" data-en="Snake" data-ro="Snake">Snake</button>
-  <button class="game-tab" data-tab="1" data-en="Day Trader" data-ro="Day Trader">Day Trader</button>
-  <button class="game-tab" data-tab="2" data-en="Whiteboard" data-ro="Tablă">Whiteboard</button>
+  <button class="game-tab active" data-tab="0">Snake</button>
+  <button class="game-tab" data-tab="1">Day Trader</button>
+  <button class="game-tab" data-tab="2">Whiteboard</button>
   <div class="nav-sep"></div>
-  <button id="lang-toggle">RO</button>
 </nav>
 
 <section id="games" class="reveal">
@@ -793,8 +779,8 @@ footer{
     <!-- SNAKE -->
       <div class="game-toolbar">
         <div class="snake-score-bar">
-          <div><span data-en="Score" data-ro="Scor">Score</span>: <span id="snake-score">0</span></div>
-          <div><span data-en="Best" data-ro="Record">Best</span>: <span id="snake-high">0</span></div>
+          <div><span>Score</span>: <span id="snake-score">0</span></div>
+          <div><span>Best</span>: <span id="snake-high">0</span></div>
         </div>
         <div class="game-toolbar-btns">
           <button class="game-toolbar-btn" id="snake-settings-btn" title="Settings">&#9881;</button>
@@ -850,19 +836,19 @@ footer{
         </div>
         <canvas id="snake-canvas" width="400" height="400"></canvas>
         <div class="snake-overlay" id="snake-overlay-start">
-          <h3 data-en="Snake" data-ro="Snake">Snake</h3>
-          <p data-en="Use arrow keys or WASD to play" data-ro="Folosește săgețile sau WASD">Use arrow keys or WASD to play</p>
-          <button class="snake-btn" id="snake-start-btn" data-en="Start Game" data-ro="Începe Jocul">Start Game</button>
+          <h3>Snake</h3>
+          <p>Use arrow keys or WASD to play</p>
+          <button class="snake-btn" id="snake-start-btn">Start Game</button>
         </div>
         <div class="snake-overlay hidden" id="snake-overlay-pause">
-          <h3 data-en="Paused" data-ro="Pauză">Paused</h3>
-          <p data-en="Press Space or click to resume" data-ro="Apasă Space sau click pt. reluare">Press Space or click to resume</p>
-          <button class="snake-btn" id="snake-resume-btn" data-en="Resume" data-ro="Reia">Resume</button>
+          <h3>Paused</h3>
+          <p>Press Space or click to resume</p>
+          <button class="snake-btn" id="snake-resume-btn">Resume</button>
         </div>
         <div class="snake-overlay hidden" id="snake-overlay-end">
-          <h3 data-en="Game Over" data-ro="Joc Terminat">Game Over</h3>
+          <h3>Game Over</h3>
           <div class="snake-final-score" id="snake-final-score">0</div>
-          <button class="snake-btn" id="snake-restart-btn" data-en="Play Again" data-ro="Joacă Din Nou">Play Again</button>
+          <button class="snake-btn" id="snake-restart-btn">Play Again</button>
         </div>
       </div>
       <div class="snake-dpad">
@@ -873,14 +859,14 @@ footer{
       </div>
       <div class="snake-leaderboard">
         <div class="lb-header">
-          <h4 data-en="Best Scores" data-ro="Cele Mai Bune Scoruri">Best Scores</h4>
+          <h4>Best Scores</h4>
           <button class="lb-clear-btn" id="snake-clear-lb" title="Clear leaderboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
         </div>
         <table>
           <thead><tr>
-            <th data-en="#" data-ro="#">#</th>
-            <th data-en="Score" data-ro="Scor">Score</th>
-            <th data-en="Date" data-ro="Data">Date</th>
+            <th>#</th>
+            <th>Score</th>
+            <th>Date</th>
           </tr></thead>
           <tbody id="snake-lb-body"></tbody>
         </table>
@@ -892,7 +878,7 @@ footer{
       <div class="game-pane">
         <div class="game-col">
       <div class="trade-panel" id="trade-wrap">
-        <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
+        <h3>SPY Day Trader</h3>
         <div class="game-toolbar-btns" style="position:absolute;top:12px;right:12px;z-index:3;">
           <button class="game-toolbar-btn" id="game-settings-btn" title="Settings">&#9881;</button>
           <button class="game-toolbar-btn" id="trade-fullscreen-btn" title="Fullscreen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 00-2 2v3"/><path d="M21 8V5a2 2 0 00-2-2h-3"/><path d="M3 16v3a2 2 0 002 2h3"/><path d="M16 21h3a2 2 0 002-2v-3"/></svg></button>
@@ -935,9 +921,9 @@ footer{
         </div>
         <div class="trade-timer"><div class="trade-timer-fill" id="trade-timer-fill"></div></div>
         <div class="trade-info">
-          <div><small data-en="Price" data-ro="Preț">Price</small><span id="trade-price">—</span></div>
-          <div><small data-en="Position" data-ro="Poziție">Position</small><span id="trade-pos">0</span></div>
-          <div id="trade-pnl-total"><small data-en="P&amp;L" data-ro="Profit">P&amp;L</small><span id="trade-pnl">$0.00</span></div>
+          <div><small>Price</small><span id="trade-price">—</span></div>
+          <div><small>Position</small><span id="trade-pos">0</span></div>
+          <div id="trade-pnl-total"><small>P&amp;L</small><span id="trade-pnl">$0.00</span></div>
           <div id="trade-pnl-realized" style="display:none"><small>Realized</small><span id="trade-rpnl">$0.00</span></div>
           <div id="trade-pnl-unrealized" style="display:none"><small>Unrealized</small><span id="trade-upnl">$0.00</span></div>
         </div>
@@ -971,33 +957,33 @@ footer{
         <div class="trade-canvas-wrap">
           <canvas id="trade-canvas" width="400" height="220"></canvas>
           <div class="trade-overlay" id="trade-overlay-start">
-            <h3 data-en="SPY Day Trader" data-ro="SPY Day Trader">SPY Day Trader</h3>
-            <p data-en="Trade simulated SPY in 30 seconds." data-ro="Tranzacționează SPY simulat în 30 de secunde.">Trade simulated SPY in 30 seconds.</p>
-            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px" data-en="&#9650;/&#9660; or buttons to trade &bull; Space to pause" data-ro="&#9650;/&#9660; sau butoane pt. tranzacții &bull; Space pt. pauză">&#9650;/&#9660; or buttons to trade &bull; Space to pause</p>
-            <button class="trade-btn start" id="trade-start-btn" data-en="Start Trading" data-ro="Începe Tranzacția">Start Trading</button>
+            <h3>SPY Day Trader</h3>
+            <p>Trade simulated SPY in 30 seconds.</p>
+            <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px">&#9650;/&#9660; or buttons to trade &bull; Space to pause</p>
+            <button class="trade-btn start" id="trade-start-btn">Start Trading</button>
           </div>
           <div class="trade-overlay hidden" id="trade-overlay-pause">
-            <h3 data-en="Paused" data-ro="Pauză">Paused</h3>
-            <p data-en="Press Space or click to resume" data-ro="Apasă Space sau click pt. reluare">Press Space or click to resume</p>
+            <h3>Paused</h3>
+            <p>Press Space or click to resume</p>
             <div style="display:flex;gap:8px">
-              <button class="trade-btn start" id="trade-resume-btn" data-en="Resume" data-ro="Reia">Resume</button>
-              <button class="trade-btn end" id="trade-end-btn" data-en="End Session" data-ro="Încheie Sesiunea">End Session</button>
+              <button class="trade-btn start" id="trade-resume-btn">Resume</button>
+              <button class="trade-btn end" id="trade-end-btn">End Session</button>
             </div>
           </div>
           <div class="trade-overlay hidden" id="trade-overlay-end">
-            <h3 data-en="Market Closed" data-ro="Piața Închisă">Market Closed</h3>
+            <h3>Market Closed</h3>
             <div class="trade-result" id="trade-result">$0.00</div>
             <p id="trade-vol-info" style="font-size:0.85rem;color:var(--muted);margin-bottom:4px"></p>
             <p id="trade-date-info" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px"></p>
-            <button class="trade-btn start" id="trade-restart-btn" data-en="Trade Again" data-ro="Tranzacționează Din Nou">Trade Again</button>
+            <button class="trade-btn start" id="trade-restart-btn">Trade Again</button>
           </div>
         </div>
-        <div class="trade-paused-badge" id="trade-paused-badge" data-en="&#9208; PAUSED" data-ro="&#9208; PAUZĂ">&#9208; PAUSED</div>
+        <div class="trade-paused-badge" id="trade-paused-badge">&#9208; PAUSED</div>
         <div class="trade-btns">
-          <button class="trade-btn buy" id="trade-buy-btn" disabled data-en="Buy +100 (&#9650;)" data-ro="Cumpără +100 (&#9650;)">Buy +100 (&#9650;)</button>
-          <button class="trade-btn sell" id="trade-sell-btn" disabled data-en="Sell -100 (&#9660;)" data-ro="Vinde -100 (&#9660;)">Sell -100 (&#9660;)</button>
+          <button class="trade-btn buy" id="trade-buy-btn" disabled>Buy +100 (&#9650;)</button>
+          <button class="trade-btn sell" id="trade-sell-btn" disabled>Sell -100 (&#9660;)</button>
         </div>
-        <div class="trade-hint" data-en="&#9650;/&#9660; Buy &amp; Sell &bull; <kbd>Space</kbd> Pause" data-ro="&#9650;/&#9660; Cumpără &amp; Vinde &bull; <kbd>Space</kbd> Pauză">&#9650;/&#9660; Buy &amp; Sell &bull; <kbd>Space</kbd> Pause</div>
+        <div class="trade-hint">&#9650;/&#9660; Buy &amp; Sell &bull; <kbd>Space</kbd> Pause</div>
         <div class="trade-log" id="trade-log" style="display:none">
           <h4>Trade Log</h4>
           <div class="trade-log-scroll">
@@ -1017,15 +1003,15 @@ footer{
         </div>
         <div class="trade-lb" id="trade-lb">
           <div class="lb-header">
-            <h4 data-en="Best Sessions" data-ro="Cele Mai Bune Sesiuni">Best Sessions</h4>
+            <h4>Best Sessions</h4>
             <button class="lb-clear-btn" id="trade-clear-lb" title="Clear leaderboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
           </div>
           <table>
             <thead><tr>
-              <th data-en="#" data-ro="#">#</th>
-              <th data-en="P&amp;L" data-ro="Profit">P&amp;L</th>
-              <th data-en="Vol" data-ro="Vol">Vol</th>
-              <th data-en="Date" data-ro="Data">Date</th>
+              <th>#</th>
+              <th>P&amp;L</th>
+              <th>Vol</th>
+              <th>Date</th>
             </tr></thead>
             <tbody id="trade-lb-body"></tbody>
           </table>
@@ -1038,7 +1024,7 @@ footer{
       <div class="game-pane" style="padding:0 16px">
   <div class="wb-wrap" id="wb-wrap">
     <div class="wb-toolbar" id="wb-toolbar">
-      <span style="font-size:13px;font-weight:600;color:var(--ink);margin-right:6px" data-en="Whiteboard" data-ro="Tablă">Whiteboard</span>
+      <span style="font-size:13px;font-weight:600;color:var(--ink);margin-right:6px">Whiteboard</span>
       <div class="wb-sep"></div>
       <div class="wb-toolbar-group" id="wb-colors">
         <button class="wb-color-btn active" data-color="#f5f7fa" style="background:#f5f7fa" title="White"></button>
@@ -1181,17 +1167,6 @@ const observer = new IntersectionObserver(entries=>{
   });
 },{threshold:0.15});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-// Language toggle
-const toggle = document.getElementById('lang-toggle');
-let lang = 'en';
-toggle.addEventListener('click', ()=>{
-  lang = lang === 'en' ? 'ro' : 'en';
-  toggle.textContent = lang === 'en' ? 'RO' : 'EN';
-  document.querySelectorAll('[data-en]').forEach(el=>{
-    el.textContent = el.getAttribute(`data-${lang}`);
-  });
-});
 
 // Game Tabs
 (function(){
