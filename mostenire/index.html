@@ -13,9 +13,8 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151b;--panel:#1a1f27;--fg:#e6e9ef;--muted:#98a1b0;--line:#2c333e;--accent:#7ea2ff;--err:#ff8a80;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#12151b;--panel:#1a1f27;--fg:#e6e9ef;--muted:#98a1b0;--line:#2c333e;--accent:#7ea2ff;--err:#ff8a80;color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
-.wrap{max-width:960px;margin:0 auto;padding-block:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:20px}
+.wrap{max-width:960px;margin:0 auto;padding-block:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
 h1{font-size:22px;margin:0}
-p.sub{margin:4px 0 0;color:var(--muted)}
 .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
 @media (max-width:700px){.grid{grid-template-columns:1fr}}
 .box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:grid;gap:8px;min-width:0}
@@ -28,7 +27,7 @@ code{font-family:var(--mono);font-size:13px}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
 th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
-td.n{font-family:var(--mono);text-align:right}
+td.n{font-family:var(--mono);text-align:right;white-space:nowrap}
 tr.final td:first-child{font-weight:600}
 .pill{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
 tr.final .pill{color:var(--accent);border-color:var(--accent)}
@@ -41,49 +40,242 @@ tr.final .pill{color:var(--accent);border-color:var(--accent)}
 #stepdesc{font-size:15px;color:var(--fg)}
 tr.chg td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
 .up{color:var(--accent)} .down{color:var(--err)}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{font:inherit;font-size:14px;font-weight:600;padding:7px 14px;border-radius:6px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.btn:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);color:var(--panel)}
+.btn.primary:hover{background:color-mix(in srgb,var(--accent) 85%,var(--fg))}
+.btn:disabled{opacity:.4;cursor:default}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap}
+.valf{display:flex;align-items:center;gap:8px}
+.valf label{text-transform:none;letter-spacing:0;font-size:14px;font-weight:400;color:var(--muted)}
+.valf input{font-family:var(--mono);font-size:14px;width:130px;text-align:right;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+.valf input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.valf input[aria-invalid="true"]{border-color:var(--err);outline-color:var(--err)}
+.valf span{color:var(--muted);font-size:14px}
+.tscroll{overflow-x:auto}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-size:14px;display:inline-flex;align-items:center;gap:2px;padding:5px 12px;border-radius:99px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;white-space:nowrap}
+.tab .tl{max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.tab[aria-selected="true"]{padding-right:5px}
+.tab .ti{font:inherit;font-size:14px;line-height:1;width:24px;height:24px;border:0;border-radius:99px;background:none;color:inherit;cursor:pointer;display:inline-grid;place-items:center;opacity:.75}
+.tab .ti:hover{opacity:1;background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.tab .ti.del:hover{color:var(--err);background:color-mix(in srgb,var(--err) 15%,transparent)}
+.tab .ti:focus-visible{outline:2px solid var(--accent);opacity:1}
+.tab .tin{font:inherit;font-weight:600;width:130px;background:var(--panel);color:var(--fg);border:1px solid var(--accent);border-radius:4px;padding:1px 6px}
+.tab[aria-selected="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,var(--panel));color:var(--accent);font-weight:600}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tab.add{color:var(--accent);border-style:dashed}
+#init{min-height:110px}
+#edges{min-height:110px}
+.apanel{gap:0;padding:0;overflow:hidden}
+.apanel .tabs{padding:12px 14px;background:color-mix(in srgb,var(--accent) 5%,var(--panel));border-bottom:1px solid var(--line)}
+.sec{display:grid;gap:8px;padding:14px;min-width:0}
+.sec+.sec{border-top:1px solid var(--line)}
+.ainit{grid-template-columns:1.4fr 1fr;gap:16px;align-items:start}
+.aleft,.aright{display:grid;gap:8px;min-width:0}
+.aright .valf input{width:100%;box-sizing:border-box;flex:1}
+@media (max-width:700px){.ainit{grid-template-columns:1fr}}
+td.n small{display:block;color:var(--muted);font-size:12px}
+#valhint{color:var(--err)}
+.rsub{display:grid;gap:2px;margin-top:6px}
+.rsub h3{font-size:15px;margin:0}
+.rsub p{margin:0}
+#deadwrap{display:grid;gap:8px;margin-top:10px}
+@media (max-width:560px){#resbox .dz{display:none}}
+.tree{display:block;width:100%;max-width:320px;margin:4px auto 0;font-family:var(--body)}
+.tree .ln{fill:none;stroke:var(--muted);stroke-width:1.5}
+.tree rect{fill:var(--bg);stroke:var(--muted);stroke-width:1.2}
+.tree rect.dead{stroke-dasharray:4 3}
+.tree rect.alive{stroke:var(--accent);stroke-width:2;fill:color-mix(in srgb,var(--accent) 8%,var(--panel))}
+.tree text{text-anchor:middle;fill:var(--fg)}
+.tree .nm{font-size:13px;font-weight:600}
+.tree .dd{font-size:11px;fill:var(--muted)}
+.tree .sh{font-size:10.5px;fill:var(--accent);font-weight:600}
+/* schema */
+.schema{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.schema svg{display:block;margin:0 auto;font-family:var(--body)}
+.schema .arc{fill:none;stroke:var(--muted);opacity:.6;transition:opacity .3s}
+.schema .arc.on{stroke:var(--accent);opacity:.9}
+.schema .arc.flow{stroke-dasharray:10 6;animation:flow .7s linear infinite}
+.schema .dim{opacity:.15}
+.schema .node{cursor:pointer;transition:opacity .3s}
+.schema .node:focus{outline:none}
+.schema .node:focus-visible rect{stroke:var(--accent);stroke-width:2.4}
+@keyframes flow{to{stroke-dashoffset:-16}}
+@media (prefers-reduced-motion:reduce){.schema .arc.flow{animation:none;stroke-dasharray:none}}
+:root{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;--s6:#008300;--s7:#6250d6;--s8:#e34948;--s0:#9a9a94}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#008300;--s7:#9085e9;--s8:#e66767;--s0:#6f6f69}}
+:root[data-theme="dark"]{--s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;--s6:#008300;--s7:#9085e9;--s8:#e66767;--s0:#6f6f69}
+.bars{display:grid;gap:8px;margin:4px 0 6px}
+.bars .bt{font-size:13px;color:var(--muted)}
+.blegend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
+.blegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.brow{display:grid;grid-template-columns:minmax(70px,max-content) 1fr 64px;align-items:center;gap:10px;font-size:14px;border-radius:4px}
+.brow .bn{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brow .bv{font-family:var(--mono);font-size:13px;text-align:right;color:var(--fg)}
+.btrack{display:flex;height:16px;background:color-mix(in srgb,var(--line) 45%,transparent);border-radius:0 4px 4px 0}
+.bseg{height:100%;min-width:2px;box-shadow:2px 0 0 var(--panel);position:relative}
+.bseg:last-child{border-radius:0 4px 4px 0;box-shadow:none}
+.bseg:hover{filter:brightness(1.12)}
+#btip{position:fixed;z-index:30;pointer-events:none;background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:13px;box-shadow:0 6px 16px rgba(0,0,0,.18);white-space:nowrap}
+/* cross-highlight */
+tr.hov td{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.brow.hov{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.schema .node.hov rect{stroke:var(--accent);stroke-width:2.4}
+#out tr[data-n],#outd tr[data-n],#steprows tr,#sumtab tr[data-n],.brow{cursor:pointer}
+.prov{font-size:14px;border-top:1px solid var(--line);padding-top:10px}
+.prov .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.prov .ph button{border:0;background:none;color:var(--muted);font-size:20px;line-height:1;cursor:pointer}
+.prov ul{margin:6px 0;padding-left:18px}
+.prov li{margin:3px 0}
+.prov summary{cursor:pointer}
+.prov .m{color:var(--muted);font-size:13px}
+.prov .orig{margin-top:6px;color:var(--muted);font-size:13px}
+.schema .lbl{font-family:var(--mono);font-size:12px;text-anchor:middle;fill:var(--muted);paint-order:stroke;stroke:var(--panel);stroke-width:4px;stroke-linejoin:round}
+.schema .lbl.on{fill:var(--accent);font-weight:600}
+.schema rect{fill:var(--bg);stroke:var(--muted);stroke-width:1.2}
+.schema rect.dead{stroke-dasharray:4 3}
+.schema rect.alive{stroke:var(--accent);stroke-width:2;fill:color-mix(in srgb,var(--accent) 8%,var(--panel))}
+.schema rect.cur{stroke:var(--accent);stroke-width:2.4;stroke-dasharray:none}
+.schema text.nm{font-size:13px;font-weight:600;text-anchor:middle;fill:var(--fg)}
+.schema text.sb{font-size:11px;text-anchor:middle;fill:var(--muted)}
+.schema text.sb.alive{fill:var(--accent);font-weight:600}
+/* print summary */
+#print{font-family:var(--body);color:#000}
+#print h1{font-size:20px;margin:0 0 2px}
+#print h3{font-size:16px;margin:22px 0 0;padding-top:10px;border-top:2px solid #000}
+#print h2{font-size:14px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+#print .meta{font-size:12px;color:#444}
+#print .cols>div{min-width:0}
+#print pre{box-sizing:border-box;font-family:var(--mono);font-size:12px;white-space:pre-wrap;margin:0;padding:8px 10px;border:1px solid #ccc;border-radius:4px}
+#print ol{margin:0;padding-left:20px;font-size:13px}
+#print ol li{margin-bottom:4px}
+#print table{font-size:13px}
+#print .schema svg{width:100%;height:auto;max-height:260px}
+#print .arc.flow{animation:none;stroke-dasharray:none}
+#print .note{font-size:11px;color:#444;margin-top:18px;border-top:1px solid #ccc;padding-top:8px}
+#print .link{font-family:var(--mono);font-size:10px;word-break:break-all;color:#444}
+@media print{
+  :root,:root[data-theme="dark"],:root:not([data-theme="light"]){--bg:#fff;--panel:#fff;--fg:#000;--muted:#555;--line:#bbb;--accent:#1d4ab8;--err:#b42318;color-scheme:light}
+  body{background:#fff;margin:0}
+  .wrap,#tut{display:none!important}
+  #print{display:block!important}
+  #print h2,#print table,#print .schema{break-inside:avoid}
+  #print .asset+.asset{break-before:page}
+  #print .res{break-inside:avoid}
+  @page{margin:16mm}
+  #print .bseg,#print .blegend i{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* tutorial */
+#tut-shade{position:fixed;inset:0;z-index:40;background:transparent}
+#tut-ring{position:fixed;z-index:41;border-radius:10px;box-shadow:0 0 0 3px var(--accent),0 0 0 9999px rgba(10,14,22,.55);pointer-events:none;transition:all .25s ease}
+#tut-card{position:fixed;z-index:42;width:min(380px,calc(100vw - 32px));background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,.25);display:grid;gap:10px;transition:top .25s ease,left .25s ease}
+#tut-card h2{font-size:16px;margin:0}
+#tut-card p{margin:0;font-size:14px}
+#tut-card .tfoot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#tut-card .tcount{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+#tut-card .tbtns{display:flex;gap:8px}
+#tut-close{position:absolute;top:8px;right:10px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1}
+[hidden]{display:none!important}
 </style>
 
 <div class="wrap">
   <header>
     <h1>Calculator moșteniri</h1>
-    <p class="sub">Graf orientat cu cote pe muchii. Nodurile se procesează în ordine topologică: <code>B += A × cotă</code>. Cotele date de fiecare persoană trebuie să însumeze exact 1.</p>
+    <div class="hbtns" id="hbtns">
+      <button class="btn" id="reset" type="button" title="Înlocuiește datele cu exemplul inițial">Exemplu</button>
+      <button class="btn" id="share" type="button" title="Copiază un link care conține datele introduse">Copiază link</button>
+      <button class="btn" id="pdf" type="button" title="Tipărește sau salvează ca PDF un rezumat al cazului">PDF</button>
+      <button class="btn" id="tut-start" type="button">Tutorial</button>
+    </div>
   </header>
 
-  <div class="grid">
-    <div class="box">
-      <label for="edges">Transmisiuni</label>
-      <textarea id="edges" spellcheck="false">Ion: Maria 1/2, Ana 1/4, Dan 1/4
-Maria: Ana 1/3, Elena 2/3
-Dan: Elena 1</textarea>
-      <div class="hint">O linie per persoană: <code>A: B 1/2, C 1/4, D 1/4</code>. Cote ca <code>1/4</code>, <code>0.25</code> sau <code>25%</code>. Ordinea liniilor nu contează.</div>
-    </div>
-    <div class="box">
-      <label for="init">Cote inițiale</label>
-      <textarea id="init" spellcheck="false">Ion 1</textarea>
-      <div class="hint"><code>Nume valoare</code>, ex. <code>Ion 1</code> sau <code>Maria 1/6</code>.</div>
-    </div>
+  <div class="box" id="edgesbox">
+    <label for="edges">Transmisiuni</label>
+    <textarea id="edges" spellcheck="false">Ion: Maria 1/4, Andrei 3/8, Elena 3/8
+Andrei: Ioana 1/3, Maria 1/6, Elena 1/2
+Maria: Elena 1</textarea>
+    <div class="hint">O linie per persoană decedată: <code>A: B 1/2, C 1/4, D 1/4</code>. Cote ca <code>1/4</code>, <code>0.25</code> sau <code>25%</code>. Ordinea liniilor nu contează. Transmisiunile sunt aceleași pentru toate bunurile.</div>
   </div>
 
   <ul class="errs" id="errs" hidden></ul>
 
-  <div class="box" id="stepbox">
-    <div class="steph">
-      <label>Pas cu pas</label>
-      <div class="nav"><button id="prev" aria-label="Pasul anterior">←</button><span id="stepn"></span><button id="next" aria-label="Pasul următor">→</button></div>
-    </div>
-    <div id="stepdesc"></div>
-    <table>
-      <thead><tr><th>Persoană</th><th style="text-align:right">Cotă</th><th style="text-align:right">Schimbare</th></tr></thead>
-      <tbody id="steprows"></tbody>
-    </table>
+  <div class="box" id="sumbox" hidden>
+    <label>Total pe toate bunurile</label>
+    <div class="tscroll"><table id="sumtab"></table></div>
+    <div class="hint" id="sumhint"></div>
   </div>
 
-  <div class="box">
-    <label>Rezultat</label>
-    <table>
-      <thead><tr><th>Persoană</th><th>Stare</th><th style="text-align:right">Cotă (fracție)</th><th style="text-align:right">Cotă (zecimal)</th></tr></thead>
-      <tbody id="out"></tbody>
-    </table>
+  <div class="box apanel" id="apanel">
+    <div class="tabs" role="tablist" id="tabs" aria-label="Bunuri"></div>
+
+    <div class="sec ainit" id="initbox">
+      <div class="aleft">
+        <label for="init">Cote inițiale</label>
+        <textarea id="init" spellcheck="false"></textarea>
+      </div>
+      <div class="aright">
+        <label for="val">Valoarea bunului</label>
+        <div class="valf"><input id="val" inputmode="decimal" autocomplete="off" placeholder="100.000"><span>lei</span></div>
+        <div class="hint" id="valhint" hidden></div>
+        <div class="hint">O linie per titular: <code>Nume cotă</code>, ex. <code>Ion 1</code> sau <code>Maria 1/2</code> — cine deține bunul înainte de primul deces.</div>
+      </div>
+    </div>
+
+    <div class="sec" id="resbox">
+      <label>Rezultat</label>
+      <div class="rsub"><h3>Supraviețuitori</h3><p class="hint"><b>Cota finală</b> = partea din bun care îi revine fiecărui moștenitor în viață, după toate transmisiunile. Cotele lor însumează întregul bun.</p></div>
+      <div class="bars" id="bars"></div>
+      <div class="tscroll"><table id="tsurv">
+        <thead id="outh"></thead>
+        <tbody id="out"></tbody>
+      </table></div>
+      <div id="deadwrap">
+        <div class="rsub"><h3>Defuncți</h3><p class="hint"><b>Cota la deces</b> = partea din bun pe care persoana o deținea când a decedat — atât cea proprie, cât și cea moștenită de la cei decedați înaintea ei — și care s-a împărțit apoi între moștenitorii ei. Aceste cote nu se adună între ele.</p></div>
+        <div class="tscroll"><table id="tdead">
+          <thead id="outdh"></thead>
+          <tbody id="outd"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="sec" id="stepbox">
+      <div class="steph">
+        <label>Pas cu pas</label>
+        <div class="nav"><button id="prev" aria-label="Pasul anterior">←</button><span id="stepn"></span><button id="next" aria-label="Pasul următor">→</button></div>
+      </div>
+      <div id="stepdesc"></div>
+      <table>
+        <thead><tr><th>Persoană</th><th style="text-align:right">Cotă</th><th style="text-align:right">Schimbare</th></tr></thead>
+        <tbody id="steprows"></tbody>
+      </table>
+    </div>
+
+    <div class="sec" id="schemabox">
+      <label>Schemă</label>
+      <div class="schema" id="schema"></div>
+      <div class="hint">Fiecare arc merge de la defunct la moștenitor, poartă cota, iar grosimea lui arată cât s-a transmis efectiv. În casete apare cota fiecăruia la pasul selectat mai sus: pasul 0 = situația inițială, ultimul pas = rezultatul final. <b>Clic pe o persoană</b> ca să vezi de unde provine cota ei.</div>
+      <div class="prov" id="prov" hidden></div>
+    </div>
+  </div>
+</div>
+
+<div id="btip" hidden></div>
+<div id="print" hidden></div>
+
+<div id="tut" hidden>
+  <div id="tut-shade"></div>
+  <div id="tut-ring"></div>
+  <div id="tut-card" role="dialog" aria-modal="true" aria-labelledby="tut-title">
+    <button id="tut-close" type="button" aria-label="Închide tutorialul">×</button>
+    <h2 id="tut-title"></h2>
+    <p id="tut-text"></p>
+    <div class="tfoot">
+      <span class="tcount" id="tut-count"></span>
+      <div class="tbtns"><button class="btn" id="tut-prev" type="button">Înapoi</button><button class="btn primary" id="tut-next" type="button">Următorul</button></div>
+    </div>
   </div>
 </div>
 
@@ -100,12 +292,21 @@ function parseNum(s){
   m=s.match(/^(-?\d+(?:\.\d+)?)%$/); if(m){const x=parseNum(m[1]);return x&&mul(x,F(1n,100n))}
   return null;
 }
+// value in bani (BigInt); '' -> null, invalid -> 'err'. Accepts 450.000 / 450 000 / 450000,50 / 450000.50
+function parseLei(str){
+  let s=str.replace(/\s|lei|ron/gi,''); if(!s) return null;
+  if(s.includes(',')) s=s.replace(/\./g,'').replace(',','.');
+  else if(/^\d{1,3}(\.\d{3})+$/.test(s)) s=s.replace(/\./g,'');
+  if(!/^\d+(\.\d{1,2})?$/.test(s)) return 'err';
+  const [i,f='']=s.split('.'); return BigInt(i)*100n+BigInt((f+'00').slice(0,2));
+}
+const lei=(b,x)=>{const r=(2n*b*x.n+x.d)/(2n*x.d);return Number(r/100n).toLocaleString('ro-RO')+','+String(r%100n).padStart(2,'0')+' lei'};
 const fmt=x=>x.d===1n?String(x.n):`${x.n}/${x.d}`;
 const dec=x=>(Number(x.n*1000000n/x.d)/1e6).toLocaleString('ro-RO',{maximumFractionDigits:6});
 
-function run(){
+function compute(et,it){
   const errs=[], out={}, nodes=new Set();
-  document.getElementById('edges').value.split('\n').forEach((raw,i)=>{
+  et.split('\n').forEach((raw,i)=>{
     const line=raw.trim(); if(!line) return;
     const c=line.indexOf(':');
     if(c<1){errs.push(`Linia ${i+1}: lipsește „:” după nume (ex. Ion: Maria 1/2, Ana 1/2).`);return}
@@ -122,7 +323,7 @@ function run(){
     out[a]=list; nodes.add(a);
   });
   const val={}, held={};
-  document.getElementById('init').value.split('\n').forEach((raw,i)=>{
+  it.split('\n').forEach((raw,i)=>{
     const t=raw.trim().split(/\s+/); if(!t[0]) return;
     const n=t.slice(0,-1).join(' '), v=parseNum(t[t.length-1]); if(!n||!v){errs.push(`Cote inițiale, linia ${i+1}: scrie nume + valoare (ex. Ion 1).`);return}
     val[n]=add(val[n]||Z,v); nodes.add(n);
@@ -133,22 +334,81 @@ function run(){
   const q=[...nodes].filter(n=>!indeg[n]), order=[];
   while(q.length){const a=q.shift();order.push(a);(out[a]||[]).forEach(([b])=>{if(--indeg[b]===0)q.push(b)})}
   if(order.length<nodes.size) errs.push('Ciclu între: '+[...nodes].filter(n=>!order.includes(n)).join(', ')+'.');
-  steps=[{snap:{...val}}]; stepOrder=order;
+  const st=[{snap:{...val}}];
   if(order.length===nodes.size) order.forEach(a=>{const v=val[a]||Z, l=out[a]; if(!l) return; held[a]=v; let given=Z; const gifts=[];
     l.forEach(([b,w])=>{const p=mul(v,w);val[b]=add(val[b]||Z,p);given=add(given,p);gifts.push([b,w,p])}); val[a]=sub(v,given);
-    steps.push({who:a,v,gifts,snap:{...val}})});
+    st.push({who:a,v,gifts,snap:{...val}})});
+  return {errs,out,order,val,held,steps:st};
+}
+function run(){
+  const R=compute(ED.value,IN.value), {errs,out,order,val,held}=R; steps=R.steps; stepOrder=order;
   const E=document.getElementById('errs'); E.innerHTML=errs.map(e=>`<li>${e.replace(/</g,'&lt;')}</li>`).join(''); E.hidden=!errs.length;
   const tb=document.getElementById('out');
   document.getElementById('stepbox').hidden=!!errs.length;
+  document.getElementById('schemabox').hidden=!!errs.length;
+  if(!errs.length){const k=x=>Number(x.n*1000000n/x.d);
+    const init=steps[0].snap, inc={}, comp={};
+    order.forEach(n=>{comp[n]={};if(init[n])comp[n][n]=init[n]});
+    steps.slice(1).forEach(s=>s.gifts.forEach(([b,w,p])=>{(inc[b]=inc[b]||[]).push([s.who,w,p]);
+      for(const o in comp[s.who])comp[b][o]=add(comp[b][o]||Z,mul(comp[s.who][o],w))}));
+    G={out,held,init,inc,comp,fin:val,order:[...order.filter(n=>out[n]),...order.filter(n=>!out[n]).sort((x,y)=>k(val[y]||Z)-k(val[x]||Z))]}}
   if(!errs.length){step=Math.min(step,steps.length-1);renderStep()}
-  if(errs.length){tb.innerHTML='<tr><td colspan="4">Corectează erorile de mai sus ca să vezi rezultatul.</td></tr>';return}
-  const rows=order.map(n=>({n,v:out[n]?held[n]:(val[n]||Z),fin:!out[n]})).sort((x,y)=>(y.fin-x.fin)||(Number(y.v.n*1000000n/y.v.d)-Number(x.v.n*1000000n/x.v.d)));
-  let tot=Z; rows.forEach(r=>{if(r.fin)tot=add(tot,r.v)});
-  tb.innerHTML=rows.map(r=>`<tr class="${r.fin?'final':''}"><td>${r.n.replace(/</g,'&lt;')}</td><td><span class="pill">${r.fin?'supraviețuitor':'la deces'}</span></td><td class="n">${fmt(r.v)}</td><td class="n">${dec(r.v)}</td></tr>`).join('')
-    +`<tr><td><b>Total supraviețuitori</b></td><td></td><td class="n"><b>${fmt(tot)}</b></td><td class="n"><b>${dec(tot)}</b></td></tr>`;
+  const V=parseLei(document.getElementById('val').value), money=typeof V==='bigint';
+  const VI=document.getElementById('val'), VH=document.getElementById('valhint');
+  VI.setAttribute('aria-invalid',V==='err'); VH.hidden=V!=='err'; VH.textContent='Valoarea nu e un număr valid (ex. 450.000 sau 450000,50).';
+  const R_=x=>'<th style="text-align:right"'+(x==='z'?' class="dz"':'')+'>';
+  document.getElementById('outh').innerHTML=`<tr><th>Persoană</th>${R_()}Cota finală</th>${R_('z')}Zecimal</th>${money?R_()+'Sumă</th>':''}</tr>`;
+  document.getElementById('outdh').innerHTML=`<tr><th>Persoană</th><th>Deces</th>${R_()}Cota la deces</th>${R_('z')}Zecimal</th>${money?R_()+'Sumă</th>':''}</tr>`;
+  const DW=document.getElementById('deadwrap');
+  if(errs.length){document.getElementById('bars').innerHTML='';document.getElementById('sumbox').hidden=true;DW.hidden=true;tb.innerHTML='<tr><td colspan="4">Corectează erorile de mai sus ca să vezi rezultatul.</td></tr>';return}
+  const num=x=>Number(x.n*1000000n/x.d);
+  const surv=order.filter(n=>!out[n]).map(n=>({n,v:val[n]||Z})).sort((x,y)=>num(y.v)-num(x.v));
+  const dead=order.filter(n=>out[n]).map((n,i)=>({n,v:held[n]||Z,k:i+1}));
+  let tot=Z; surv.forEach(r=>tot=add(tot,r.v));
+  const cells=v=>`<td class="n">${fmt(v)}</td><td class="n dz">${dec(v)}</td>${money?`<td class="n">${lei(V,v)}</td>`:''}`;
+  tb.innerHTML=surv.map(r=>`<tr class="final" data-n="${escA(r.n)}"><td>${escA(r.n)}</td>${cells(r.v)}</tr>`).join('')
+    +`<tr><td><b>Total</b></td><td class="n"><b>${fmt(tot)}</b></td><td class="n dz"><b>${dec(tot)}</b></td>${money?`<td class="n"><b>${lei(V,tot)}</b></td>`:''}</tr>`;
+  document.getElementById('outd').innerHTML=dead.map(r=>`<tr data-n="${escA(r.n)}"><td>${escA(r.n)}</td><td><span class="pill">† pasul ${r.k}</span></td>${cells(r.v)}</tr>`).join('');
+  DW.hidden=!dead.length;
+  drawBars(V);
+  drawSummary();
+}
+function drawSummary(){
+  const box=document.getElementById('sumbox');
+  const Rs=assets.map(a=>compute(ED.value,a.c)), Vs=assets.map(a=>parseLei(a.v)), allV=Vs.every(v=>typeof v==='bigint');
+  const bad=assets.filter((a,i)=>Rs[i].errs.length).map(a=>a.n||'Bun');
+  const heirs=[]; Rs.forEach(R=>{if(R.errs.length)return;R.order.forEach(n=>{if(!R.out[n]&&(R.val[n]||Z).n!==0n&&!heirs.includes(n))heirs.push(n)})});
+  const lt=(b,x)=>{const r=(2n*b*x.n+x.d)/(2n*x.d);return r};
+  const fl=r=>Number(r/100n).toLocaleString('ro-RO')+','+String(r%100n).padStart(2,'0')+' lei';
+  const rows=heirs.map(n=>{let tb=0n;
+    const cells=assets.map((a,i)=>{const R=Rs[i]; if(R.errs.length) return '<td class="n">—</td>';
+      const f=R.val[n]||Z; if(typeof Vs[i]==='bigint') tb+=lt(Vs[i],f);
+      return `<td class="n">${f.n===0n?'0':fmt(f)}${typeof Vs[i]==='bigint'?`<small>${lei(Vs[i],f)}</small>`:''}</td>`}).join('');
+    const sh=Rs.reduce((t,R)=>{const f=R.errs.length?Z:(R.val[n]||Z);return t+Number(f.n)/Number(f.d)},0);
+    return {n,tb,sh,html:`<tr class="final" data-n="${escA(n)}"><td>${escA(n)}</td>${cells}${allV?`<td class="n"><b>${fl(tb)}</b></td>`:''}</tr>`}}).sort((x,y)=>allV?Number(y.tb-x.tb):y.sh-x.sh);
+  const totV=allV?Vs.reduce((t,v)=>t+v,0n):0n;
+  document.getElementById('sumtab').innerHTML=`<thead><tr><th>Persoană</th>${assets.map(a=>`<th style="text-align:right">${escA(a.n||'Bun')}</th>`).join('')}${allV?'<th style="text-align:right">Total</th>':''}</tr></thead><tbody>`
+    +rows.map(r=>r.html).join('')+(allV?`<tr><td><b>Total</b></td>${Vs.map(v=>`<td class="n"><b>${fl(v)}</b></td>`).join('')}<td class="n"><b>${fl(totV)}</b></td></tr>`:'')+'</tbody>';
+  document.getElementById('sumhint').textContent=(bad.length?`Corectează cotele inițiale pentru: ${bad.join(', ')}. `:'')+(allV||Vs.every(v=>v===null)&&assets.length<2?'':'Completează valoarea fiecărui bun ca să vezi totalul în lei.');
+  box.hidden=false;
+}
+const escA=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function drawBars(V){
+  const B=document.getElementById('bars'), {comp,init,fin,order,out}=G;
+  const owners=Object.keys(init), total=owners.reduce((t,o)=>add(t,init[o]),Z), num=f=>Number(f.n)/Number(f.d);
+  if(!owners.length||total.n===0n){B.innerHTML='';return}
+  const col=o=>{const i=owners.indexOf(o);return i<8?`var(--s${i+1})`:'var(--s0)'};
+  const heirs=order.filter(n=>!out[n]&&(fin[n]||Z).n!==0n);
+  const leg=owners.length>1?`<div class="blegend">${owners.slice(0,8).map(o=>`<span><i style="background:${col(o)}"></i>${escA(o)}</span>`).join('')}${owners.length>8?'<span><i style="background:var(--s0)"></i>Altele</span>':''}</div>`:'';
+  B.innerHTML=`<div class="bt">Din a cui parte a bunului provine fiecare cotă</div>`+leg+heirs.map(n=>{
+    const segs=owners.filter(o=>comp[n][o]&&comp[n][o].n!==0n).map(o=>{const f=comp[n][o];
+      const tip=`<b>${escA(n)}</b>: <b>${fmt(f)}</b> din cota inițială deținută de ${escA(o)}${typeof V==='bigint'?' ('+lei(V,f)+')':''}`;
+      return `<div class="bseg" style="width:${(100*num(f)/num(total)).toFixed(3)}%;background:${col(o)}" data-tip="${escA(tip)}"></div>`}).join('');
+    return `<div class="brow" data-n="${escA(n)}"><span class="bn">${escA(n)}</span><div class="btrack">${segs}</div><span class="bv">${fmt(fin[n])}</span></div>`}).join('');
 }
 function renderStep(){
   const s=steps[step], p=steps[step-1], esc=x=>x.replace(/</g,'&lt;');
+  drawSchema();
   document.getElementById('stepn').textContent=`${step} / ${steps.length-1}`;
   document.getElementById('prev').disabled=step===0;
   document.getElementById('next').disabled=step===steps.length-1;
@@ -156,12 +416,230 @@ function renderStep(){
     :`<b>${esc(s.who)}</b> transmite ${fmt(s.v)}: `+s.gifts.map(([b,w,q])=>`${esc(b)} primește ${fmt(w)} × ${fmt(s.v)} = <b>${fmt(q)}</b>`).join('; ')+'.';
   document.getElementById('steprows').innerHTML=stepOrder.map(n=>{
     const v=s.snap[n]||Z, d=p?sub(v,p.snap[n]||Z):Z, ch=d.n!==0n;
-    return `<tr class="${ch?'chg':''}"><td>${esc(n)}</td><td class="n">${fmt(v)}</td><td class="n ${d.n>0n?'up':d.n<0n?'down':''}">${ch?(d.n>0n?'+':'')+fmt(d):''}</td></tr>`}).join('');
+    return `<tr class="${ch?'chg':''}" data-n="${escA(n)}"><td>${esc(n)}</td><td class="n">${fmt(v)}</td><td class="n ${d.n>0n?'up':d.n<0n?'down':''}">${ch?(d.n>0n?'+':'')+fmt(d):''}</td></tr>`}).join('');
 }
-let steps=[], stepOrder=[], step=0;
-document.getElementById('prev').onclick=()=>{if(step>0){step--;renderStep()}};
-document.getElementById('next').onclick=()=>{if(step<steps.length-1){step++;renderStep()}};
-document.addEventListener('keydown',e=>{if(e.target.tagName==='TEXTAREA')return;if(e.key==='ArrowLeft')document.getElementById('prev').click();if(e.key==='ArrowRight')document.getElementById('next').click()});
-['edges','init'].forEach(id=>document.getElementById(id).addEventListener('input',run));
+let steps=[], stepOrder=[], step=0, G=null;
+function drawSchema(plain){
+  const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const {out,held,fin,order,inc}=G; if(sel&&!order.includes(sel)) sel=null;
+  const live=step>0&&!sel&&!plain, snap=steps[step].snap, cur=live?steps[step].who:null;
+  const pos={}, gap=52, nh=40; let x=6; const sub={}, idx={};
+  order.filter(n=>out[n]).forEach((n,i)=>idx[n]=i+1);
+  // box text = holding at the selected step; once dead: "† pasul k"
+  order.forEach(n=>{sub[n]=idx[n]&&idx[n]<=step?`† pasul ${idx[n]}`:fmt(snap[n]||Z)});
+  order.forEach((n,i)=>{const longest=Math.max(...steps.map(t=>fmt(t.snap[n]||Z).length),idx[n]?`† pasul ${idx[n]}`.length:0);
+    const w=Math.max(70,n.length*8+22,longest*6.4+18);pos[n]={i,x,w,cx:x+w/2};x+=w+gap});
+  let anc=null; if(sel){anc=new Set([sel]);for(let i=order.length-1;i>=0;i--){const a=order[i];if((out[a]||[]).some(([b])=>anc.has(b)))anc.add(a)}}
+  const W=x-gap+6, edges=[], num=f=>Number(f.n)/Number(f.d); let maxH=0, maxP=0;
+  order.forEach(a=>(out[a]||[]).forEach(([b,w])=>{const h=26+34*(pos[b].i-pos[a].i-1), p=mul(held[a]||Z,w);
+    maxH=Math.max(maxH,h);maxP=Math.max(maxP,num(p));edges.push({a,b,w,h,p})}));
+  const base=maxH+16, H=base+nh+4;
+  const arcs=edges.map(e=>{const sx=pos[e.a].cx+6, ex=pos[e.b].cx-6;
+    const st=plain?'':anc?(anc.has(e.a)&&anc.has(e.b)?'on':'dim'):live?(e.a===cur?'on':pos[e.a].i+1>step?'dim':''):'';
+    const sw=(1.2+8*(maxP?num(e.p)/maxP:0)).toFixed(2), on=st==='on';
+    return `<g class="${st==='dim'?'dim':''}"><title>${esc(e.a)} → ${esc(e.b)}: ${fmt(e.w)} × ${fmt(held[e.a]||Z)} = ${fmt(e.p)}</title>`
+      +`<path class="arc${on?' on':''}${on&&live?' flow':''}" style="stroke-width:${sw}px" d="M${sx} ${base} A${(ex-sx)/2} ${e.h} 0 0 1 ${ex} ${base}" marker-end="url(#ah${on?'1':'0'})"/>`
+      +`<text class="lbl${on?' on':''}" x="${(sx+ex)/2}" y="${base-e.h+4}">${fmt(e.w)}</text></g>`}).join('');
+  const boxes=order.map(n=>{const p=pos[n], dead=!!out[n], hi=!plain&&(n===cur||n===sel);
+    const c=(dead?'dead':'alive')+(hi?' cur':'');
+    return `<g class="node${anc&&!anc.has(n)?' dim':''}" data-n="${esc(n)}" tabindex="0" role="button" aria-label="Proveniența cotei: ${esc(n)}"><rect class="${c}" x="${p.x}" y="${base}" width="${p.w}" height="${nh}" rx="6"/><text class="nm" x="${p.cx}" y="${base+17}">${esc(n)}</text><text class="sb${dead?'':' alive'}" x="${p.cx}" y="${base+32}">${sub[n]}</text></g>`}).join('');
+  const mk=(id,c)=>`<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(${c})"/></marker>`;
+  document.getElementById('schema').innerHTML=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Schema transmisiunilor"><defs>${mk('ah0','--muted')}${mk('ah1','--accent')}</defs>${arcs}${boxes}</svg>`;
+  renderProv();
+}
+function renderProv(){
+  const P=document.getElementById('prov'); if(!sel){P.hidden=true;return}
+  const esc=x=>x.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const {out,held,init,inc,comp,fin}=G, V=parseLei(document.getElementById('val').value);
+  const money=x=>typeof V==='bigint'?` <span class="m">(${lei(V,x)})</span>`:'';
+  const parts=(n,seen)=>{const li=[];
+    if(init[n]) li.push(`<li><b>${fmt(init[n])}</b> — cotă proprie inițială${money(init[n])}</li>`);
+    (inc[n]||[]).forEach(([a,w,p])=>{
+      const leaf=!(inc[a]||[]).length, why=`<span class="m">${fmt(w)} × ${fmt(held[a])}</span>`;
+      li.push(leaf||seen.has(a)
+        ?`<li><b>${fmt(p)}</b> de la ${esc(a)} ${why}${money(p)}</li>`
+        :`<li><details><summary><b>${fmt(p)}</b> de la ${esc(a)} ${why}${money(p)}</summary><div class="m">${esc(a)} avea la deces ${fmt(held[a])}, din care:</div><ul>${parts(a,new Set([...seen,a]))}</ul></details></li>`)});
+    return li.join('')};
+  const dead=!!out[sel], tot=dead?held[sel]:(fin[sel]||Z);
+  const orig=Object.entries(comp[sel]).map(([o,f])=>`${esc(o)} ${fmt(f)}`).join(' · ');
+  P.innerHTML=`<div class="ph"><div><b>${esc(sel)}</b> — ${dead?'cota deținută la deces':'cota finală'}: <b>${fmt(tot)}</b>${money(tot)}</div><button type="button" id="provx" aria-label="Închide">×</button></div>`
+    +(parts(sel,new Set([sel]))?`<ul>${parts(sel,new Set([sel]))}</ul>`:'<div class="m">Nu primește nimic.</div>')
+    +(orig?`<div class="orig">După titularul inițial al bunului: ${orig}</div>`:'');
+  P.hidden=false;
+  document.getElementById('provx').onclick=()=>{sel=null;drawSchema()};
+}
+let sel=null;
+const pick=n=>{sel=sel===n?null:n;drawSchema()};
+document.getElementById('schema').addEventListener('click',e=>{const g=e.target.closest('.node');pick(g?g.dataset.n:null)});
+document.getElementById('schema').addEventListener('keydown',e=>{const g=e.target.closest('.node');if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();pick(g.dataset.n)}});
+document.getElementById('prev').onclick=()=>{sel=null;if(step>0){step--;renderStep()}};
+document.getElementById('next').onclick=()=>{sel=null;if(step<steps.length-1){step++;renderStep()}};
+document.addEventListener('keydown',e=>{if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT'||e.target.closest('#tabs')||!tutEl.hidden)return;if(e.key==='ArrowLeft')document.getElementById('prev').click();if(e.key==='ArrowRight')document.getElementById('next').click()});
+// ---- assets (tabs) + persistence: link (#hash) > browser storage > example ----
+const ED=document.getElementById('edges'), IN=document.getElementById('init'), VL=document.getElementById('val'), KEY='mostenire:v2';
+const EXAMPLE={t:ED.value,a:[{n:'Casă',c:'Ion 1/2\nMaria 1/2',v:''}]};
+let assets=EXAMPLE.a.map(x=>({...x})), ai=0;
+const clean=as=>as.map(x=>({n:String(x.n||''),c:String(x.c||''),v:String(x.v||'')}));
+const isEx=()=>ED.value===EXAMPLE.t&&JSON.stringify(clean(assets))===JSON.stringify(EXAMPLE.a);
+const b64e=o=>{const b=new TextEncoder().encode(JSON.stringify(o));let s='';b.forEach(c=>s+=String.fromCharCode(c));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const b64d=s=>{const b=atob(s.replace(/-/g,'+').replace(/_/g,'/'));return JSON.parse(new TextDecoder().decode(Uint8Array.from(b,c=>c.charCodeAt(0))))};
+function load(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  try{if(h.has('d')){const o=b64d(h.get('d'));if(Array.isArray(o.a)&&o.a.length)return {t:String(o.t||''),a:clean(o.a)}}}catch(e){}
+  try{if(h.has('a'))return {t:h.get('t')||'',a:clean(JSON.parse(h.get('a')))}}catch(e){}
+  if(h.has('t')||h.has('c')) return {t:h.get('t')||'',a:[{n:'Bun',c:h.get('c')||'',v:h.get('v')||''}]};
+  try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&typeof v.t==='string'&&Array.isArray(v.a)&&v.a.length)return {t:v.t,a:clean(v.a)}}catch(e){}
+  try{const v=JSON.parse(localStorage.getItem('mostenire:v1'));if(v&&typeof v.t==='string')return {t:v.t,a:[{n:'Bun',c:v.c||'',v:v.v||''}]}}catch(e){}
+  return null;
+}
+const linkFor=()=>location.href.split('#')[0]+'#d='+b64e({t:ED.value,a:clean(assets)});
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify({t:ED.value,a:clean(assets)}))}catch(e){}
+  try{history.replaceState(null,'',isEx()?location.pathname+location.search:linkFor())}catch(e){}
+}
+let editing=-1;
+function renderTabs(){
+  const T=document.getElementById('tabs'), many=assets.length>1;
+  T.innerHTML=assets.map((a,i)=>{const on=i===ai, nm=a.n||'Bun '+(i+1);
+    const label=editing===i?`<input class="tin" value="${escA(a.n)}" aria-label="Denumirea bunului" placeholder="Denumire">`:`<span class="tl">${escA(nm)}</span>`;
+    const tools=on&&editing!==i?`<button class="ti" type="button" data-act="edit" title="Redenumește" aria-label="Redenumește ${escA(nm)}">✎</button>`+(many?`<button class="ti del" type="button" data-act="del" title="Șterge" aria-label="Șterge ${escA(nm)}">×</button>`:''):'';
+    return `<div class="tab" role="tab" tabindex="${on?0:-1}" aria-selected="${on}" data-i="${i}">${label}${tools}</div>`}).join('')
+    +'<button class="tab add" type="button" id="addtab" title="Adaugă un bun">+ Bun</button>';
+  const inp=T.querySelector('.tin');
+  if(inp){inp.focus();inp.select();
+    const done=ok=>{if(editing<0)return;const i=editing;editing=-1;if(ok){assets[i].n=inp.value.trim()||assets[i].n}renderTabs();run();save();const t=T.querySelector(`.tab[data-i="${i}"]`);if(t)t.focus()};
+    inp.onkeydown=e=>{e.stopPropagation();if(e.key==='Enter'){e.preventDefault();done(true)}else if(e.key==='Escape'){e.preventDefault();done(false)}};
+    inp.onblur=()=>done(true);inp.onclick=e=>e.stopPropagation()}
+}
+function syncIn(){const a=assets[ai];IN.value=a.c;VL.value=a.v;renderTabs()}
+function selectAsset(i){ai=i;sel=null;editing=-1;syncIn();run();save()}
+document.getElementById('tabs').addEventListener('click',e=>{
+  if(e.target.closest('#addtab')){assets.push({n:'Bun '+(assets.length+1),c:'',v:''});ai=assets.length-1;sel=null;editing=ai;syncIn();run();save();return}
+  const act=e.target.closest('[data-act]');
+  if(act&&act.dataset.act==='edit'){editing=ai;renderTabs();return}
+  if(act&&act.dataset.act==='del'){if(assets.length<2||!confirm(`Ștergi bunul „${assets[ai].n||'Bun'}”?`))return;assets.splice(ai,1);selectAsset(Math.max(0,ai-1));return}
+  const t=e.target.closest('.tab[data-i]'); if(t&&+t.dataset.i!==ai) selectAsset(+t.dataset.i)});
+document.getElementById('tabs').addEventListener('dblclick',e=>{const t=e.target.closest('.tab[data-i]');if(t&&+t.dataset.i===ai&&editing<0){editing=ai;renderTabs()}});
+document.getElementById('tabs').addEventListener('keydown',e=>{const t=e.target.closest('.tab[data-i]');if(!t||e.target!==t)return;
+  if(e.key==='F2'){e.preventDefault();editing=ai;renderTabs();return}
+  const d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0; if(!d)return; e.preventDefault(); e.stopPropagation();
+  selectAsset((ai+d+assets.length)%assets.length); document.querySelector(`.tab[data-i="${ai}"]`).focus()});
+const saved=load(); if(saved){ED.value=saved.t;assets=saved.a.length?saved.a:assets}
+syncIn();
+ED.addEventListener('input',()=>{run();save()});
+IN.addEventListener('input',()=>{assets[ai].c=IN.value;run();save()});
+VL.addEventListener('input',()=>{assets[ai].v=VL.value;run();save()});
+document.getElementById('reset').onclick=()=>{
+  if(!isEx()&&!confirm('Înlocuiești datele introduse cu exemplul inițial?'))return;
+  ED.value=EXAMPLE.t;assets=EXAMPLE.a.map(x=>({...x}));ai=0;step=0;sel=null;syncIn();run();save()};
+document.getElementById('share').onclick=async e=>{
+  const b=e.currentTarget, url=linkFor(); let ok=false;
+  try{await navigator.clipboard.writeText(url);ok=true}catch(err){}
+  if(!ok){prompt('Copiază acest link:',url);return}
+  b.textContent='Link copiat ✓';setTimeout(()=>b.textContent='Copiază link',2000)};
+// ---- cross-highlight: same person across diagram, tables, bars ----
+const hl=(n,on)=>{if(n==null)return;document.querySelectorAll(`.wrap [data-n="${CSS.escape(n)}"]`).forEach(el=>el.classList.toggle('hov',on))};
+let hovN=null;
+document.querySelector('.wrap').addEventListener('mouseover',e=>{const t=e.target.closest('[data-n]'), n=t?t.dataset.n:null;
+  if(n!==hovN){hl(hovN,false);hovN=n;hl(n,true)}
+  const sg=e.target.closest('.bseg'), tip=document.getElementById('btip');
+  if(sg){tip.innerHTML=sg.dataset.tip;tip.hidden=false}else tip.hidden=true});
+document.querySelector('.wrap').addEventListener('mousemove',e=>{const tip=document.getElementById('btip');if(tip.hidden)return;
+  const w=tip.offsetWidth;tip.style.left=Math.min(e.clientX+12,innerWidth-w-8)+'px';tip.style.top=(e.clientY+16)+'px'});
+document.querySelector('.wrap').addEventListener('mouseleave',()=>{hl(hovN,false);hovN=null;document.getElementById('btip').hidden=true});
+document.querySelector('.wrap').addEventListener('click',e=>{const t=e.target.closest('#out tr[data-n], #outd tr[data-n], #steprows tr[data-n], #sumtab tr[data-n], .brow');
+  if(!t)return; sel=t.dataset.n; drawSchema(); hl(sel,true); hovN=sel;
+  document.getElementById('schemabox').scrollIntoView({behavior:'smooth',block:'nearest'})});
+
+// ---- PDF / print summary ----
+function buildPrint(){
+  const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const keepA=ai, keepS=step, keepSel=sel, parts=[];
+  assets.forEach((a,i)=>{
+    ai=i; syncIn(); step=0; sel=null; run(); step=steps.length-1; drawSchema(true);
+    if(!document.getElementById('errs').hidden){parts.push(`<div class="asset"><h3>${esc(a.n||'Bun')}</h3><p>Datele acestui bun conțin erori.</p></div>`);return}
+    const schema=document.getElementById('schema').innerHTML.replace(/ah([01])/g,`pah$1_${i}`);
+    const list=steps.slice(1).map((s,k)=>`<li><b>Pasul ${k+1} — ${esc(s.who)}</b> transmite ${fmt(s.v)}: `
+      +s.gifts.map(([b,w,q])=>`${esc(b)} primește ${fmt(w)} × ${fmt(s.v)} = <b>${fmt(q)}</b>`).join('; ')+'.</li>').join('');
+    const V=parseLei(a.v);
+    parts.push(`<div class="asset"><h3>${esc(a.n||'Bun')}${typeof V==='bigint'?` — ${lei(V,ONE)}`:''}</h3>
+      <h2>Cote inițiale</h2><pre>${esc(a.c.trim())}</pre>
+      <div class="res"><h2>Rezultat — supraviețuitori (cota finală)</h2><div class="bars">${document.getElementById('bars').innerHTML}</div><table>${document.getElementById('tsurv').innerHTML}</table></div>
+      ${document.getElementById('deadwrap').hidden?'':`<div class="res"><h2>Rezultat — defuncți (cota la deces)</h2><table>${document.getElementById('tdead').innerHTML}</table></div>`}
+      <h2>Pas cu pas</h2><ol>${list}</ol>
+      <h2>Schemă</h2><div class="schema">${schema}</div></div>`);
+  });
+  ai=keepA; syncIn(); step=keepS; sel=keepSel; run();
+  const date=new Date().toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('print').innerHTML=`
+    <h1>Calcul moștenire</h1><div class="meta">Generat la ${date} · ${assets.length} ${assets.length===1?'bun':'bunuri'}</div>
+    <h2>Transmisiuni</h2><pre>${esc(ED.value.trim())}</pre>
+    ${document.getElementById('sumbox').hidden?'':`<h2>Total pe toate bunurile</h2><table>${document.getElementById('sumtab').innerHTML}</table><div class="meta">${esc(document.getElementById('sumhint').textContent)}</div>`}
+    ${parts.join('')}
+    <div class="note">Calculul este pur aritmetic, pe baza cotelor introduse. Stabilirea cotelor legale (rezervă, testamente, renunțări, bunuri comune) trebuie verificată de un notar.
+    <div class="link"><a href="${escA(linkFor())}">Deschide acest caz în calculator</a></div></div>`;
+}
+document.getElementById('pdf').onclick=()=>{
+  if(!document.getElementById('errs').hidden){alert('Corectează mai întâi erorile din date.');return}
+  buildPrint();
+  const t=document.title, first=steps[1]&&steps[1].who;
+  document.title='Mostenire'+(first?' - '+first:'')+' - '+new Date().toISOString().slice(0,10);
+  addEventListener('afterprint',()=>{document.title=t},{once:true});
+  print();
+};
 run();
+
+// ---- tutorial ----
+const TUT=[
+  {t:'Bun venit',x:'Acest calculator arată cum se împarte o moștenire atunci când mai multe persoane decedează una după alta (moșteniri succesive). Tu introduci cine moștenește de la cine și în ce cote, iar calculatorul îți arată, bun cu bun, cât revine în final fiecărei persoane în viață. Tutorialul durează un minut; poți folosi și tastele ← → sau Esc.'},
+  {el:'edgesbox',t:'Transmisiuni',x:'Câte o linie pentru fiecare persoană decedată: numele, apoi „:” și moștenitorii cu cotele lor, separați prin virgulă. Ex.: <code>Ion: Maria 1/4, Andrei 3/8, Elena 3/8</code>. Cotele se pot scrie ca <code>1/4</code>, <code>0.25</code> sau <code>25%</code>, iar ordinea liniilor nu contează. Transmisiunile sunt comune pentru toate bunurile.'},
+  {el:'edgesbox',t:'Verificări automate',x:'Cotele lăsate de fiecare persoană trebuie să însumeze exact 1. Dacă greșești o cotă, scrii greșit formatul sau apare un ciclu (cineva ajunge să moștenească de la el însuși), sub câmpuri apare un mesaj roșu care îți spune ce linie trebuie corectată.'},
+  {el:'sumbox',t:'Total pe toate bunurile',x:'Imediat sub transmisiuni vezi concluzia: cât primește în final fiecare moștenitor în viață, din fiecare bun (cotă și sumă), plus totalul în lei dacă toate bunurile au valoare. Cu un singur bun, e chiar rezultatul lui; cu mai multe, le adună.'},
+  {el:'tabs',t:'Bunuri',x:'Fiecare bun are propria filă, iar tot ce e sub file — cote inițiale, rezultat, pas cu pas, schemă — se referă la bunul selectat. <b>+ Bun</b> adaugă un bun nou; pe fila selectată, <b>✎</b> o redenumește (sau dublu-clic pe nume) și <b>×</b> o șterge.'},
+  {el:'initbox',t:'Cote inițiale și valoare',x:'Scrii cine deține bunul înainte de primul deces și în ce cote, ex. <code>Ion 1</code> sau <code>Ion 1/2</code> și <code>Maria 1/2</code> pentru un bun comun. Valoarea în lei e opțională: dacă o completezi, apar și sumele în rezultat și în total.'},
+  {el:'initbox',t:'Exemplul de pe pagină',x:'<b>Casa</b> este bun comun al soților: Ion și Maria dețin câte 1/2. <b>Ion</b> decedează primul, lăsând soția Maria și doi copii: soția ia 1/4, copiii câte 3/8. Apoi decedează <b>Andrei</b>, fără copii: soția Ioana ia 1/3, mama Maria 1/6, sora Elena 1/2. La final decedează <b>Maria</b>, moștenită de Elena.<svg class="tree" viewBox="0 0 300 130" role="img" aria-label="Arborele familiei din exemplu"><path class="ln" d="M115 23H175M115 27H175M145 27V64M120 64H220M120 64V84M220 64V84M75 101H85M75 105H85"/><rect class="dead" x="45" y="6" width="70" height="38" rx="6"/><text x="80" y="23" class="nm">Ion</text><text x="80" y="37" class="dd">† 1</text><rect class="dead" x="175" y="6" width="70" height="38" rx="6"/><text x="210" y="23" class="nm">Maria</text><text x="210" y="37" class="dd">† 3</text><rect class="alive" x="5" y="84" width="70" height="38" rx="6"/><text x="40" y="101" class="nm">Ioana</text><text x="40" y="115" class="sh">cota 1/16</text><rect class="dead" x="85" y="84" width="70" height="38" rx="6"/><text x="120" y="101" class="nm">Andrei</text><text x="120" y="115" class="dd">† 2</text><rect class="alive" x="185" y="84" width="70" height="38" rx="6"/><text x="220" y="101" class="nm">Elena</text><text x="220" y="115" class="sh">cota 15/16</text></svg><span class="hint">† n = ordinea decesului; cu albastru, moștenitorii în viață și cota lor din casă.</span>'},
+  {el:'resbox',t:'Rezultat',x:'Rezultatul bunului selectat are două părți. <b>Supraviețuitori</b>: cota finală a fiecărui moștenitor în viață — barele arată, pe culori, din partea cărui titular inițial provine (treci cu mouse-ul peste ele). <b>Defuncți</b>: cota pe care o deținea fiecare la deces (proprie plus moștenită) și pe care a transmis-o mai departe. Dacă ai completat valoarea, apar și sumele în lei. Clic pe un rând îl selectează în schemă.'},
+  {el:'stepbox',t:'Pas cu pas',x:'Aici vezi fiecare deces pe rând: ce cotă avea persoana și cum s-a împărțit între moștenitori. Folosește săgețile ← → (sau tastele săgeți). Rândurile modificate la pasul curent sunt evidențiate, iar în schema de dedesubt arcele pasului curent se animă.'},
+  {el:'schemabox',t:'Schemă',x:'Schema se desenează automat pentru bunul selectat. Fiecare arc merge de la defunct la moștenitor și poartă cota; <b>grosimea</b> lui arată cât s-a transmis efectiv. În casete vezi cota fiecăruia la pasul selectat în „Pas cu pas”: la pasul 0 situația inițială, la ultimul pas rezultatul final; cine a decedat deja apare cu „† pasul n”. Cu albastru, moștenitorii în viață. Schema nu știe relațiile de familie — arată doar transmisiunile.'},
+  {el:'schemabox',t:'De unde provine o cotă',x:'<b>Clic pe o persoană</b> din schemă: drumurile care duc la ea se evidențiază, iar dedesubt apare descompunerea cotei — cât a primit direct și cât prin fiecare defunct, cu detalii care se pot deschide. Când treci cu mouse-ul peste o persoană, ea se evidențiază peste tot în pagină: în schemă, în tabele și în bare.'},
+  {el:'hbtns',t:'Butoane',x:'<b>Exemplu</b> readuce exemplul inițial. <b>Copiază link</b> copiază un link cu tot cazul, ca să-l trimiți familiei sau notarului. <b>PDF</b> deschide un rezumat de tipărit sau de salvat ca PDF, cu toate bunurile. <b>Tutorial</b> pornește din nou acest ghid. Datele tale rămân salvate automat în browser.'},
+  {t:'Gata!',x:'Acum înlocuiește exemplul cu datele tale — rezultatul se actualizează pe loc. Reține: calculatorul face doar aritmetica. Cotele legale (rezervă, testamente, renunțări, bunuri comune) trebuie stabilite corect de tine sau de notar.'}
+];
+let TL=TUT;
+const tutEl=document.getElementById('tut'), ring=document.getElementById('tut-ring'), card=document.getElementById('tut-card');
+let ti=0;
+function tutPlace(){
+  const s=TL[ti], el=s.el&&document.getElementById(s.el), vw=innerWidth, vh=innerHeight, cw=card.offsetWidth, ch=card.offsetHeight, m=16;
+  if(!el){ring.style.cssText='top:50%;left:50%;width:0;height:0';card.style.left=(vw-cw)/2+'px';card.style.top=Math.max(m,(vh-ch)/2)+'px';return}
+  const r=el.getBoundingClientRect(), pad=6;
+  ring.style.cssText=`top:${r.top-pad}px;left:${r.left-pad}px;width:${r.width+2*pad}px;height:${r.height+2*pad}px`;
+  let top= r.bottom+pad+12+ch<=vh-m ? r.bottom+pad+12 : r.top-pad-12-ch>=m ? r.top-pad-12-ch : vh-ch-m;
+  let left=Math.min(Math.max(m,r.left),vw-cw-m);
+  card.style.top=top+'px'; card.style.left=left+'px';
+}
+function tutShow(){
+  const s=TL[ti];
+  document.getElementById('tut-title').textContent=s.t;
+  document.getElementById('tut-text').innerHTML=s.x;
+  document.getElementById('tut-count').textContent=`${ti+1} / ${TL.length}`;
+  document.getElementById('tut-prev').disabled=ti===0;
+  document.getElementById('tut-next').textContent=ti===TL.length-1?'Închide':'Următorul';
+  const el=s.el&&document.getElementById(s.el);
+  if(el){const r=el.getBoundingClientRect();if(r.top<0||r.bottom>innerHeight)el.scrollIntoView({block:r.height>innerHeight*.6?'start':'center',behavior:'smooth'})}
+  tutPlace(); setTimeout(tutPlace,350);
+  document.getElementById('tut-next').focus();
+}
+function tutOpen(){TL=TUT.filter(s=>!s.el||!document.getElementById(s.el).hidden);ti=0;tutEl.hidden=false;tutShow()}
+function tutClose(){tutEl.hidden=true;document.getElementById('tut-start').focus()}
+document.getElementById('tut-start').onclick=tutOpen;
+document.getElementById('tut-close').onclick=tutClose;
+document.getElementById('tut-shade').onclick=tutClose;
+document.getElementById('tut-prev').onclick=()=>{if(ti>0){ti--;tutShow()}};
+document.getElementById('tut-next').onclick=()=>{if(ti<TL.length-1){ti++;tutShow()}else tutClose()};
+document.addEventListener('keydown',e=>{if(tutEl.hidden)return;
+  if(e.key==='Escape')tutClose();
+  else if(e.key==='ArrowRight')document.getElementById('tut-next').click();
+  else if(e.key==='ArrowLeft')document.getElementById('tut-prev').click()});
+addEventListener('resize',()=>{if(!tutEl.hidden)tutPlace()});
+addEventListener('scroll',()=>{if(!tutEl.hidden)tutPlace()},{passive:true});
 </script>
