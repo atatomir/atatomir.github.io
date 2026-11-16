@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>O scrisoare de la Polul Nord</title>
+<meta name="description" content="Am o întrebare foarte importantă pentru voi…">
+<meta property="og:title" content="✉️ O scrisoare de la Polul Nord">
+<meta property="og:description" content="Am o întrebare foarte importantă pentru voi…">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎄</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@400;600;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #0a1730;
+    --night-2: #142a52;
+    --red: #d1213a;
+    --red-dark: #8e0d22;
+    --green: #1e7a4c;
+    --green-dark: #11502f;
+    --gold: #f5c451;
+    --cream: #fff8ec;
+    --paper: #fffdf6;
+    --kraft: #f1ddb6;
+    --baby: #5fb1ee;
+    --ice: #cfeaff;
+    --ink: #3b2a20;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Nunito", system-ui, sans-serif;
+    color: var(--cream);
+    background:
+      radial-gradient(circle at 80% 8%, rgba(255,246,214,.22) 0, rgba(255,246,214,0) 18%),
+      linear-gradient(180deg, var(--night) 0%, var(--night-2) 55%, #23457a 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  button { font: inherit; }
+
+  /* ---------- Sky & snow ---------- */
+  .sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .star { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; animation: twinkle 3s ease-in-out infinite; }
+  .moon { position: absolute; top: 6%; right: 12%; width: 70px; height: 70px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #fffbe8, #f3e3b0); box-shadow: 0 0 60px 20px rgba(255,240,190,.25); }
+  .moon::after { content: ""; position: absolute; inset: -4px -4px 8px 16px; border-radius: 50%; background: transparent; box-shadow: inset -10px 6px 0 0 rgba(0,0,0,0); }
+  @keyframes twinkle { 50% { opacity: .2; transform: scale(.6); } }
+  #snow { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+  main { position: relative; z-index: 2; }
+  section { padding: 56px 16px; text-align: center; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding-top: 40px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .kicker { display: inline-block; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 12px;
+    color: var(--gold); border: 1.5px dashed rgba(245,196,81,.6); padding: 6px 14px; border-radius: 999px; }
+  h1, h2 { font-family: "Pacifico", cursive; font-weight: 400; margin: 0; }
+  h1 { font-size: clamp(36px, 8vw, 68px); line-height: 1.2; margin: 18px 0 22px;
+    text-shadow: 0 4px 0 var(--red-dark), 0 8px 24px rgba(0,0,0,.4); }
+  h1 .blue { color: var(--ice); text-shadow: 0 4px 0 #2b6ea8, 0 8px 24px rgba(0,0,0,.4); }
+  h2 { font-size: clamp(28px, 6vw, 44px); margin-bottom: 8px; text-shadow: 0 3px 0 rgba(0,0,0,.25); }
+  .lead { font-size: clamp(16px, 2.6vw, 20px); max-width: 560px; margin: 0 auto; opacity: .92; line-height: 1.55; }
+
+  /* Stockings garland */
+  .mantel { position: relative; width: min(560px, 100%); height: 170px; margin: 24px auto 4px; }
+  .mantel svg.garland { position: absolute; inset: 0 0 auto 0; width: 100%; height: 50px; overflow: visible; }
+  .bulb { animation: blink 1.6s ease-in-out infinite; }
+  .bulb:nth-child(2n) { animation-delay: .4s; } .bulb:nth-child(3n) { animation-delay: .8s; }
+  @keyframes blink { 50% { opacity: .35; } }
+  .stockings { position: absolute; inset: 18px 0 0 0; display: flex; justify-content: space-around; align-items: flex-start; }
+  .stocking { display: flex; flex-direction: column; align-items: center; transform-origin: top center; animation: sway 4s ease-in-out infinite; }
+  .stocking:nth-child(2) { animation-delay: -1s; } .stocking:nth-child(3) { animation-delay: -2s; }
+  .stocking svg { width: 64px; height: 100px; filter: drop-shadow(0 6px 6px rgba(0,0,0,.3)); }
+  .stocking .name { font-family: "Caveat", cursive; font-weight: 700; font-size: 20px; margin-top: 2px; }
+  .stocking.new svg { width: 46px; height: 72px; }
+  .stocking.new { animation: sway 4s ease-in-out infinite, hop 2.4s ease-in-out infinite; }
+  .stocking.new .name { color: var(--ice); }
+  .stocking.new .tag { font-size: 11px; font-weight: 800; background: var(--baby); color: #fff; padding: 2px 8px; border-radius: 999px; margin-top: 2px; }
+  @keyframes sway { 0%,100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+  @keyframes hop { 0%,70%,100% { translate: 0 0; } 80% { translate: 0 -8px; } 90% { translate: 0 0; } }
+
+  /* Countdown gifts */
+  .count-label { margin: 28px 0 14px; font-weight: 700; font-size: 17px; }
+  .count-label b { color: var(--gold); }
+  .countdown { display: flex; gap: clamp(10px, 3vw, 22px); justify-content: center; flex-wrap: wrap; }
+  .gift { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .box { --c: var(--red); position: relative; width: clamp(68px, 18vw, 92px); aspect-ratio: 1; background: var(--c);
+    border-radius: 10px; display: grid; place-items: center; margin-top: 18px;
+    box-shadow: inset 0 -8px 0 rgba(0,0,0,.18), 0 10px 22px rgba(0,0,0,.35); }
+  .box::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 14px; translate: -50% 0; background: var(--gold); }
+  .box::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 14px; translate: 0 -50%; background: var(--gold); }
+  .box .bow { position: absolute; top: -18px; left: 50%; translate: -50% 0; width: 44px; height: 22px; }
+  .box .bow::before, .box .bow::after { content: ""; position: absolute; top: 2px; width: 22px; height: 16px; border: 5px solid var(--gold); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
+  .box .bow::before { left: 0; rotate: -20deg; } .box .bow::after { right: 0; rotate: 20deg; }
+  .box .num { position: relative; z-index: 2; background: var(--cream); color: var(--ink); font-weight: 900;
+    font-size: clamp(20px, 5vw, 28px); min-width: 2.2em; padding: 2px 6px; border-radius: 8px; box-shadow: 0 2px 0 rgba(0,0,0,.15); font-variant-numeric: tabular-nums; }
+  .gift:nth-child(2) .box { --c: var(--green); } .gift:nth-child(3) .box { --c: #2f7fc4; } .gift:nth-child(4) .box { --c: #b1307a; }
+  .gift small { font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; opacity: .85; }
+  .tiny { font-size: 14px; opacity: .7; margin-top: 14px; }
+
+  .cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 34px; padding: 14px 26px; border-radius: 999px;
+    background: var(--red); color: #fff; font-weight: 800; text-decoration: none; border: none; cursor: pointer;
+    box-shadow: 0 5px 0 var(--red-dark), 0 12px 24px rgba(0,0,0,.3); transition: transform .15s; }
+  .cta:hover { transform: translateY(-2px); }
+  .cta:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--red-dark); }
+  .cta .arrow { display: inline-block; animation: bob 1.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(4px); } }
+
+  /* ---------- Envelope ---------- */
+  .env-wrap { margin: 70px auto 0; width: min(380px, 100%); }
+  .envelope { position: relative; width: 100%; aspect-ratio: 16 / 10.5; border: 0; padding: 0; background: none; cursor: pointer;
+    perspective: 900px; display: block; animation: wiggle 3s ease-in-out infinite; }
+  .envelope:focus-visible { outline: 3px solid var(--gold); outline-offset: 8px; border-radius: 8px; }
+  .envelope.open { animation: none; cursor: default; }
+  @keyframes wiggle { 0%,80%,100% { rotate: 0deg; } 85% { rotate: -3deg; } 90% { rotate: 3deg; } 95% { rotate: -1.5deg; } }
+  .env-body { position: absolute; inset: 0; background: #e6cc9b; border-radius: 10px; box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+  .peek { position: absolute; left: 6%; right: 6%; top: 6%; height: 88%; background: var(--paper); border-radius: 4px; z-index: 1;
+    padding: 14px 16px; text-align: left; color: var(--ink); font-family: "Caveat", cursive; font-size: 22px;
+    background-image: repeating-linear-gradient(transparent 0 27px, #d9e6f5 27px 28px);
+    transition: transform .9s cubic-bezier(.2,.8,.3,1.2) .45s; }
+  .pocket { position: absolute; inset: 0; z-index: 2; border-radius: 10px;
+    background: linear-gradient(160deg, #f6e4bf, var(--kraft));
+    clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%); }
+  .pocket::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top right, transparent 49.6%, rgba(0,0,0,.06) 50%, transparent 50.6%), linear-gradient(to top left, transparent 49.6%, rgba(0,0,0,.06) 50%, transparent 50.6%); }
+  .flap { position: absolute; left: 0; right: 0; top: 0; height: 58%; z-index: 3; transform-origin: top center;
+    background: linear-gradient(180deg, #ecd5a8, #dfc28c); clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transition: transform .6s ease-in-out, z-index 0s linear .3s; }
+  .envelope.open .flap { transform: rotateX(180deg); z-index: 0; }
+  .envelope.open .peek { transform: translateY(-58%); }
+  .seal { position: absolute; left: 50%; top: 58%; translate: -50% -50%; z-index: 4; width: 50px; height: 50px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ef4a5f, #a3122a 70%); display: grid; place-items: center; font-size: 22px;
+    box-shadow: 0 3px 6px rgba(0,0,0,.35), inset 0 0 0 4px rgba(0,0,0,.12); transition: transform .4s, opacity .4s; }
+  .envelope.open .seal { transform: scale(0) rotate(90deg); opacity: 0; }
+  .stamp { position: absolute; top: 7%; right: 5%; width: 21%; z-index: 4; rotate: 6deg; filter: drop-shadow(0 2px 3px rgba(0,0,0,.3)); }
+  .postmark { position: absolute; top: 6%; right: 15%; width: 40%; z-index: 5; rotate: -12deg; pointer-events: none; }
+  .address { position: absolute; left: 7%; bottom: 8%; z-index: 4; text-align: left; color: #5b3d22; font-family: "Caveat", cursive; line-height: 1.05; }
+  .address .to { font-size: clamp(18px, 5vw, 24px); font-weight: 700; }
+  .address .sub { font-size: clamp(14px, 4vw, 18px); }
+  .hint { margin-top: 26px; font-weight: 700; opacity: .85; }
+  .hint span { display: inline-block; animation: bob 1.4s ease-in-out infinite; }
+
+  /* ---------- Letter ---------- */
+  .reveal { display: none; }
+  .reveal.show { display: block; animation: rise .9s cubic-bezier(.2,.8,.3,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(40px); } }
+  .letter { position: relative; width: min(620px, 100%); margin: 10px auto 0; background: var(--paper); color: var(--ink);
+    padding: 44px clamp(22px, 6vw, 56px) 40px; text-align: left; border-radius: 6px;
+    font-family: "Caveat", cursive; font-size: clamp(21px, 4.4vw, 26px); line-height: 34px;
+    border: 12px solid transparent;
+    background:
+      linear-gradient(90deg, transparent 0 clamp(14px, 4vw, 40px), rgba(209,33,58,.35) 0 calc(clamp(14px, 4vw, 40px) + 2px), transparent 0) padding-box,
+      repeating-linear-gradient(transparent 0 33px, #d4e3f3 33px 34px) 0 10px / 100% 100% padding-box,
+      linear-gradient(var(--paper), var(--paper)) padding-box,
+      repeating-linear-gradient(45deg, var(--red) 0 14px, #fff 14px 28px) border-box;
+    box-shadow: 0 30px 60px rgba(0,0,0,.45); rotate: -1deg; }
+  .letter p { margin: 0 0 14px; }
+  .letter .hello { font-size: 1.3em; font-weight: 700; color: var(--red-dark); }
+  .letter .sign { text-align: right; margin-top: 24px; }
+  .letter .sign b { font-size: 1.25em; color: #2b6ea8; }
+  .letter .ps { font-size: .9em; opacity: .85; margin-top: 18px; }
+  .holly { position: absolute; top: -26px; right: 18px; width: 86px; rotate: 12deg; }
+  .footprint { display: inline-block; rotate: -15deg; }
+
+  /* ---------- Mailbox ---------- */
+  .mailbox-btn { position: relative; border: 0; background: none; padding: 0; cursor: pointer; margin: 30px auto 0; display: block;
+    width: min(240px, 66vw); -webkit-tap-highlight-color: transparent; }
+  .mailbox-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 6px; border-radius: 16px; }
+  .mailbox-btn svg { width: 100%; height: auto; overflow: visible; display: block; }
+  .mailbox-btn.idle svg { animation: nudge 2.6s ease-in-out infinite; transform-origin: 50% 95%; }
+  .mailbox-btn.shake svg { animation: shake .5s ease-in-out 2; transform-origin: 50% 95%; }
+  @keyframes nudge { 0%,70%,100% { rotate: 0deg; } 76% { rotate: -2.5deg; } 82% { rotate: 2.5deg; } 88% { rotate: -1deg; } }
+  @keyframes shake { 25% { rotate: -5deg; } 75% { rotate: 5deg; } }
+  .badge { position: absolute; top: 8%; right: 6%; width: 38px; height: 38px; border-radius: 50%; background: var(--gold); color: var(--red-dark);
+    font-weight: 900; font-size: 20px; display: grid; place-items: center; box-shadow: 0 4px 10px rgba(0,0,0,.35); animation: pulse 1.3s ease-in-out infinite; }
+  .mailbox-btn.opened .badge { display: none; }
+  @keyframes pulse { 50% { transform: scale(1.18); } }
+  #mailLetter { transition: transform .9s cubic-bezier(.2,.9,.3,1.3); transform: translateY(0); }
+  .mailbox-btn.opened #mailLetter { transform: translateY(-96px); }
+
+  /* ---------- Question card ---------- */
+  .overlay { position: fixed; inset: 0; z-index: 10; display: none; place-items: center; padding: 16px;
+    background: rgba(5,12,28,.6); backdrop-filter: blur(4px); }
+  .overlay.show { display: grid; animation: fade .3s both; }
+  @keyframes fade { from { opacity: 0; } }
+  .card { position: relative; width: min(440px, 100%); background: var(--cream); color: var(--ink); border-radius: 22px;
+    padding: 30px 24px 28px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+    border: 8px solid transparent;
+    background: linear-gradient(var(--cream), var(--cream)) padding-box, repeating-linear-gradient(45deg, var(--red) 0 12px, #fff 12px 24px, var(--green) 24px 36px, #fff 36px 48px) border-box;
+    animation: pop .7s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes pop { from { transform: scale(.2) rotate(-12deg) translateY(200px); opacity: 0; } }
+  .card .baby { width: 120px; margin: -76px auto 6px; display: block; filter: drop-shadow(0 6px 10px rgba(0,0,0,.25)); }
+  .card .to { font-family: "Caveat", cursive; font-size: 26px; font-weight: 700; color: var(--green-dark); }
+  .card h3 { font-family: "Pacifico", cursive; font-weight: 400; font-size: clamp(30px, 8vw, 40px); line-height: 1.25; margin: 4px 0 10px; color: var(--red); }
+  .card p { margin: 0 0 18px; font-size: 16px; line-height: 1.5; }
+  .answers { position: relative; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; min-height: 56px; }
+  .yes, .no { border: 0; border-radius: 999px; padding: 14px 26px; font-weight: 900; font-size: 18px; cursor: pointer; }
+  .yes { background: var(--green); color: #fff; box-shadow: 0 5px 0 var(--green-dark); animation: glow 1.6s ease-in-out infinite; }
+  .yes:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
+  @keyframes glow { 50% { transform: scale(1.06); } }
+  .no { background: #e9e2d4; color: #7a6a5a; transition: transform .25s cubic-bezier(.3,1.5,.5,1); font-size: 15px; }
+  .close { position: absolute; top: 8px; right: 12px; border: 0; background: none; font-size: 22px; cursor: pointer; color: #9a8a7a; }
+  .yay { display: none; }
+  .card.said-yes .ask { display: none; }
+  .card.said-yes .yay { display: block; animation: rise .6s both; }
+  .yay h3 { color: var(--green); }
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; }
+
+  /* ---------- Footer ---------- */
+  footer { position: relative; z-index: 2; margin-top: 60px; }
+  footer svg { display: block; width: 100%; height: auto; }
+  footer .sig { position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; color: #2a4a74; font-family: "Caveat", cursive; font-size: clamp(20px, 4vw, 30px); font-weight: 700; padding: 0 16px; }
+
+  @media (max-width: 600px) {
+    .moon { width: 40px; height: 40px; top: 2%; right: 5%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sky" id="sky"><div class="moon"></div></div>
+<canvas id="snow"></canvas>
+<canvas id="confetti"></canvas>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <span class="kicker">✉ Poșta specială · Polul Nord</span>
+    <h1>Un spiriduș nou<br><span class="blue">vine pe lume!</span></h1>
+    <p class="lead">Familia noastră crește: <b>Anastasia</b> va avea un <b>frățior</b>! 💙<br>Iar el a scris deja prima lui scrisoare… și e una foarte importantă.</p>
+
+    <div class="mantel" aria-hidden="true">
+      <svg class="garland" viewBox="0 0 560 50" preserveAspectRatio="none">
+        <path d="M0 8 Q140 44 280 14 Q420 44 560 8" fill="none" stroke="#1e7a4c" stroke-width="10" stroke-linecap="round"/>
+        <path d="M0 8 Q140 44 280 14 Q420 44 560 8" fill="none" stroke="#2f9e63" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round"/>
+        <g>
+          <circle class="bulb" cx="40" cy="17" r="5" fill="#f5c451"/>
+          <circle class="bulb" cx="100" cy="27" r="5" fill="#d1213a"/>
+          <circle class="bulb" cx="170" cy="30" r="5" fill="#5fb1ee"/>
+          <circle class="bulb" cx="235" cy="22" r="5" fill="#f5c451"/>
+          <circle class="bulb" cx="320" cy="22" r="5" fill="#d1213a"/>
+          <circle class="bulb" cx="390" cy="30" r="5" fill="#5fb1ee"/>
+          <circle class="bulb" cx="460" cy="27" r="5" fill="#f5c451"/>
+          <circle class="bulb" cx="520" cy="17" r="5" fill="#d1213a"/>
+        </g>
+      </svg>
+      <div class="stockings">
+        <div class="stocking"><svg viewBox="0 0 64 100"><use href="#sock" fill="#d1213a"/></svg><span class="name">Mami</span></div>
+        <div class="stocking"><svg viewBox="0 0 64 100"><use href="#sock" fill="#1e7a4c"/></svg><span class="name">Tati</span></div>
+        <div class="stocking"><svg viewBox="0 0 64 100"><use href="#sock" fill="#b1307a"/></svg><span class="name">Anastasia</span></div>
+        <div class="stocking new"><svg viewBox="0 0 64 100"><use href="#sock" fill="#5fb1ee"/></svg><span class="name">Eu!</span><span class="tag">în curând</span></div>
+      </div>
+    </div>
+
+    <p class="count-label">Sosesc pe <b>12 ianuarie 2027</b>. Până atunci mai sunt:</p>
+    <div class="countdown" id="countdown">
+      <div class="gift"><div class="box"><span class="bow"></span><span class="num" id="cd-d">--</span></div><small>zile</small></div>
+      <div class="gift"><div class="box"><span class="bow"></span><span class="num" id="cd-h">--</span></div><small>ore</small></div>
+      <div class="gift"><div class="box"><span class="bow"></span><span class="num" id="cd-m">--</span></div><small>minute</small></div>
+      <div class="gift"><div class="box"><span class="bow"></span><span class="num" id="cd-s">--</span></div><small>secunde</small></div>
+    </div>
+    <p class="tiny" id="cd-note">(dacă nu mă grăbesc să ajung la cozonac 😄)</p>
+
+    <a href="#plic" class="cta">Am găsit o scrisoare <span class="arrow">↓</span></a>
+  </section>
+
+  <!-- ============ ENVELOPE ============ -->
+  <section id="plic">
+    <h2>Am găsit-o sub brad…</h2>
+    <p class="lead">E adresată chiar lui Moș Crăciun. Hai să tragem cu ochiul!</p>
+
+    <div class="env-wrap">
+      <button class="envelope" id="envelope" aria-label="Deschide plicul">
+        <div class="env-body"></div>
+        <div class="peek">Dragă Moș Crăciun,<br>eu sunt cel mai nou spiriduș…</div>
+        <div class="pocket"></div>
+        <div class="flap"></div>
+        <div class="seal">🎄</div>
+
+        <!-- North Pole stamp -->
+        <svg class="stamp" viewBox="0 0 100 120" aria-hidden="true">
+          <defs>
+            <pattern id="perf" x="-5" y="-5" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="3.4" fill="#000"/></pattern>
+            <pattern id="candy" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="8" height="8" fill="#fff"/><rect width="8" height="4" fill="#d1213a"/></pattern>
+            <mask id="stampMask">
+              <rect width="100" height="120" fill="#fff"/>
+              <rect x="0" y="0" width="100" height="4" fill="url(#perf)"/>
+              <rect x="0" y="116" width="100" height="4" fill="url(#perf)"/>
+              <rect x="0" y="0" width="4" height="120" fill="url(#perf)"/>
+              <rect x="96" y="0" width="4" height="120" fill="url(#perf)"/>
+            </mask>
+          </defs>
+          <g mask="url(#stampMask)">
+            <rect width="100" height="120" fill="#fffaf0"/>
+            <rect x="8" y="8" width="84" height="104" fill="#17345f"/>
+            <circle cx="22" cy="40" r="1.2" fill="#fff"/><circle cx="80" cy="34" r="1" fill="#fff"/><circle cx="70" cy="52" r="1.2" fill="#fff"/><circle cx="30" cy="58" r="1" fill="#fff"/>
+            <path d="M24 26 l2.2 4.6 5 .7 -3.6 3.5 .9 5 -4.5-2.4 -4.5 2.4 .9-5 -3.6-3.5 5-.7z" fill="#f5c451"/>
+            <text x="50" y="20" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="7.5" fill="#f5c451" letter-spacing=".5">POȘTA MOȘULUI</text>
+            <path d="M8 80 Q30 66 56 76 T92 70 V92 H8Z" fill="#fff"/>
+            <path d="M14 82 l8 -22 8 22z M17 72 l5 -14 5 14z" fill="#1e7a4c"/>
+            <rect x="47" y="36" width="6" height="44" fill="url(#candy)"/>
+            <circle cx="50" cy="34" r="4.2" fill="#f5c451"/>
+            <rect x="53" y="44" width="26" height="11" rx="1.5" fill="#8b5a2b"/>
+            <text x="66" y="52" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="7" fill="#fff">NORD</text>
+            <rect x="8" y="92" width="84" height="20" fill="#d1213a"/>
+            <text x="50" y="105.5" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="9.5" fill="#fff" letter-spacing=".4">POLUL NORD</text>
+            <text x="86" y="88" text-anchor="end" font-family="Nunito, sans-serif" font-weight="900" font-size="7" fill="#d1213a">1 HO</text>
+          </g>
+        </svg>
+
+        <!-- Postmark -->
+        <svg class="postmark" viewBox="0 0 170 90" aria-hidden="true">
+          <defs><path id="ring" d="M13,45 a32,32 0 1,1 64,0 a32,32 0 1,1 -64,0"/></defs>
+          <g fill="none" stroke="rgba(28,38,80,.62)" stroke-width="2.2">
+            <circle cx="45" cy="45" r="38"/>
+            <circle cx="45" cy="45" r="26" stroke-width="1.2"/>
+            <path d="M88 26 q10 -6 20 0 t20 0 t20 0 t20 0"/>
+            <path d="M88 38 q10 -6 20 0 t20 0 t20 0 t20 0"/>
+            <path d="M88 50 q10 -6 20 0 t20 0 t20 0 t20 0"/>
+            <path d="M88 62 q10 -6 20 0 t20 0 t20 0 t20 0"/>
+          </g>
+          <text font-family="Nunito, sans-serif" font-weight="900" font-size="8" fill="rgba(28,38,80,.62)" letter-spacing="1.1">
+            <textPath href="#ring">POLUL NORD ★ POȘTA MOȘULUI ★</textPath>
+          </text>
+          <text x="45" y="43" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="11" fill="rgba(28,38,80,.62)">24 DEC</text>
+          <text x="45" y="55" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="9" fill="rgba(28,38,80,.62)">2026</text>
+        </svg>
+
+        <div class="address">
+          <div class="to">Pentru: Moș Crăciun</div>
+          <div class="sub">Atelierul de jucării nr. 1, Polul Nord</div>
+        </div>
+      </button>
+    </div>
+    <p class="hint" id="envHint"><span>👆</span> Atinge plicul ca să-l deschizi</p>
+
+    <!-- ============ LETTER ============ -->
+    <div class="reveal" id="letterWrap">
+      <div style="height:30px"></div>
+      <article class="letter">
+        <svg class="holly" viewBox="0 0 100 60" aria-hidden="true">
+          <path d="M50 30 C35 10 10 12 4 22 C14 22 14 32 8 38 C18 36 22 44 22 50 C30 40 42 40 50 30Z" fill="#1e7a4c"/>
+          <path d="M50 30 C65 10 90 12 96 22 C86 22 86 32 92 38 C82 36 78 44 78 50 C70 40 58 40 50 30Z" fill="#2a9461"/>
+          <circle cx="45" cy="32" r="7" fill="#d1213a"/><circle cx="56" cy="34" r="7" fill="#b51a31"/><circle cx="50" cy="24" r="7" fill="#e23a50"/>
+        </svg>
+        <p class="hello">Dragă Moș Crăciun,</p>
+        <p>Eu sunt cel mai nou spiriduș al familiei. Deocamdată stau la căldurică, în burtica mamei, dar am aflat că pe <b>12 ianuarie 2027</b> ies și eu să văd lumea. ❄️</p>
+        <p>Surioara mea, Anastasia, mi-a povestit o mulțime despre tine: că ai reni care zboară, că știi tot și că le aduci cadouri copiilor cuminți. Eu n-am apucat încă să fac nicio năzbâtie, deci sigur sunt pe lista celor cuminți. 😇</p>
+        <p>Anul acesta nu-ți cer jucării și nici ciocolată (oricum nu am dinți încă). Am o singură dorință, cea mai mare dintre toate: <b>doi oameni minunați</b> care să mă țină în brațe la botez, să-mi aprindă lumânarea și să fie lângă mine toată viața.</p>
+        <p>I-am ales deja. Sunt prietenii cei mai dragi ai mamei și ai tatei. 💙</p>
+        <p>Te rog, du-le tu întrebarea mea. Am lăsat-o în cutia poștală!</p>
+        <p class="sign">Cu drag și mulți pupici,<br><b>Frățiorul cel mic</b> <span class="footprint">👣</span></p>
+        <p class="ps">P.S. Anastasia zice că o să fie cea mai bună soră mai mare din lume. Eu o cred! ❤️</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ MAILBOX ============ -->
+  <section class="reveal" id="cutie">
+    <h2>Aveți poștă! 📮</h2>
+    <p class="lead">Moșul a trimis dorința mai departe… și cred că a ajuns la <b>voi</b>. Atingeți cutia poștală!</p>
+
+    <button class="mailbox-btn idle" id="mailbox" aria-label="Deschide cutia poștală">
+      <span class="badge">1</span>
+      <svg viewBox="0 0 200 340" aria-hidden="true">
+        <defs>
+          <linearGradient id="redBody" x1="0" x2="1">
+            <stop offset="0" stop-color="#a5132b"/><stop offset=".35" stop-color="#e02a44"/><stop offset=".6" stop-color="#d1213a"/><stop offset="1" stop-color="#8e0d22"/>
+          </linearGradient>
+          <clipPath id="slotClip"><rect x="0" y="-200" width="200" height="324"/></clipPath>
+        </defs>
+        <ellipse cx="100" cy="326" rx="80" ry="10" fill="rgba(0,0,0,.3)"/>
+        <!-- snow pile at base -->
+        <path d="M18 326 Q30 306 54 312 Q70 300 100 308 Q130 300 150 312 Q172 306 184 326Z" fill="#fff"/>
+        <rect x="40" y="296" width="120" height="22" rx="4" fill="#8e0d22"/>
+        <rect x="50" y="94" width="100" height="208" fill="url(#redBody)"/>
+        <path d="M46 96 Q46 30 100 28 Q154 30 154 96Z" fill="url(#redBody)"/>
+        <rect x="40" y="88" width="120" height="14" rx="7" fill="#8e0d22"/>
+        <!-- slot -->
+        <rect x="64" y="112" width="72" height="9" rx="3" fill="#7a0a1c"/>
+        <rect x="70" y="120" width="60" height="8" rx="4" fill="#2a0508"/>
+        <!-- plate -->
+        <rect x="66" y="142" width="68" height="44" rx="5" fill="#fff8ec"/>
+        <text x="100" y="160" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="12" fill="#8e0d22">POȘTA</text>
+        <text x="100" y="176" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="9" fill="#1e7a4c">POLUL NORD</text>
+        <!-- door -->
+        <rect x="62" y="200" width="76" height="84" rx="8" fill="none" stroke="#8e0d22" stroke-width="3"/>
+        <path d="M100 226 l4.5 9 10 1.4 -7.2 7 1.7 10 -9-4.7 -9 4.7 1.7-10 -7.2-7 10-1.4z" fill="#f5c451"/>
+        <circle cx="128" cy="244" r="3.5" fill="#f5c451"/>
+        <!-- wreath -->
+        <circle cx="100" cy="242" r="0" fill="none"/>
+        <!-- snow cap -->
+        <path d="M44 74 Q44 26 100 22 Q156 26 156 74 Q150 84 142 76 Q134 88 124 78 Q114 90 104 80 Q92 92 82 80 Q72 90 64 78 Q54 86 44 74Z" fill="#fff"/>
+        <path d="M38 92 Q40 82 54 86 Q70 80 86 86 Q104 80 120 86 Q140 80 162 92 Q156 98 146 94 Q136 100 124 95 Q110 100 96 95 Q80 100 66 95 Q52 100 38 92Z" fill="#fff"/>
+        <path d="M60 100 l3 12 3 -12z M92 100 l2.5 10 2.5 -10z M128 100 l3 14 3 -14z" fill="#cfeaff"/>
+        <!-- holly on cap -->
+        <path d="M86 30 C78 20 64 22 62 28 C68 28 68 34 64 37 C72 36 74 40 74 44 C78 38 82 36 86 30Z" fill="#1e7a4c"/>
+        <path d="M86 30 C94 20 108 22 110 28 C104 28 104 34 108 37 C100 36 98 40 98 44 C94 38 90 36 86 30Z" fill="#2a9461"/>
+        <circle cx="82" cy="32" r="4.5" fill="#d1213a"/><circle cx="90" cy="33" r="4.5" fill="#b51a31"/><circle cx="86" cy="26" r="4.5" fill="#e23a50"/>
+        <!-- letter coming out of slot -->
+        <g clip-path="url(#slotClip)">
+          <g id="mailLetter">
+            <rect x="74" y="126" width="52" height="66" rx="3" fill="#fffdf6" stroke="#e6cc9b" stroke-width="2"/>
+            <path d="M74 126 L100 150 L126 126" fill="none" stroke="#e6cc9b" stroke-width="2"/>
+            <path d="M100 172 c-6-6-14-2-10 5 l10 9 l10-9 c4-7-4-11-10-5z" fill="#d1213a"/>
+          </g>
+        </g>
+      </svg>
+    </button>
+    <p class="hint" id="mailHint"><span>👆</span> Atinge cutia poștală</p>
+  </section>
+</main>
+
+<!-- ============ QUESTION CARD ============ -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="q-title">
+  <div class="card" id="card">
+    <button class="close" id="closeCard" aria-label="Închide">✕</button>
+    <svg class="baby" viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="72" r="36" fill="#ffe2cc"/>
+      <circle cx="40" cy="82" r="7" fill="#ffb0b0" opacity=".7"/><circle cx="80" cy="82" r="7" fill="#ffb0b0" opacity=".7"/>
+      <path d="M42 70 q6 6 12 0 M66 70 q6 6 12 0" fill="none" stroke="#5a3a2a" stroke-width="3" stroke-linecap="round"/>
+      <path d="M52 88 q8 8 16 0" fill="none" stroke="#5a3a2a" stroke-width="3" stroke-linecap="round"/>
+      <path d="M28 52 Q40 6 96 12 Q84 26 92 52Z" fill="#d1213a"/>
+      <rect x="22" y="46" width="76" height="14" rx="7" fill="#fff"/>
+      <circle cx="98" cy="13" r="9" fill="#fff"/>
+      <path d="M50 108 h20 v6 a10 6 0 0 1 -20 0z" fill="#5fb1ee"/>
+    </svg>
+
+    <div class="ask">
+      <div class="to">Dragii mei,</div>
+      <h3 id="q-title">Vreți să fiți nașii mei?</h3>
+      <p>Promit să fiu cel mai drăgălaș fin din lume, să vă zâmbesc mereu și să nu plâng (prea tare) la botez! 💙</p>
+      <div class="answers" id="answers">
+        <button class="yes" id="yesBtn">DA, cu mare drag! 🎄</button>
+        <button class="no" id="noBtn">Nu</button>
+      </div>
+    </div>
+
+    <div class="yay">
+      <div class="to">Yupiii!</div>
+      <h3>Cel mai frumos cadou de Crăciun! 🎁</h3>
+      <p>Mi-ați îndeplinit cea mai mare dorință. Abia aștept să vă cunosc și să ne vedem la botez, <b>dragii mei nași</b>!</p>
+      <p style="font-family:Caveat,cursive;font-size:22px;margin:0">Vă iubim! Mami, Tati, Anastasia și eu 💙❤️</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer aria-hidden="false">
+  <svg viewBox="0 0 1200 220" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 90 Q150 30 320 80 T640 70 T960 60 T1200 80 V220 H0Z" fill="#e8f3ff"/>
+    <path d="M0 140 Q200 90 420 130 T820 120 T1200 120 V220 H0Z" fill="#ffffff"/>
+    <g fill="#1e7a4c">
+      <path d="M90 92 l26 -70 26 70z"/><path d="M98 70 l18 -48 18 48z" fill="#2a9461"/>
+      <path d="M1040 78 l30 -80 30 80z"/><path d="M1050 52 l20 -54 20 54z" fill="#2a9461"/>
+      <path d="M1110 86 l20 -54 20 54z"/>
+    </g>
+    <circle cx="116" cy="22" r="5" fill="#f5c451"/><circle cx="1070" cy="-2" r="5" fill="#f5c451"/>
+  </svg>
+  <div class="sig">Cu drag, Mami, Tati, Anastasia și frățiorul 🎄</div>
+</footer>
+
+<!-- shared stocking shape -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="sock">
+      <path d="M14 18 H50 V62 Q50 78 36 86 L20 95 Q6 101 2 90 Q-1 80 10 74 L14 72Z"/>
+      <path d="M2 90 Q6 101 20 95 L24 93 Q14 92 12 80 Q6 82 2 90Z" fill="#fff" opacity=".9"/>
+      <rect x="10" y="4" width="44" height="18" rx="6" fill="#fff"/>
+      <circle cx="18" cy="13" r="2" fill="#e6eef7"/><circle cx="32" cy="10" r="2" fill="#e6eef7"/><circle cx="44" cy="15" r="2" fill="#e6eef7"/>
+    </g>
+  </defs>
+</svg>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- stars ---- */
+  const sky = document.getElementById('sky');
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 70 + '%';
+    s.style.animationDelay = (Math.random() * 3) + 's';
+    const sz = Math.random() < .2 ? 3 : 2;
+    s.style.width = s.style.height = sz + 'px';
+    sky.appendChild(s);
+  }
+
+  /* ---- snow ---- */
+  const sc = document.getElementById('snow'), sx = sc.getContext('2d');
+  let W, H, flakes = [];
+  function resize() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    [sc, cc].forEach(c => { c.width = W * dpr; c.height = H * dpr; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); });
+  }
+  const cc = document.getElementById('confetti'), cx = cc.getContext('2d');
+  resize(); addEventListener('resize', resize);
+  const N = reduce ? 40 : Math.min(140, Math.round(W / 8));
+  for (let i = 0; i < N; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2.6 + .8, v: Math.random() * .7 + .35, p: Math.random() * 6.28 });
+  function snow() {
+    sx.clearRect(0, 0, W, H);
+    sx.fillStyle = 'rgba(255,255,255,.85)';
+    for (const f of flakes) {
+      if (!reduce) { f.y += f.v; f.p += .01; f.x += Math.sin(f.p) * .4; }
+      if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; }
+      sx.beginPath(); sx.arc(f.x, f.y, f.r, 0, 6.283); sx.fill();
+    }
+    if (!reduce) requestAnimationFrame(snow);
+  }
+  snow();
+
+  /* ---- countdown ---- */
+  const target = new Date(2027, 0, 12, 0, 0, 0).getTime();
+  const pad = n => String(n).padStart(2, '0');
+  const el = id => document.getElementById(id);
+  function tick() {
+    let d = target - Date.now();
+    if (d <= 0) {
+      el('countdown').innerHTML = '<p class="lead" style="font-size:26px">💙 Am sosit! Bun găsit, lume! 💙</p>';
+      el('cd-note').textContent = '';
+      document.querySelector('.count-label').textContent = 'Ziua cea mare a venit!';
+      return;
+    }
+    const s = Math.floor(d / 1000);
+    el('cd-d').textContent = Math.floor(s / 86400);
+    el('cd-h').textContent = pad(Math.floor(s % 86400 / 3600));
+    el('cd-m').textContent = pad(Math.floor(s % 3600 / 60));
+    el('cd-s').textContent = pad(s % 60);
+    setTimeout(tick, 1000 - Date.now() % 1000);
+  }
+  tick();
+
+  /* ---- envelope ---- */
+  const env = el('envelope');
+  env.addEventListener('click', () => {
+    if (env.classList.contains('open')) return;
+    env.classList.add('open');
+    env.setAttribute('aria-label', 'Plic deschis');
+    el('envHint').style.visibility = 'hidden';
+    burst(innerWidth / 2, env.getBoundingClientRect().top + 40, 40, ['#fff', '#cfeaff', '#f5c451']);
+    setTimeout(() => {
+      el('letterWrap').classList.add('show');
+      el('letterWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 1300);
+    setTimeout(() => el('cutie').classList.add('show'), 1800);
+  });
+
+  /* ---- mailbox ---- */
+  const mb = el('mailbox'), overlay = el('overlay'), card = el('card');
+  mb.addEventListener('click', () => {
+    if (mb.classList.contains('opened')) { overlay.classList.add('show'); return; }
+    mb.classList.remove('idle'); mb.classList.add('shake');
+    el('mailHint').style.visibility = 'hidden';
+    setTimeout(() => { mb.classList.remove('shake'); mb.classList.add('opened'); }, 1000);
+    setTimeout(() => { overlay.classList.add('show'); el('yesBtn').focus({ preventScroll: true }); }, 2000);
+  });
+  el('closeCard').addEventListener('click', () => overlay.classList.remove('show'));
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+  addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('show'); });
+
+  /* ---- the runaway "Nu" ---- */
+  const no = el('noBtn');
+  const lines = ['Sigur? 🥺', 'Chiar sigur?', 'Mai gândiți-vă!', 'Nu se poate apăsa 😅', 'Hai, vă rog! 🙏', 'Ultima șansă…'];
+  let dodges = 0;
+  function dodge(e) {
+    if (no.dataset.yes) return;
+    if (e) e.preventDefault();
+    if (dodges >= lines.length) {
+      no.textContent = 'Bine, DA! 💙';
+      no.className = 'yes'; no.dataset.yes = '1'; no.style.transform = '';
+      return;
+    }
+    no.textContent = lines[dodges++];
+    const c = card.getBoundingClientRect(), b = no.getBoundingClientRect();
+    const baseX = b.left - c.left - (parseFloat(no.dataset.tx) || 0);
+    const baseY = b.top - c.top - (parseFloat(no.dataset.ty) || 0);
+    const tx = 20 + Math.random() * (c.width - b.width - 40) - baseX;
+    const ty = 20 + Math.random() * (c.height - b.height - 40) - baseY;
+    no.dataset.tx = tx; no.dataset.ty = ty;
+    no.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random() * 20 - 10).toFixed(1)}deg)`;
+  }
+  no.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') dodge(); });
+  no.addEventListener('pointerdown', dodge);
+  no.addEventListener('click', e => { if (no.dataset.yes) sayYes(); else dodge(e); });
+
+  /* ---- yes! ---- */
+  el('yesBtn').addEventListener('click', sayYes);
+  function sayYes() {
+    card.classList.add('said-yes');
+    const r = card.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 3, 220);
+    setTimeout(() => burst(innerWidth * .2, innerHeight * .3, 100), 400);
+    setTimeout(() => burst(innerWidth * .8, innerHeight * .3, 100), 700);
+  }
+
+  /* ---- confetti ---- */
+  let parts = [], running = false;
+  const COLORS = ['#d1213a', '#1e7a4c', '#f5c451', '#5fb1ee', '#ffffff', '#b1307a'];
+  function burst(x, y, n, colors = COLORS) {
+    if (reduce) n = Math.round(n / 4);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, sp = Math.random() * 9 + 3;
+      parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5, w: Math.random() * 8 + 5, h: Math.random() * 5 + 3,
+        rot: Math.random() * 6, vr: Math.random() * .3 - .15, c: colors[i % colors.length], life: 0, star: Math.random() < .25 });
+    }
+    if (!running) { running = true; requestAnimationFrame(draw); }
+  }
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    parts = parts.filter(p => p.y < H + 40 && p.life < 360);
+    for (const p of parts) {
+      p.vy += .22; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.fillStyle = p.c;
+      if (p.star) { cx.font = '16px serif'; cx.fillText('❄', -6, 6); }
+      else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      cx.restore();
+    }
+    if (parts.length) requestAnimationFrame(draw); else { running = false; cx.clearRect(0, 0, W, H); }
+  }
+})();
+</script>
+</body>
+</html>
