@@ -55,7 +55,7 @@
   section { padding: 56px 16px; text-align: center; }
 
   /* ---------- Hero ---------- */
-  .hero { padding-top: 40px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .hero { padding-top: 76px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .kicker { display: inline-block; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; font-size: 12px;
     color: var(--gold); border: 1.5px dashed rgba(245,196,81,.6); padding: 6px 14px; border-radius: 999px; }
   h1, h2 { font-family: "Pacifico", cursive; font-weight: 400; margin: 0; }
@@ -166,8 +166,8 @@
   .footprint { display: inline-block; rotate: -15deg; }
 
   /* ---------- Mailbox ---------- */
-  .mailbox-btn { position: relative; border: 0; background: none; padding: 0; cursor: pointer; margin: 30px auto 0; display: block;
-    width: min(240px, 66vw); -webkit-tap-highlight-color: transparent; }
+  .mailbox-btn { position: relative; border: 0; background: none; padding: 0; cursor: pointer; margin: 0; display: block; flex: none;
+    width: min(230px, 52vw); -webkit-tap-highlight-color: transparent; }
   .mailbox-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 6px; border-radius: 16px; }
   .mailbox-btn svg { width: 100%; height: auto; overflow: visible; display: block; }
   .mailbox-btn.idle svg { animation: nudge 2.6s ease-in-out infinite; transform-origin: 50% 95%; }
@@ -214,7 +214,101 @@
   footer svg { display: block; width: 100%; height: auto; }
   footer .sig { position: absolute; left: 0; right: 0; bottom: 18%; text-align: center; color: #2a4a74; font-family: "Caveat", cursive; font-size: clamp(20px, 4vw, 30px); font-weight: 700; padding: 0 16px; }
 
+
+  /* ---------- String lights ---------- */
+  .lights { position: absolute; top: 0; left: 0; width: 100%; height: 64px; z-index: 3; pointer-events: none; overflow: visible; }
+  .bulb2 { animation: glowb 2.2s ease-in-out infinite; }
+  @keyframes glowb { 50% { opacity: .3; } }
+
+  /* ---------- Sleigh ---------- */
+  .sleigh { position: fixed; top: 11vh; left: 0; width: clamp(200px, 30vw, 340px); z-index: 4; pointer-events: none; visibility: hidden; }
+  .sleigh.fly { visibility: visible; animation: flyX 11s linear forwards; }
+  .sleigh.finale { top: 12vh; z-index: 21; animation-duration: 7.5s; }
+  .sleigh svg { width: 100%; height: auto; display: block; overflow: visible; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
+  .sleigh .bobber { animation: bobY 1.3s ease-in-out infinite; }
+  .sleigh .leg { transform-box: fill-box; transform-origin: 50% 0; animation: gallop .32s ease-in-out infinite alternate; }
+  .sleigh .leg.b { animation-delay: -.32s; }
+  @keyframes flyX { from { transform: translateX(calc(100vw + 20px)) rotate(-5deg); } to { transform: translateX(-900px) rotate(3deg); } }
+  @keyframes bobY { 50% { transform: translateY(-10px); } }
+  @keyframes gallop { from { rotate: -30deg; } to { rotate: 30deg; } }
+  .sleigh .banner { display: none; position: absolute; left: calc(100% + 36px); top: 28%; white-space: nowrap; background: var(--cream); color: var(--red);
+    font-family: "Pacifico", cursive; font-size: clamp(16px, 3vw, 22px); padding: 4px 16px 8px; border-radius: 6px;
+    box-shadow: 0 6px 14px rgba(0,0,0,.35); animation: flutter .45s ease-in-out infinite alternate; transform-origin: left center; }
+  .sleigh .banner::before { content: ""; position: absolute; right: 100%; top: 50%; width: 38px; border-top: 2px dashed var(--gold); }
+  .sleigh.finale .banner { display: block; }
+  @keyframes flutter { from { transform: skewY(-3deg); } to { transform: skewY(3deg); } }
+
+  /* ---------- Letter writes itself ---------- */
+  .letter .w { display: inline-block; }
+  .letter.writing { cursor: pointer; }
+  .letter.writing .w { opacity: 0; animation: ink .5s ease forwards; }
+  .letter.done .w { opacity: 1; animation: none; }
+  @keyframes ink { from { opacity: 0; filter: blur(4px); transform: translateY(6px) rotate(-3deg); } to { opacity: 1; filter: none; transform: none; } }
+  #skipHint { transition: opacity .4s; }
+
+  /* ---------- Countdown pop ---------- */
+  .num.pop { animation: numpop .45s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes numpop { 0% { transform: scale(.6) rotate(-8deg); } 100% { transform: none; } }
+  .box { transition: transform .25s cubic-bezier(.3,1.6,.5,1); }
+  .box:hover { transform: rotate(-5deg) scale(1.07); }
+
+  /* ---------- Snowman + mailbox scene ---------- */
+  .mail-scene { display: flex; align-items: flex-end; justify-content: center; gap: clamp(0px, 2vw, 24px); margin-top: 30px; }
+  .snowman { width: min(150px, 34vw); flex: none; margin-bottom: 4px; }
+  .snowman .arm { transform-origin: 96px 92px; animation: waveArm .7s ease-in-out infinite alternate; }
+  @keyframes waveArm { from { rotate: -28deg; } to { rotate: 14deg; } }
+
+  /* ---------- Music button ---------- */
+  .music { position: fixed; right: 16px; bottom: 16px; z-index: 12; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 999px;
+    padding: 10px 16px 10px 12px; background: var(--cream); color: var(--red-dark); font-weight: 900; font-size: 14px; cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,.4); }
+  .music .ico { font-size: 20px; display: inline-block; }
+  .music.on .ico { animation: ring .25s ease-in-out infinite alternate; }
+  .music.nudge { animation: nudgeK 1.8s ease-in-out infinite; }
+  @keyframes ring { from { rotate: -20deg; } to { rotate: 20deg; } }
+  @keyframes nudgeK { 50% { transform: scale(1.07); } }
+
+  /* ---------- Scratch card ---------- */
+  .scratch-hint { font-size: 15px; margin: 0 0 6px !important; }
+  .scratch { position: relative; margin: 4px auto 14px; border-radius: 14px; }
+  .scratch h3 { margin: 0; padding: 14px 10px; }
+  .scratch canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 14px; touch-action: none; cursor: grab;
+    box-shadow: 0 4px 0 rgba(0,0,0,.12); transition: opacity .7s; }
+  .scratch canvas:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+  .ask .after { display: none; }
+  .ask.revealed .scratch-hint { display: none; }
+  .ask.revealed .scratch canvas { opacity: 0; pointer-events: none; }
+  .ask.revealed .after { display: block; animation: rise .6s .2s both; }
+  .ask.revealed h3 { animation: tada .9s; }
+  @keyframes tada { 30% { transform: scale(1.12) rotate(-3deg); } 60% { transform: scale(1.04) rotate(2deg); } }
+  .wa { display: inline-flex; align-items: center; gap: 8px; margin: 16px 0 6px; background: #25d366; color: #fff; font-weight: 900;
+    padding: 12px 20px; border-radius: 999px; text-decoration: none; box-shadow: 0 4px 0 #128c4a; }
+  .wa:active { transform: translateY(3px); box-shadow: 0 1px 0 #128c4a; }
+
+  /* ---------- Baby size + stockings ---------- */
+  .size { opacity: .95 !important; font-weight: 700; font-size: 15px; margin-top: 8px !important; }
+  .size .fruit { display: inline-block; font-size: 22px; vertical-align: -3px; animation: hop 2s ease-in-out infinite; }
+  .stocking { cursor: pointer; }
+  .stocking svg { transform-origin: 50% 0; }
+  .stocking.jig svg { animation: jig .7s ease-in-out; }
+  @keyframes jig { 20% { transform: rotate(-16deg); } 40% { transform: rotate(12deg); } 60% { transform: rotate(-7deg); } 80% { transform: rotate(3deg); } }
+
+  /* ---------- Link maker (?creare) ---------- */
+  .maker { position: fixed; top: 70px; left: 50%; translate: -50% 0; z-index: 30; width: min(440px, calc(100% - 32px)); background: var(--cream);
+    color: var(--ink); border-radius: 18px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.5); text-align: left; }
+  .maker[hidden] { display: none; }
+  .maker h4 { margin: 0 0 4px; font-family: "Pacifico", cursive; font-weight: 400; font-size: 22px; color: var(--red); }
+  .maker label { display: block; font-weight: 800; font-size: 13px; margin-top: 10px; }
+  .maker input { width: 100%; font: inherit; font-size: 16px; padding: 10px 12px; margin-top: 4px; border: 2px solid #e6cc9b; border-radius: 10px; background: #fff; color: var(--ink); }
+  .maker .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .maker .row > * { flex: 1; text-align: center; border: 0; border-radius: 999px; padding: 10px 14px; font-weight: 900; cursor: pointer; text-decoration: none; font-size: 14px; }
+  .maker .copy { background: var(--red); color: #fff; }
+  .maker .send { background: #25d366; color: #fff; }
+  .maker .x { position: absolute; top: 8px; right: 12px; background: none; border: 0; font-size: 20px; cursor: pointer; color: #9a8a7a; }
+
   @media (max-width: 600px) {
+    .music .lbl { display: none; }
+    .music { padding: 12px; }
     .moon { width: 40px; height: 40px; top: 2%; right: 5%; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -227,11 +321,67 @@
 <div class="sky" id="sky"><div class="moon"></div></div>
 <canvas id="snow"></canvas>
 <canvas id="confetti"></canvas>
+<svg class="lights" id="lights" aria-hidden="true"></svg>
+
+<div class="sleigh" id="sleigh" aria-hidden="true">
+  <svg viewBox="-12 -14 290 78">
+    <g class="bobber">
+      <path d="M6 30 Q36 40 66 26 Q98 38 128 30 Q166 42 204 30" fill="none" stroke="#f5c451" stroke-width="1.4"/>
+      <g transform="translate(0 4)">
+          <path class="leg" d="M12 30 L8 42" stroke="#6b3f1d" stroke-width="3" stroke-linecap="round"/>
+          <path class="leg b" d="M31 30 L35 42" stroke="#6b3f1d" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="22" cy="26" rx="15" ry="8" fill="#9a6532"/>
+          <path d="M10 24 Q6 15 7 10" stroke="#9a6532" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <ellipse cx="3" cy="9" rx="7" ry="5" fill="#9a6532"/>
+          <circle cx="-3" cy="10" r="2.3" fill="#3b2314"/><circle cx="4" cy="7" r="1.2" fill="#111"/>
+          <path d="M7 5 L5 -5 M5.6 -2 L0 -5 M8 3 L13 -5 M11 -1 L16 -2" stroke="#ecc98e" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <path d="M11 19 Q16 26 13 32" stroke="#d1213a" stroke-width="3" fill="none"/><circle cx="14" cy="27" r="2.2" fill="#f5c451"/>
+          <path d="M36 22 q5 -4 7 0" stroke="#9a6532" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </g>
+      <g transform="translate(62 0)">
+          <path class="leg" d="M12 30 L8 42" stroke="#6b3f1d" stroke-width="3" stroke-linecap="round"/>
+          <path class="leg b" d="M31 30 L35 42" stroke="#6b3f1d" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="22" cy="26" rx="15" ry="8" fill="#9a6532"/>
+          <path d="M10 24 Q6 15 7 10" stroke="#9a6532" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <ellipse cx="3" cy="9" rx="7" ry="5" fill="#9a6532"/>
+          <circle cx="-3" cy="10" r="2.3" fill="#3b2314"/><circle cx="4" cy="7" r="1.2" fill="#111"/>
+          <path d="M7 5 L5 -5 M5.6 -2 L0 -5 M8 3 L13 -5 M11 -1 L16 -2" stroke="#ecc98e" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <path d="M11 19 Q16 26 13 32" stroke="#d1213a" stroke-width="3" fill="none"/><circle cx="14" cy="27" r="2.2" fill="#f5c451"/>
+          <path d="M36 22 q5 -4 7 0" stroke="#9a6532" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </g>
+      <g transform="translate(124 4)">
+          <path class="leg" d="M12 30 L8 42" stroke="#6b3f1d" stroke-width="3" stroke-linecap="round"/>
+          <path class="leg b" d="M31 30 L35 42" stroke="#6b3f1d" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="22" cy="26" rx="15" ry="8" fill="#9a6532"/>
+          <path d="M10 24 Q6 15 7 10" stroke="#9a6532" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <ellipse cx="3" cy="9" rx="7" ry="5" fill="#9a6532"/>
+          <circle cx="-3" cy="10" r="2.3" fill="#3b2314"/><circle cx="4" cy="7" r="1.2" fill="#111"/>
+          <path d="M7 5 L5 -5 M5.6 -2 L0 -5 M8 3 L13 -5 M11 -1 L16 -2" stroke="#ecc98e" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <path d="M11 19 Q16 26 13 32" stroke="#d1213a" stroke-width="3" fill="none"/><circle cx="14" cy="27" r="2.2" fill="#f5c451"/>
+          <path d="M36 22 q5 -4 7 0" stroke="#9a6532" stroke-width="3" stroke-linecap="round" fill="none"/>
+        </g>
+      <path d="M262 58 H186 Q170 58 172 46" fill="none" stroke="#f5c451" stroke-width="3" stroke-linecap="round"/>
+      <path d="M196 58 v-9 M244 58 v-9" stroke="#f5c451" stroke-width="2.5"/>
+      <circle cx="243" cy="22" r="13" fill="#8b5a2b"/>
+      <rect x="232" y="4" width="10" height="10" fill="#5fb1ee"/><rect x="242" y="1" width="9" height="12" fill="#1e7a4c"/><path d="M237 4 v10 M246.5 1 v12" stroke="#f5c451" stroke-width="1.5"/>
+      <circle cx="212" cy="26" r="11" fill="#d1213a"/>
+      <circle cx="208" cy="12" r="6" fill="#ffe2cc"/>
+      <path d="M202 13 q6 13 12 0" fill="#fff"/>
+      <path d="M202 9 Q205 -3 217 1 L214 9Z" fill="#d1213a"/><circle cx="217" cy="1" r="2.6" fill="#fff"/>
+      <rect x="201" y="7.5" width="14" height="3.5" rx="1.75" fill="#fff"/>
+      <path d="M184 30 H250 Q262 30 262 18 H268 Q268 50 240 50 H196 Q182 50 184 30Z" fill="#d1213a"/>
+      <path d="M190 38 H254" stroke="#f5c451" stroke-width="2"/>
+    </g>
+  </svg>
+  <div class="banner">Nașii mei au zis DA! 💙</div>
+</div>
+
+<button class="music nudge" id="music" aria-pressed="false" aria-label="Muzică"><span class="ico">🔔</span><span class="lbl">Pornește muzica</span></button>
 
 <main>
   <!-- ============ HERO ============ -->
   <section class="hero">
-    <span class="kicker">✉ Poșta specială · Polul Nord</span>
+    <span class="kicker" id="kicker">✉ Poșta specială · Polul Nord</span>
     <h1>Un spiriduș nou<br><span class="blue">vine pe lume!</span></h1>
     <p class="lead">Familia noastră crește: <b>Anastasia</b> va avea un <b>frățior</b>! 💙<br>Iar el a scris deja prima lui scrisoare… și e una foarte importantă.</p>
 
@@ -265,6 +415,7 @@
       <div class="gift"><div class="box"><span class="bow"></span><span class="num" id="cd-m">--</span></div><small>minute</small></div>
       <div class="gift"><div class="box"><span class="bow"></span><span class="num" id="cd-s">--</span></div><small>secunde</small></div>
     </div>
+    <p class="tiny size" id="babySize"></p>
     <p class="tiny" id="cd-note">(dacă nu mă grăbesc să ajung la cozonac 😄)</p>
 
     <a href="#plic" class="cta">Am găsit o scrisoare <span class="arrow">↓</span></a>
@@ -358,14 +509,35 @@
         <p class="sign">Cu drag și mulți pupici,<br><b>Frățiorul cel mic</b> <span class="footprint">👣</span></p>
         <p class="ps">P.S. Anastasia zice că o să fie cea mai bună soră mai mare din lume. Eu o cred! ❤️</p>
       </article>
+      <p class="tiny" id="skipHint">✍️ Frățiorul scrie… (atinge scrisoarea ca s-o vezi toată)</p>
     </div>
   </section>
 
   <!-- ============ MAILBOX ============ -->
   <section class="reveal" id="cutie">
     <h2>Aveți poștă! 📮</h2>
-    <p class="lead">Moșul a trimis dorința mai departe… și cred că a ajuns la <b>voi</b>. Atingeți cutia poștală!</p>
+    <p class="lead" id="mailLead">Moșul a trimis dorința mai departe… și cred că a ajuns la <b>voi</b>. Atingeți cutia poștală!</p>
 
+    <div class="mail-scene">
+      <svg class="snowman" viewBox="0 0 140 200" aria-hidden="true">
+        <defs><radialGradient id="snowG" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#cfe2f3"/></radialGradient></defs>
+        <ellipse cx="70" cy="194" rx="56" ry="7" fill="rgba(0,0,0,.25)"/>
+        <path d="M44 92 L16 76 M24 81 L16 72 M24 81 L13 84" stroke="#6b3f1d" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <g class="arm"><path d="M96 92 L126 70 M118 76 L121 62 M118 76 L132 75" stroke="#6b3f1d" stroke-width="3.5" stroke-linecap="round" fill="none"/></g>
+        <circle cx="70" cy="152" r="42" fill="url(#snowG)"/>
+        <circle cx="70" cy="94" r="30" fill="url(#snowG)"/>
+        <circle cx="70" cy="50" r="22" fill="url(#snowG)"/>
+        <circle cx="70" cy="88" r="3.5" fill="#2b2b2b"/><circle cx="70" cy="102" r="3.5" fill="#2b2b2b"/><circle cx="70" cy="140" r="4" fill="#2b2b2b"/><circle cx="70" cy="156" r="4" fill="#2b2b2b"/>
+        <circle cx="62" cy="45" r="2.8" fill="#2b2b2b"/><circle cx="78" cy="45" r="2.8" fill="#2b2b2b"/>
+        <circle cx="57" cy="54" r="3.5" fill="#ffb0b0" opacity=".6"/><circle cx="83" cy="54" r="3.5" fill="#ffb0b0" opacity=".6"/>
+        <path d="M70 50 L91 55 L70 57Z" fill="#f08a24"/>
+        <path d="M61 61 q9 7 18 0" fill="none" stroke="#2b2b2b" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="0.1 4.5"/>
+        <path d="M48 68 Q70 78 92 68 L93 76 Q70 87 47 76Z" fill="#5fb1ee"/>
+        <path d="M80 77 L84 102 L93 100 L89 75Z" fill="#4a9ad8"/>
+        <path d="M58 72 v9 M70 75 v9 M82 72 v9" stroke="#fff" stroke-width="3" opacity=".8"/>
+        <rect x="46" y="28" width="48" height="6" rx="3" fill="#222"/><rect x="54" y="4" width="32" height="26" rx="2" fill="#222"/>
+        <rect x="54" y="22" width="32" height="5" fill="#d1213a"/><circle cx="80" cy="24.5" r="3" fill="#2a9461"/>
+      </svg>
     <button class="mailbox-btn idle" id="mailbox" aria-label="Deschide cutia poștală">
       <span class="badge">1</span>
       <svg viewBox="0 0 200 340" aria-hidden="true">
@@ -413,6 +585,7 @@
         </g>
       </svg>
     </button>
+    </div>
     <p class="hint" id="mailHint"><span>👆</span> Atinge cutia poștală</p>
   </section>
 </main>
@@ -432,13 +605,19 @@
       <path d="M50 108 h20 v6 a10 6 0 0 1 -20 0z" fill="#5fb1ee"/>
     </svg>
 
-    <div class="ask">
-      <div class="to">Dragii mei,</div>
-      <h3 id="q-title">Vreți să fiți nașii mei?</h3>
+    <div class="ask" id="ask">
+      <div class="to" id="toLine">Dragii mei,</div>
+      <p class="scratch-hint">Am o întrebare pentru voi… <b>răzuiți cu degetul</b> ca s-o descoperiți! ✨</p>
+      <div class="scratch" id="scratch">
+        <h3 id="q-title">Vreți să fiți nașii mei?</h3>
+        <canvas id="scratchCanvas" tabindex="0" role="button" aria-label="Răzuiește ca să descoperi întrebarea (sau apasă Enter)"></canvas>
+      </div>
+      <div class="after">
       <p>Promit să fiu cel mai drăgălaș fin din lume, să vă zâmbesc mereu și să nu plâng (prea tare) la botez! 💙</p>
       <div class="answers" id="answers">
         <button class="yes" id="yesBtn">DA, cu mare drag! 🎄</button>
         <button class="no" id="noBtn">Nu</button>
+      </div>
       </div>
     </div>
 
@@ -447,8 +626,21 @@
       <h3>Cel mai frumos cadou de Crăciun! 🎁</h3>
       <p>Mi-ați îndeplinit cea mai mare dorință. Abia aștept să vă cunosc și să ne vedem la botez, <b>dragii mei nași</b>!</p>
       <p style="font-family:Caveat,cursive;font-size:22px;margin:0">Vă iubim! Mami, Tati, Anastasia și eu 💙❤️</p>
+      <a class="wa" id="waBtn" target="_blank" rel="noopener">💌 Trimiteți-ne răspunsul pe WhatsApp</a>
     </div>
   </div>
+</div>
+
+<!-- ============ LINK MAKER (open the page with ?creare) ============ -->
+<div class="maker" id="maker" hidden>
+  <button class="x" id="mkClose" aria-label="Închide">✕</button>
+  <h4>Link pentru nași 🎁</h4>
+  <div style="font-size:14px">Scrie numele și trimite fiecărei perechi linkul ei personal.</div>
+  <label for="mkName">Numele nașilor</label>
+  <input id="mkName" placeholder="ex: Ana și Mihai" autocomplete="off">
+  <label for="mkLink">Linkul personal</label>
+  <input id="mkLink" readonly>
+  <div class="row"><button class="copy" id="mkCopy">Copiază linkul</button><a class="send" id="mkSend" target="_blank" rel="noopener">Trimite pe WhatsApp</a></div>
 </div>
 
 <!-- ============ FOOTER ============ -->
@@ -480,51 +672,148 @@
 
 <script>
 (() => {
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* Optional: your WhatsApp number in international format, no + (e.g. '40722123456'). Empty = they choose the contact. */
+  const WHATSAPP = '';
 
-  /* ---- stars ---- */
-  const sky = document.getElementById('sky');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const el = id => document.getElementById(id);
+  const ri = (a, b) => a + Math.random() * (b - a);
+
+  /* ---------- stars ---------- */
+  const sky = el('sky');
   for (let i = 0; i < 70; i++) {
     const s = document.createElement('div');
     s.className = 'star';
     s.style.left = Math.random() * 100 + '%';
     s.style.top = Math.random() * 70 + '%';
     s.style.animationDelay = (Math.random() * 3) + 's';
-    const sz = Math.random() < .2 ? 3 : 2;
-    s.style.width = s.style.height = sz + 'px';
+    s.style.width = s.style.height = (Math.random() < .2 ? 3 : 2) + 'px';
     sky.appendChild(s);
   }
 
-  /* ---- snow ---- */
-  const sc = document.getElementById('snow'), sx = sc.getContext('2d');
-  let W, H, flakes = [];
+  /* ---------- string lights ---------- */
+  const LIGHT_COLORS = ['#ff4d6d', '#f5c451', '#5fb1ee', '#3ddc84', '#ff9f43'];
+  function buildLights() {
+    const w = document.documentElement.clientWidth, n = Math.max(6, Math.round(w / 70)), step = w / n;
+    let d = 'M0 6', bulbs = '';
+    for (let i = 0; i < n; i++) {
+      const x = step * i + step / 2, c = LIGHT_COLORS[i % LIGHT_COLORS.length];
+      d += ` Q${x} 34 ${step * (i + 1)} 6`;
+      bulbs += `<g transform="translate(${x} 19) rotate(${ri(-12, 12).toFixed(0)})"><rect x="-3" y="0" width="6" height="6" rx="1" fill="#2f3d33"/>` +
+        `<ellipse class="bulb2" cx="0" cy="13" rx="5.5" ry="8.5" fill="${c}" style="filter:drop-shadow(0 0 7px ${c});animation-delay:${ri(0, 2.2).toFixed(2)}s"/></g>`;
+    }
+    el('lights').innerHTML = `<path d="${d}" fill="none" stroke="#1d3a2a" stroke-width="2.5"/>${bulbs}`;
+  }
+  buildLights();
+
+  /* ---------- canvases ---------- */
+  const sc = el('snow'), sx = sc.getContext('2d'), cc = el('confetti'), cx = cc.getContext('2d');
+  let W, H;
   function resize() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     W = innerWidth; H = innerHeight;
     [sc, cc].forEach(c => { c.width = W * dpr; c.height = H * dpr; c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0); });
   }
-  const cc = document.getElementById('confetti'), cx = cc.getContext('2d');
-  resize(); addEventListener('resize', resize);
-  const N = reduce ? 40 : Math.min(140, Math.round(W / 8));
-  for (let i = 0; i < N; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2.6 + .8, v: Math.random() * .7 + .35, p: Math.random() * 6.28 });
+  resize();
+  addEventListener('resize', () => { resize(); buildLights(); });
+
+  /* ---------- snow that dodges your finger ---------- */
+  const ptr = { x: -999, y: -999 };
+  addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; }, { passive: true });
+  addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') ptr.x = ptr.y = -999; });
+  const flakes = [];
+  const N = reduce ? 40 : Math.min(150, Math.round(W / 8));
+  for (let i = 0; i < N; i++) flakes.push({ x: Math.random() * W, y: Math.random() * H, r: ri(.8, 3.4), v: ri(.35, 1.05), p: ri(0, 6.28) });
   function snow() {
     sx.clearRect(0, 0, W, H);
     sx.fillStyle = 'rgba(255,255,255,.85)';
     for (const f of flakes) {
-      if (!reduce) { f.y += f.v; f.p += .01; f.x += Math.sin(f.p) * .4; }
+      if (!reduce) {
+        f.y += f.v; f.p += .01; f.x += Math.sin(f.p) * .4;
+        const dx = f.x - ptr.x, dy = f.y - ptr.y, d2 = dx * dx + dy * dy;
+        if (d2 < 10000) { const d = Math.sqrt(d2) || 1, k = (100 - d) / 100 * 3.5; f.x += dx / d * k; f.y += dy / d * k; }
+      }
       if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; }
+      if (f.x < -6) f.x = W + 5; else if (f.x > W + 6) f.x = -5;
       sx.beginPath(); sx.arc(f.x, f.y, f.r, 0, 6.283); sx.fill();
     }
     if (!reduce) requestAnimationFrame(snow);
   }
   snow();
 
-  /* ---- countdown ---- */
+  /* ---------- particles: confetti, flakes, sleigh sparkles ---------- */
+  let parts = [], looping = false, sleighOn = false;
+  const CONF = ['#d1213a', '#1e7a4c', '#f5c451', '#5fb1ee', '#ffffff', '#b1307a'];
+  function burst(x, y, n, o = {}) {
+    const colors = o.colors || CONF, sp0 = o.speed || 9;
+    if (reduce) n = Math.ceil(n / 4);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * 6.283, sp = Math.random() * sp0 + 2;
+      parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 4, g: .2, life: 0, max: 300,
+        w: ri(5, 12), h: ri(3, 7), rot: ri(0, 6), vr: ri(-.15, .15), c: colors[i % colors.length],
+        kind: o.kind || (Math.random() < .2 ? 'flake' : 'rect'), e: o.emoji ? o.emoji[i % o.emoji.length] : '❄' });
+    }
+    run();
+  }
+  function spark(x, y) {
+    parts.push({ x, y, vx: ri(.6, 1.8), vy: ri(-.5, .8), g: .03, life: 0, max: 70, w: ri(1.5, 3.5), c: Math.random() < .55 ? '#f5c451' : '#fff', kind: 'spark' });
+  }
+  function run() { if (!looping) { looping = true; requestAnimationFrame(draw); } }
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    if (sleighOn) { const r = sleighSvg.getBoundingClientRect(); spark(r.right - r.width * .06, r.top + r.height * .72); spark(r.right - r.width * .1, r.top + r.height * .6); }
+    parts = parts.filter(p => p.y < H + 40 && p.life < p.max);
+    for (const p of parts) {
+      p.vy += p.g; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.life++;
+      cx.save(); cx.translate(p.x, p.y);
+      if (p.kind === 'spark') {
+        cx.globalAlpha = 1 - p.life / p.max; cx.fillStyle = p.c;
+        cx.beginPath(); cx.arc(0, 0, p.w, 0, 6.283); cx.fill();
+      } else {
+        p.rot += p.vr; cx.rotate(p.rot); cx.fillStyle = p.c;
+        if (p.kind === 'flake' || p.kind === 'emoji') { cx.font = p.kind === 'emoji' ? '20px serif' : '16px serif'; cx.fillText(p.e, -8, 7); }
+        else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      cx.restore();
+    }
+    if (parts.length || sleighOn) requestAnimationFrame(draw);
+    else { looping = false; cx.clearRect(0, 0, W, H); }
+  }
+
+  /* tap anywhere on the sky → snow puff */
+  addEventListener('click', e => {
+    if (e.target.closest('button, a, .card, .overlay, .letter, .stocking, .maker')) return;
+    burst(e.clientX, e.clientY, 16, { colors: ['#fff', '#cfeaff', '#f5c451'], speed: 5 });
+  });
+
+  /* ---------- Santa's sleigh ---------- */
+  const sleigh = el('sleigh'), sleighSvg = sleigh.querySelector('svg');
+  function fly(finale) {
+    if (reduce && !finale) return;
+    sleigh.classList.remove('fly', 'finale');
+    void sleigh.offsetWidth;
+    sleigh.classList.add('fly');
+    if (finale) sleigh.classList.add('finale');
+    sleighOn = true; run();
+  }
+  sleigh.addEventListener('animationend', e => {
+    if (e.target !== sleigh) return;
+    sleigh.classList.remove('fly', 'finale'); sleighOn = false;
+  });
+  setTimeout(() => fly(), 2500);
+  setInterval(() => { if (!document.hidden && !sleigh.classList.contains('fly')) fly(); }, 26000);
+
+  /* ---------- countdown ---------- */
   const target = new Date(2027, 0, 12, 0, 0, 0).getTime();
   const pad = n => String(n).padStart(2, '0');
-  const el = id => document.getElementById(id);
+  function setNum(id, v) {
+    const e = el(id); v = String(v);
+    if (e.textContent === v) return;
+    e.textContent = v;
+    e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop');
+  }
   function tick() {
-    let d = target - Date.now();
+    const d = target - Date.now();
     if (d <= 0) {
       el('countdown').innerHTML = '<p class="lead" style="font-size:26px">💙 Am sosit! Bun găsit, lume! 💙</p>';
       el('cd-note').textContent = '';
@@ -532,43 +821,142 @@
       return;
     }
     const s = Math.floor(d / 1000);
-    el('cd-d').textContent = Math.floor(s / 86400);
-    el('cd-h').textContent = pad(Math.floor(s % 86400 / 3600));
-    el('cd-m').textContent = pad(Math.floor(s % 3600 / 60));
-    el('cd-s').textContent = pad(s % 60);
+    setNum('cd-d', Math.floor(s / 86400));
+    setNum('cd-h', pad(Math.floor(s % 86400 / 3600)));
+    setNum('cd-m', pad(Math.floor(s % 3600 / 60)));
+    setNum('cd-s', pad(s % 60));
     setTimeout(tick, 1000 - Date.now() % 1000);
   }
   tick();
 
-  /* ---- envelope ---- */
+  /* ---------- sound: music-box Jingle Bells + effects ---------- */
+  let actx, musicGain, fxGain, noiseBuf, musicOn = false, nextLoop = 0, sched = null;
+  function audio() {
+    if (actx) return;
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    musicGain = actx.createGain(); musicGain.gain.value = 0; musicGain.connect(actx.destination);
+    fxGain = actx.createGain(); fxGain.gain.value = .6; fxGain.connect(actx.destination);
+    noiseBuf = actx.createBuffer(1, Math.floor(actx.sampleRate * .2), actx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  function bell(f, t, len, vol, dest) {
+    const g = actx.createGain(); g.connect(dest);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0005, t + len);
+    [[1, 1], [2.01, .3], [3.98, .08]].forEach(([m, a]) => {
+      const o = actx.createOscillator(), og = actx.createGain();
+      o.frequency.value = f * m; og.gain.value = a;
+      o.connect(og).connect(g); o.start(t); o.stop(t + len + .05);
+    });
+  }
+  function jingle(t, vol, dest) {
+    const s = actx.createBufferSource(); s.buffer = noiseBuf;
+    const hp = actx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7000;
+    const g = actx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0005, t + .15);
+    s.connect(hp).connect(g).connect(dest); s.start(t); s.stop(t + .2);
+  }
+  const NOTE = { C: 523.25, D: 587.33, E: 659.25, F: 698.46, G: 783.99 };
+  const SONG = ('E1 E1 E2 E1 E1 E2 E1 G1 C1.5 D.5 E4 F1 F1 F1.5 F.5 F1 E1 E1 E.5 E.5 E1 D1 D1 E1 D2 G2 ' +
+                'E1 E1 E2 E1 E1 E2 E1 G1 C1.5 D.5 E4 F1 F1 F1.5 F.5 F1 E1 E1 E.5 E.5 G1 G1 F1 D1 C4 R4')
+    .split(' ').map(x => [x[0], parseFloat(x.slice(1))]);
+  const BASS = [130.81, 130.81, 130.81, 130.81, 174.61, 130.81, 146.83, 196, 130.81, 130.81, 130.81, 130.81, 174.61, 130.81, 196, 130.81, 0];
+  const BEAT = .32;
+  function scheduleSong(t0) {
+    let t = t0;
+    for (const [n, b] of SONG) { if (n !== 'R') bell(NOTE[n], t, Math.max(.6, b * BEAT * 1.8), .16, musicGain); t += b * BEAT; }
+    BASS.forEach((f, i) => {
+      const bt = t0 + i * 4 * BEAT;
+      for (let k = 0; k < 4; k++) jingle(bt + k * BEAT, k % 2 ? .025 : .045, musicGain);
+      if (f) { bell(f, bt, 1, .12, musicGain); bell(f * 1.5, bt + 2 * BEAT, 1, .08, musicGain); }
+    });
+    return t;
+  }
+  const musicBtn = el('music');
+  musicBtn.addEventListener('click', () => {
+    audio(); actx.resume();
+    musicOn = !musicOn;
+    musicBtn.classList.remove('nudge');
+    musicBtn.classList.toggle('on', musicOn);
+    musicBtn.setAttribute('aria-pressed', musicOn);
+    musicBtn.querySelector('.lbl').textContent = musicOn ? 'Oprește muzica' : 'Pornește muzica';
+    musicGain.gain.setTargetAtTime(musicOn ? .55 : 0, actx.currentTime, .08);
+    if (musicOn && !sched) {
+      nextLoop = scheduleSong(actx.currentTime + .1);
+      sched = setInterval(() => { if (nextLoop - actx.currentTime < 1.5) nextLoop = scheduleSong(nextLoop); }, 300);
+    }
+  });
+  function fx(notes, jingles = 0) {
+    audio(); actx.resume();
+    const t = actx.currentTime + .05;
+    notes.forEach(([f, dt, len, vol]) => bell(f, t + dt, len, vol, fxGain));
+    for (let i = 0; i < jingles; i++) jingle(t + i * .08, .07, fxGain);
+  }
+
+  /* ---------- envelope + self-writing letter ---------- */
+  const letter = document.querySelector('.letter');
+  function wrapWords(node) {
+    for (const ch of [...node.childNodes]) {
+      if (ch.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        ch.textContent.split(/(\s+)/).forEach(t => {
+          if (!t) return;
+          if (/^\s+$/.test(t)) frag.append(t);
+          else { const sp = document.createElement('span'); sp.className = 'w'; sp.textContent = t; frag.append(sp); }
+        });
+        ch.replaceWith(frag);
+      } else if (ch.nodeType === 1 && ch.tagName !== 'BR') wrapWords(ch);
+    }
+  }
+  let delay = 0;
+  letter.querySelectorAll('p').forEach(p => {
+    wrapWords(p);
+    p.querySelectorAll('.w').forEach(w => { w.style.animationDelay = delay.toFixed(2) + 's'; delay += .045; });
+    delay += .35;
+  });
+  const writeMs = delay * 1000 + 500;
+  let written = false;
+  function finishWriting() {
+    if (written) return;
+    written = true;
+    letter.classList.add('done');
+    el('skipHint').style.opacity = 0;
+    el('cutie').classList.add('show');
+  }
+  letter.addEventListener('click', finishWriting);
+
   const env = el('envelope');
   env.addEventListener('click', () => {
     if (env.classList.contains('open')) return;
     env.classList.add('open');
     env.setAttribute('aria-label', 'Plic deschis');
     el('envHint').style.visibility = 'hidden';
-    burst(innerWidth / 2, env.getBoundingClientRect().top + 40, 40, ['#fff', '#cfeaff', '#f5c451']);
+    burst(innerWidth / 2, env.getBoundingClientRect().top + 40, 40, { colors: ['#fff', '#cfeaff', '#f5c451'] });
+    fx([[1046.5, 0, .8, .1], [1318.5, .1, 1, .1]], 3);
     setTimeout(() => {
       el('letterWrap').classList.add('show');
       el('letterWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (reduce) finishWriting();
+      else { letter.classList.add('writing'); setTimeout(finishWriting, writeMs); }
     }, 1300);
-    setTimeout(() => el('cutie').classList.add('show'), 1800);
   });
 
-  /* ---- mailbox ---- */
+  /* ---------- mailbox + question ---------- */
   const mb = el('mailbox'), overlay = el('overlay'), card = el('card');
   mb.addEventListener('click', () => {
     if (mb.classList.contains('opened')) { overlay.classList.add('show'); return; }
     mb.classList.remove('idle'); mb.classList.add('shake');
     el('mailHint').style.visibility = 'hidden';
-    setTimeout(() => { mb.classList.remove('shake'); mb.classList.add('opened'); }, 1000);
-    setTimeout(() => { overlay.classList.add('show'); el('yesBtn').focus({ preventScroll: true }); }, 2000);
+    setTimeout(() => {
+      mb.classList.remove('shake'); mb.classList.add('opened');
+      fx([[1318.5, 0, 1.2, .14], [1046.5, .18, 1.6, .14]]);
+    }, 1000);
+    setTimeout(() => { overlay.classList.add('show'); requestAnimationFrame(() => { initScratch(); el('scratchCanvas').focus({ preventScroll: true }); }); }, 2000);
   });
   el('closeCard').addEventListener('click', () => overlay.classList.remove('show'));
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
   addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('show'); });
 
-  /* ---- the runaway "Nu" ---- */
+  /* the runaway "Nu" */
   const no = el('noBtn');
   const lines = ['Sigur? 🥺', 'Chiar sigur?', 'Mai gândiți-vă!', 'Nu se poate apăsa 😅', 'Hai, vă rog! 🙏', 'Ultima șansă…'];
   let dodges = 0;
@@ -581,52 +969,139 @@
       return;
     }
     no.textContent = lines[dodges++];
+    fx([[1567.98 - dodges * 120, 0, .3, .06]]);
     const c = card.getBoundingClientRect(), b = no.getBoundingClientRect();
     const baseX = b.left - c.left - (parseFloat(no.dataset.tx) || 0);
     const baseY = b.top - c.top - (parseFloat(no.dataset.ty) || 0);
     const tx = 20 + Math.random() * (c.width - b.width - 40) - baseX;
     const ty = 20 + Math.random() * (c.height - b.height - 40) - baseY;
     no.dataset.tx = tx; no.dataset.ty = ty;
-    no.style.transform = `translate(${tx}px, ${ty}px) rotate(${(Math.random() * 20 - 10).toFixed(1)}deg)`;
+    no.style.transform = `translate(${tx}px, ${ty}px) rotate(${ri(-10, 10).toFixed(1)}deg)`;
   }
   no.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') dodge(); });
   no.addEventListener('pointerdown', dodge);
   no.addEventListener('click', e => { if (no.dataset.yes) sayYes(); else dodge(e); });
 
-  /* ---- yes! ---- */
+  /* YES! */
   el('yesBtn').addEventListener('click', sayYes);
   function sayYes() {
+    if (card.classList.contains('said-yes')) return;
     card.classList.add('said-yes');
+    fx([[523.25, 0, 1, .16], [659.25, .12, 1, .16], [783.99, .24, 1, .16], [1046.5, .36, 2.2, .18], [783.99, .36, 2.2, .1], [659.25, .36, 2.2, .08]], 10);
     const r = card.getBoundingClientRect();
-    burst(r.left + r.width / 2, r.top + r.height / 3, 220);
-    setTimeout(() => burst(innerWidth * .2, innerHeight * .3, 100), 400);
-    setTimeout(() => burst(innerWidth * .8, innerHeight * .3, 100), 700);
+    burst(r.left + r.width / 2, r.top + r.height / 3, 200);
+    for (let i = 1; i < 8; i++) setTimeout(() => burst(ri(.1, .9) * W, ri(.1, .5) * H, 70), i * 420);
+    setTimeout(() => fly(true), 900);
+    const hint = el('mailHint');
+    hint.innerHTML = '💙 Nașii mei au zis <b>DA</b>! 💙';
+    hint.style.visibility = 'visible';
+    const msg = (nasi ? `Noi, ${nasi}, zicem ` : '') + 'DA! 🎄💙 Vrem din tot sufletul să fim nașii frățiorului Anastasiei! 🥰';
+    el('waBtn').href = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
   }
 
-  /* ---- confetti ---- */
-  let parts = [], running = false;
-  const COLORS = ['#d1213a', '#1e7a4c', '#f5c451', '#5fb1ee', '#ffffff', '#b1307a'];
-  function burst(x, y, n, colors = COLORS) {
-    if (reduce) n = Math.round(n / 4);
-    for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2, sp = Math.random() * 9 + 3;
-      parts.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5, w: Math.random() * 8 + 5, h: Math.random() * 5 + 3,
-        rot: Math.random() * 6, vr: Math.random() * .3 - .15, c: colors[i % colors.length], life: 0, star: Math.random() < .25 });
-    }
-    if (!running) { running = true; requestAnimationFrame(draw); }
+  /* ---------- scratch card ---------- */
+  const scv = el('scratchCanvas'), sctx = scv.getContext('2d'), ask = el('ask');
+  let scratchReady = false, scratching = false, scratchMoves = 0, revealed = false;
+  function initScratch() {
+    if (scratchReady || revealed) return;
+    const r = { width: scv.offsetWidth, height: scv.offsetHeight }; // layout size, unaffected by the card's pop-in transform
+    if (!r.width) return;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    scv.width = r.width * dpr; scv.height = r.height * dpr;
+    sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = sctx.createLinearGradient(0, 0, r.width, r.height);
+    g.addColorStop(0, '#e2ad3a'); g.addColorStop(.45, '#fde596'); g.addColorStop(.55, '#f7d570'); g.addColorStop(1, '#c99327');
+    sctx.fillStyle = g; sctx.fillRect(0, 0, r.width, r.height);
+    sctx.fillStyle = 'rgba(255,255,255,.55)'; sctx.font = '13px serif';
+    for (let i = 0; i < 26; i++) sctx.fillText('❄', Math.random() * r.width, Math.random() * r.height);
+    sctx.fillStyle = '#7a4a05'; sctx.font = '900 18px Nunito, sans-serif'; sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+    sctx.fillText('✨ Răzuiește aici ✨', r.width / 2, r.height / 2);
+    scratchReady = true;
   }
-  function draw() {
-    cx.clearRect(0, 0, W, H);
-    parts = parts.filter(p => p.y < H + 40 && p.life < 360);
-    for (const p of parts) {
-      p.vy += .22; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
-      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.fillStyle = p.c;
-      if (p.star) { cx.font = '16px serif'; cx.fillText('❄', -6, 6); }
-      else cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      cx.restore();
-    }
-    if (parts.length) requestAnimationFrame(draw); else { running = false; cx.clearRect(0, 0, W, H); }
+  function scratchAt(e) {
+    if (!scratchReady) initScratch();
+    const r = scv.getBoundingClientRect(), k = scv.offsetWidth / r.width;
+    sctx.globalCompositeOperation = 'destination-out';
+    sctx.beginPath(); sctx.arc((e.clientX - r.left) * k, (e.clientY - r.top) * k, 24, 0, 6.283); sctx.fill();
+    sctx.globalCompositeOperation = 'source-over';
+    if (actx && scratchMoves % 3 === 0) jingle(actx.currentTime, .02, fxGain);
+    if (++scratchMoves % 8 === 0) checkScratch();
   }
+  function checkScratch() {
+    if (revealed || !scv.width) return;
+    const d = sctx.getImageData(0, 0, scv.width, scv.height).data;
+    let clear = 0, n = 0;
+    for (let i = 3; i < d.length; i += 64) { n++; if (d[i] < 20) clear++; }
+    if (clear / n > .42) reveal();
+  }
+  function reveal() {
+    if (revealed) return;
+    revealed = true;
+    ask.classList.add('revealed');
+    fx([[783.99, 0, 1, .12], [1046.5, .1, 1.2, .14], [1318.5, .2, 1.6, .14]], 5);
+    const r = el('scratch').getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, 50, { colors: ['#f5c451', '#fff', '#fde596'] });
+    setTimeout(() => el('yesBtn').focus({ preventScroll: true }), 500);
+  }
+  scv.addEventListener('pointerdown', e => { audio(); actx.resume(); scratching = true; scv.setPointerCapture(e.pointerId); scratchAt(e); });
+  scv.addEventListener('pointermove', e => { if (scratching) scratchAt(e); });
+  scv.addEventListener('pointerup', () => { scratching = false; checkScratch(); });
+  scv.addEventListener('pointercancel', () => { scratching = false; });
+  scv.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } });
+
+  /* ---------- personal link: ?nasi=Ana și Mihai ---------- */
+  const params = new URLSearchParams(location.search);
+  const nasi = (params.get('nasi') || '').trim().slice(0, 60);
+  if (nasi) {
+    el('toLine').textContent = `Dragii mei ${nasi},`;
+    el('kicker').textContent = `✉ Poștă specială pentru ${nasi}`;
+    const lead = el('mailLead'), b = document.createElement('b');
+    b.textContent = nasi;
+    lead.textContent = '';
+    lead.append('Moșul a trimis dorința mai departe… și a ajuns exact la voi, ', b, '! Atingeți cutia poștală!');
+    document.title = `O scrisoare de la Polul Nord pentru ${nasi}`;
+  }
+
+  /* ---------- link maker: open the page with ?creare ---------- */
+  if (params.has('creare')) {
+    const mk = el('maker'), base = location.href.split(/[?#]/)[0];
+    mk.hidden = false;
+    const upd = () => {
+      const n = el('mkName').value.trim();
+      const link = n ? `${base}?nasi=${encodeURIComponent(n)}` : base;
+      el('mkLink').value = link;
+      el('mkSend').href = 'https://wa.me/?text=' + encodeURIComponent(`Avem o scrisoare de la Polul Nord pentru voi… ✉️🎄\n${link}`);
+    };
+    el('mkName').addEventListener('input', upd); upd();
+    el('mkCopy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(el('mkLink').value); } catch { el('mkLink').select(); document.execCommand('copy'); }
+      el('mkCopy').textContent = 'Copiat! ✓';
+      setTimeout(() => el('mkCopy').textContent = 'Copiază linkul', 1500);
+    });
+    el('mkClose').addEventListener('click', () => mk.hidden = true);
+  }
+
+  /* ---------- how big am I? ---------- */
+  const SIZES = { 28: ['o vânătă', '🍆'], 29: ['un dovlecel mare', '🥒'], 30: ['o varză', '🥬'], 31: ['o nucă de cocos', '🥥'],
+    32: ['o conopidă mare', '🥦'], 33: ['un ananas', '🍍'], 34: ['un pepene galben', '🍈'], 35: ['un pepene galben mare', '🍈'],
+    36: ['o salată mare', '🥬'], 37: ['o legătură de mangold', '🌿'], 38: ['un praz', '🌱'], 39: ['un pepene verde mic', '🍉'], 40: ['un dovleac', '🎃'] };
+  const daysLeft = (target - Date.now()) / 864e5;
+  const week = Math.min(40, Math.floor(40 - daysLeft / 7));
+  if (daysLeft > 0 && SIZES[week]) {
+    const [what, emo] = SIZES[week];
+    el('babySize').innerHTML = `Acum sunt cât ${what} <span class="fruit">${emo}</span> · săptămâna ${week}`;
+  }
+
+  /* ---------- tappable stockings ---------- */
+  const STOCK_NOTES = [659.25, 783.99, 880, 1046.5];
+  document.querySelectorAll('.stocking').forEach((st, i) => {
+    st.addEventListener('click', () => {
+      st.classList.remove('jig'); void st.offsetWidth; st.classList.add('jig');
+      const r = st.getBoundingClientRect();
+      burst(r.left + r.width / 2, r.top + r.height * .45, 12, { kind: 'emoji', emoji: i === 3 ? ['💙', '👶', '⭐'] : ['❤️', '⭐', '💙'], speed: 6 });
+      fx([[STOCK_NOTES[i], 0, .9, .12]]);
+    });
+  });
 })();
 </script>
 </body>
