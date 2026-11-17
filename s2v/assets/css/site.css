@@ -763,7 +763,7 @@ textarea.input{height:auto;min-height:150px;padding:14px 16px;resize:vertical;li
 .ai-grid .ftile p{min-height:0}
 @media (max-width:1060px){.ai-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:620px){.ai-grid{grid-template-columns:1fr}}
-.ai-grid .ftile{display:flex;flex-direction:column;align-items:flex-start}.ai-grid .ftile .demo{margin-top:auto;padding-top:18px}
+@media (min-width:621px){.ai-grid .ftile{display:flex;flex-direction:column;align-items:flex-start}.ai-grid .ftile .demo{margin-top:auto;padding-top:18px}}
 @media (max-width:520px){.typed-line{font-size:min(1em,8vw)}}
 
 /* Recording-mode chips (interactive) */
@@ -779,3 +779,102 @@ button.chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 /* Partner code redemption result */
 .redeem-result{padding:16px 18px;border-radius:14px;border:1px solid rgba(31,191,174,.3);background:rgba(31,191,174,.06);font-size:.95rem;overflow-wrap:anywhere}
 .redeem-result .alert{margin:0}
+/* Cookie banner: bottom-left on desktop and above the chat bubble on phones, so it never sits under the Tawk.to chat button (bottom-right) */
+.consent{margin-left:0;margin-right:auto}
+@media (max-width:560px){.consent{bottom:88px}}
+/* AI section on phones: compact 2x2 tiles (icon, name, demo link); descriptions stay for screen readers */
+@media (max-width:620px){
+  .ai-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .ai-grid .ftile{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px}
+  .ai-grid .ftile .ic-box{width:40px;height:40px}
+  .ai-grid .ftile h3{margin:0;font-size:.95rem;line-height:1.3}
+  .ai-grid .ftile p{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .ai-grid .ftile .demo{margin-top:auto;padding-top:2px;font-size:.8rem}
+}
+
+/* ===== Phone layout: shorter pages, same content ===== */
+.same-feat{display:none}
+@media (max-width:620px){
+  /* Feature + support tiles: play icon / arrow beside the title instead of an extra line */
+  .ftile{grid-template-columns:auto 1fr auto;padding:16px;column-gap:14px}
+  .ftile .demo{font-size:0;gap:0;margin:0;padding:0;grid-column:3;grid-row:1/span 3;align-self:center}
+  .ftile .demo .i{width:18px;height:18px}
+  .ftile p{font-size:.9rem;line-height:1.5}
+  .fgroup .grid,.grid.g3{gap:10px}
+  /* How-to: videos stay full size, descriptions trimmed to three lines */
+  .tut .body{padding:16px 18px 18px}
+  .tut .body p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;overflow:hidden;font-size:.92rem}
+  /* Pricing: the Educational card doesn't repeat the identical feature list */
+  .plan .checks.dup{display:none}
+  .same-feat{display:block;margin:0 0 20px;color:var(--muted);font-size:.92rem}
+  /* Help Center landing: sub-topics as compact tags */
+  .hc-card ul{display:flex;flex-wrap:wrap;gap:6px}
+  .hc-card li a{padding:5px 10px;border:1px solid var(--line-2);border-radius:999px;font-size:.82rem}
+  .hc-card li a::before{content:none}
+  /* Home hero: the four benefits as a 2x2 grid */
+  .strip{grid-template-columns:1fr 1fr}
+  .strip>div{padding:14px 12px;gap:10px;align-items:flex-start}
+  .strip .i{width:20px;height:20px;flex:none;margin-top:2px}
+  .strip b{font-size:.88rem}
+  .strip span{font-size:.78rem}
+  /* Home "Everything in one app": decorative graphics hidden */
+  .viz.wave,.viz.tl{display:none}
+  .bento .card{min-height:0}
+}
+@media (max-width:620px){.fgroup .card:not(.ftile){display:grid;grid-template-columns:auto 1fr;column-gap:14px;padding:16px}.fgroup .card:not(.ftile) .ic-box{grid-row:span 2}.fgroup .card:not(.ftile) h3{margin:2px 0 4px}.fgroup .card:not(.ftile) p{font-size:.9rem;line-height:1.5;margin:0}}
+@media (max-width:620px){.plan .same-feat{margin:0 0 20px}}
+/* AI section on phones: one slim row per feature (icon, name, play) */
+@media (max-width:620px){
+  .ai-grid{grid-template-columns:1fr;gap:8px}
+  .ai-grid .ftile{display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:14px;padding:12px 16px}
+  .ai-grid .ftile .ic-box{grid-row:auto;width:40px;height:40px}
+  .ai-grid .ftile h3{margin:0;font-size:1rem}
+  .ai-grid .ftile .demo{font-size:0;gap:0;margin:0;padding:0;grid-column:3;grid-row:1;align-self:center}
+  .ai-grid .ftile .demo .i{width:18px;height:18px}
+}
+
+/* "Who is it for": cards on desktop, tap-to-expand rows on phones */
+.aud-item>summary{list-style:none;cursor:default}
+.aud-item>summary::-webkit-details-marker{display:none}
+.aud-item>summary h3{margin-bottom:0}
+.aud-item>p{margin-top:12px}
+@media (max-width:620px){
+  .aud .grid{gap:8px}
+  .aud .card.aud-item{padding:0}
+  .aud-item>summary{display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:14px;padding:14px 16px;cursor:pointer}
+  .aud-item>summary::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+  .aud-item[open]>summary::after{transform:rotate(-135deg)}
+  .aud-item .ic-box{width:40px;height:40px}
+  .aud-item h3{margin:0;font-size:1rem}
+  .aud-item .num{display:none}
+  .aud-item>p{margin:0;padding:0 16px 16px;font-size:.9rem;line-height:1.55}
+  .aud-item>summary:focus-visible{outline:2px solid var(--teal);outline-offset:-2px;border-radius:var(--r-lg)}
+}
+/* Keep everything inside the reviews carousel (incl. screen-reader labels) clipped to it, so the page never scrolls sideways */
+.revs{position:relative}.rvw{position:relative}
+@media (max-width:380px){.rev-nav .btn{padding-left:14px;padding-right:14px;font-size:.88rem}}
+/* Layout polish: balanced headings (no orphaned last word), help images never wider than the text column, single-line option tags */
+h1,h2,h3{text-wrap:balance}
+.hc-body img{max-width:calc(100% - 8px)}
+.opt span{white-space:nowrap}
+
+/* AI section: cards on larger screens, tap-to-open rows with a demo button on phones */
+.ai-acc{display:none}
+@media (max-width:620px){
+  .ai-grid{display:none!important}
+  .ai-acc{display:grid;gap:8px}
+  .ai-item{padding:0}
+  .ai-item>summary{list-style:none;display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:14px;padding:12px 16px;cursor:pointer}
+  .ai-item>summary::-webkit-details-marker{display:none}
+  .ai-item>summary::after{content:"";width:8px;height:8px;margin-right:4px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+  .ai-item[open]>summary::after{transform:rotate(-135deg)}
+  .ai-item>summary:focus-visible{outline:2px solid var(--teal);outline-offset:-2px;border-radius:var(--r-lg)}
+  .ai-item .ic-box{width:40px;height:40px}
+  .ai-item h3{margin:0;font-size:1rem}
+  .ai-body{padding:0 16px 16px}
+  .ai-body p{margin:0 0 12px;font-size:.9rem;line-height:1.55;color:var(--muted)}
+  .ai-demo .i{width:15px;height:15px}
+}
+/* Troubleshooting tiles: the link label ("Microsoft Support article", ...) is real information, so keep it visible on phones */
+@media (max-width:620px){[data-page=troubleshooting] .ftile{grid-template-columns:auto 1fr}[data-page=troubleshooting] .ftile .demo{font-size:.86rem;gap:8px;grid-column:2;grid-row:auto;align-self:start;margin-top:8px}[data-page=troubleshooting] .ftile .demo .i{width:14px;height:14px}}
+@media (max-width:380px){.phero h1{font-size:1.8rem}}

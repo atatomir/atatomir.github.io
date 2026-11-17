@@ -134,7 +134,7 @@
     function show(t) {
       mt.textContent = t.getAttribute('data-title') || '';
       mv.src = t.getAttribute('data-video');
-      list = $$('.ftile[data-video], .tut[data-video]').filter(function (x) { return x.offsetParent !== null; });
+      list = $$('.ftile[data-video], .tut[data-video], .ai-demo[data-video]').filter(function (x) { return x.offsetParent !== null; });
       cur = list.indexOf(t);
       navs.forEach(function (n) { n.hidden = cur < 0 || list.length < 2; });
       var p = mv.play(); if (p && p.catch) p.catch(function () {});
@@ -212,6 +212,16 @@
         ysecs.forEach(function (y) { y.hidden = !$$('.cl-item:not([hidden])', y).length; });
       });
     });
+  }
+
+  // ---- "Who is it for": collapsed rows on phones, always open on larger screens --
+  var audItems = $$('details.aud-item');
+  if (audItems.length && window.matchMedia) {
+    var audMq = matchMedia('(max-width: 620px)');
+    var audSync = function () { audItems.forEach(function (x) { x.open = !audMq.matches; }); };
+    audSync();
+    if (audMq.addEventListener) audMq.addEventListener('change', audSync);
+    audItems.forEach(function (x) { $('summary', x).addEventListener('click', function (ev) { if (!audMq.matches) ev.preventDefault(); }); });
   }
 
   // ---- Recording modes (home "Record your Screen" card) -------------------

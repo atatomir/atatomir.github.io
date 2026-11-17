@@ -766,7 +766,7 @@ def cta(p, title="Get started with no editing experience!", lead="Fully featured
 
 def audience(p):
     cards = "".join(
-        f'<article class="card card-spot rv" style="--rd:{i * .08}s"><span class="num">0{i + 1}</span><div class="ic-box{" c" if i == 1 else ""}">{icon(p, ic)}</div><h3>{t}</h3><p>{d}</p></article>'
+        f'<details class="card card-spot rv aud-item" style="--rd:{i * .08}s" open><summary><span class="num">0{i + 1}</span><div class="ic-box{" c" if i == 1 else ""}">{icon(p, ic)}</div><h3>{t}</h3></summary><p>{d}</p></details>'
         for i, (ic, t, d) in enumerate(AUDIENCE))
     return f"""<section class="sec aud"><div class="wrap">
   <div class="head center rv"><div class="eyebrow">Made for everyone</div><h2>Who is ScreenToVideo designed for?</h2></div>
@@ -907,10 +907,16 @@ AI_CARDS = [
 
 def ai_section(p):
     cards = "".join(ftile(p, ic, t, d, v, i % 2 == 1, i * .05, badge=False) for i, (ic, t, d, v) in enumerate(AI_CARDS))
+    # phones: the same four features as tap-to-open rows, each with its demo button
+    rows = "".join(
+        f'<details class="card ai-item"><summary><span class="ic-box{" c" if i % 2 else ""}">{icon(p, ic)}</span><h3>{t}</h3></summary>'
+        f'<div class="ai-body"><p>{d}</p><button type="button" class="btn btn-ghost btn-sm ai-demo" data-video="{MEDIA}{v}.mp4" data-title="{e(t)}">{icon(p, "play")}Watch demo</button></div></details>'
+        for i, (ic, t, d, v) in enumerate(AI_CARDS))
     return f'''<section class="sec"><div class="wrap">
   <div class="head center rv"><div class="eyebrow">AI built in</div><h2>Let AI do the <span class="grad">tedious work</span></h2>
   <p class="lead">Professional-looking videos without a studio: AI cleans up your background, narrates your script and trims the dead air.</p></div>
   <div class="grid g4 ai-grid">{cards}</div>
+  <div class="ai-acc">{rows}</div>
 </div></section>'''
 
 
@@ -1130,7 +1136,8 @@ def buy():
   <span class="ic-box{' c' if pl['hot'] else ''}">{icon(p, pl['icon'])}</span>
   <h3>{pl['name']}</h3><p class="for">{pl['who']}</p>
   <div class="price"><b>${pl['base']}</b><span>one-time fee</span></div>
-  {checks(PLAN_FEATURES, c=pl['hot'])}
+  {checks(PLAN_FEATURES, c=pl['hot']).replace('<ul class="checks', '<ul class="checks dup', 1) if not pl['hot'] else checks(PLAN_FEATURES, c=True)}
+  {'' if pl['hot'] else '<p class="same-feat">Includes every feature of the Regular license.</p>'}
   <div class="tiers">{rows}</div>
   <div class="qty"><label for="q-{pl['key']}">Licenses</label>
     <div class="stepper"><button type="button" data-step="-1" aria-label="Fewer licenses">−</button><input id="q-{pl['key']}" type="number" inputmode="numeric" min="1" max="99" value="1"><button type="button" data-step="1" aria-label="More licenses">+</button></div>
