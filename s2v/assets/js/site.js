@@ -4,6 +4,7 @@
 
   // ---- Config -------------------------------------------------------------
   var ORIGIN = 'https://screentovideo.com';
+  var PROD = /(^|\.)screentovideo\.com$/.test(location.hostname);
   var CFG = {
     adsId: 'AW-17501610339',
     downloadConversion: 'AW-17501610339/yF1oCJy2gowbEOPCtZlB',
@@ -58,7 +59,7 @@
   if (track === 'uploadtogd') track += (qs.get('status') || '').toLowerCase();
   if (track) {
     try {
-      fetch(CFG.tracker + '?page=' + encodeURIComponent(track) + '&referrer=' + encodeURIComponent(d.referrer),
+      if (PROD) fetch(CFG.tracker + '?page=' + encodeURIComponent(track) + '&referrer=' + encodeURIComponent(d.referrer),
         { mode: 'no-cors', keepalive: true, credentials: 'omit' }).catch(function () {});
     } catch (e) {}
   }
@@ -83,10 +84,14 @@
     // Reserve the height of the tallest word, so a long word that wraps never pushes the page down
     var tline = typed.parentNode;
     var fitTyped = function () {
-      var cur = typed.textContent, mx = 0;
-      tline.style.minHeight = '';
-      words.forEach(function (w) { typed.textContent = w; mx = Math.max(mx, tline.offsetHeight); });
-      typed.textContent = cur;
+      // one hidden copy of the line per word, measured together (a single layout pass)
+      var probe = d.createElement('div');
+      probe.setAttribute('aria-hidden', 'true');
+      probe.style.cssText = 'position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;width:' + tline.getBoundingClientRect().width + 'px';
+      probe.innerHTML = words.map(function (w) { return '<span class="typed-line" style="min-height:0">with <span class="typed">' + w.replace(/[&<>]/g, '') + '</span><span class="caret"></span></span>'; }).join('');
+      tline.parentNode.appendChild(probe);
+      var mx = 0; $$('.typed-line', probe).forEach(function (x) { mx = Math.max(mx, x.offsetHeight); });
+      probe.remove();
       tline.style.minHeight = mx + 'px';
     };
     fitTyped();
@@ -134,7 +139,7 @@
     function show(t) {
       mt.textContent = t.getAttribute('data-title') || '';
       mv.src = t.getAttribute('data-video');
-      list = $$('.ftile[data-video], .tut[data-video], .ai-demo[data-video]').filter(function (x) { return x.offsetParent !== null; });
+      list = $$('.card-btn[data-video], .ai-demo[data-video]').filter(function (x) { return x.offsetParent !== null; });
       cur = list.indexOf(t);
       navs.forEach(function (n) { n.hidden = cur < 0 || list.length < 2; });
       var p = mv.play(); if (p && p.catch) p.catch(function () {});
@@ -536,6 +541,6 @@
   }
   idle(function () {
     addScript('https://www.googletagmanager.com/gtag/js?id=' + CFG.adsId);
-    if (!body.hasAttribute('data-nochat')) { window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date(); addScript(CFG.tawk, { charset: 'UTF-8', crossorigin: '*' }); }
+    if (PROD && !body.hasAttribute('data-nochat')) { window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date(); addScript(CFG.tawk, { charset: 'UTF-8', crossorigin: '*' }); }
   }, page === 'download' ? 0 : 2500);
 })();

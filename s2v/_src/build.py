@@ -701,7 +701,7 @@ def layout(p, *, title, desc, content, active=None, page="", track=None, robots=
 
 
 def footer(p):
-    col = lambda title, links: f'<div><h4>{title}</h4><ul>' + "".join(
+    col = lambda title, links: f'<div><h2 class="ftr-h">{title}</h2><ul>' + "".join(
         f'<li><a href="{h}"{" target=_blank rel=noopener" if h.startswith("http") else ""}>{t}</a></li>' for h, t in links) + "</ul></div>"
     return f"""<footer class="ftr">
   <div class="wrap">
@@ -766,7 +766,7 @@ def cta(p, title="Get started with no editing experience!", lead="Fully featured
 
 def audience(p):
     cards = "".join(
-        f'<details class="card card-spot rv aud-item" style="--rd:{i * .08}s" open><summary><span class="num">0{i + 1}</span><div class="ic-box{" c" if i == 1 else ""}">{icon(p, ic)}</div><h3>{t}</h3></summary><p>{d}</p></details>'
+        f'<details class="card card-spot rv aud-item" style="--rd:{i * .08}s" open><summary><span class="num">0{i + 1}</span><span class="ic-box{" c" if i == 1 else ""}">{icon(p, ic)}</span><h3>{t}</h3></summary><p>{d}</p></details>'
         for i, (ic, t, d) in enumerate(AUDIENCE))
     return f"""<section class="sec aud"><div class="wrap">
   <div class="head center rv"><div class="eyebrow">Made for everyone</div><h2>Who is ScreenToVideo designed for?</h2></div>
@@ -821,7 +821,7 @@ def home():
     <p class="note rv" style="--rd:.2s">{icon(p, 'check')}Fully featured 15-day free trial. Requires Windows 7 or newer (64-bit).</p>
     <div class="shot rv" style="--rd:.25s">
       <div class="shot-media">
-        <img src="assets/img/hero-editor.webp" width="1280" height="720" alt="The ScreenToVideo editor: adding a text balloon to a project, with the properties panel and timeline" fetchpriority="high">
+        <img src="assets/img/hero-editor.webp" srcset="assets/img/hero-editor-640.webp 640w, assets/img/hero-editor-960.webp 960w, assets/img/hero-editor.webp 1280w" sizes="(max-width: 1148px) calc(100vw - 32px), 1116px" width="1280" height="720" alt="The ScreenToVideo editor: adding a text balloon to a project, with the properties panel and timeline" fetchpriority="high">
         <button class="watch" data-video="{MEDIA}home_editor_2.mp4" data-title="ScreenToVideo Editor"><span>{icon(p, 'play')}</span>Watch overview</button>
       </div>
     </div>
@@ -837,14 +837,14 @@ def home():
 <section class="sec"><div class="wrap">
   <div class="split">
     <div class="split-media rv">
-      <img src="assets/img/home-recorder.webp" width="960" height="540" alt="ScreenToVideo screen recorder quick setup window" loading="lazy" decoding="async">
+      <img src="assets/img/home-recorder.webp" srcset="assets/img/home-recorder-480.webp 480w, assets/img/home-recorder.webp 960w" sizes="(max-width: 860px) calc(100vw - 32px), 540px" width="960" height="540" alt="ScreenToVideo screen recorder quick setup window" loading="lazy" decoding="async">
       <button class="play play-sm" data-video="{MEDIA}home_screen_recorder_2.mp4" data-title="Screen Recorder" aria-label="Play the screen recorder video"><span class="play-btn">{icon(p, 'play')}</span></button>
     </div>
     <div class="rv" style="--rd:.1s">
       <div class="eyebrow">Screen recorder</div>
       <h2>Record your screen in minutes</h2>
       {checks(HOME_RECORD)}
-      <a class="btn btn-ghost" href="{p.u('features/#recording')}">Learn more{icon(p, 'arrow')}</a>
+      <a class="btn btn-ghost" href="{p.u('features/#recording')}">See recording features{icon(p, 'arrow')}</a>
     </div>
   </div>
 </div></section>
@@ -852,14 +852,14 @@ def home():
 <section class="sec" style="padding-top:0"><div class="wrap">
   <div class="split rev">
     <div class="split-media rv">
-      <img src="assets/img/home-editor.webp" width="960" height="540" alt="ScreenToVideo editor adding an annotation balloon" loading="lazy" decoding="async">
+      <img src="assets/img/home-editor.webp" srcset="assets/img/home-editor-480.webp 480w, assets/img/home-editor.webp 960w" sizes="(max-width: 860px) calc(100vw - 32px), 540px" width="960" height="540" alt="ScreenToVideo editor adding an annotation balloon" loading="lazy" decoding="async">
       <button class="play play-sm" data-video="{MEDIA}home_editor_2.mp4" data-title="Video Editor" aria-label="Play the video editor video"><span class="play-btn">{icon(p, 'play')}</span></button>
     </div>
     <div class="rv" style="--rd:.1s">
       <div class="eyebrow">Video editor</div>
       <h2>All editing tools in one place</h2>
       {checks(HOME_EDIT, c=True)}
-      <a class="btn btn-ghost" href="{p.u('features/#editing')}">Learn more{icon(p, 'arrow')}</a>
+      <a class="btn btn-ghost" href="{p.u('features/#editing')}">See editing features{icon(p, 'arrow')}</a>
     </div>
   </div>
 </div></section>
@@ -927,7 +927,7 @@ def reviews(p):
   <h3>{e(t)}</h3>
   <blockquote><p>\u201c{e(q)}\u201d</p></blockquote>
   <figcaption><span class="av" aria-hidden="true">{e(n[0].upper())}</span><span class="rev-date">{d} \u00b7 AppSumo</span>
-  <a class="rev-link" href="{APPSUMO_PRODUCT}{u}" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo">{icon(p, "external")}</a></figcaption>
+  <a class="rev-link" href="{APPSUMO_PRODUCT}{u}" target="_blank" rel="noopener" aria-label="Read the full review \u201c{e(t)}\u201d on AppSumo">{icon(p, "external")}</a></figcaption>
 </figure>''' for i, (n, d, t, q, u) in enumerate(REVIEWS[:HOME_REVIEWS]))
     return f'''<section class="sec"><div class="wrap">
   <div class="rev-head rv">
@@ -940,7 +940,7 @@ def reviews(p):
       <span>{rating_stars(p)}<small>on AppSumo</small></span>
     </a>
   </div>
-  <div class="revs rv" tabindex="0" aria-label="Customer reviews" aria-roledescription="carousel">{cards}</div>
+  <div class="revs rv" tabindex="0" role="region" aria-label="Customer reviews" aria-roledescription="carousel">{cards}</div>
   <div class="rev-nav rv">
     <a class="btn btn-ghost" href="{APPSUMO_PRODUCT}#reviews" target="_blank" rel="noopener">Read more reviews on AppSumo{icon(p, "external")}</a>
     <div class="rev-ctl">
@@ -1040,9 +1040,10 @@ def ftile(p, ic, t, d, v=None, c=False, delay=0, badge=True):
     if badge and t in AI_TILES:
         t = f'{t}<span class="ai-badge">AI</span>' if not t.startswith("AI ") else f'{t[3:]}<span class="ai-badge">AI</span>'
     if v:
-        return (f'<button class="card card-spot ftile rv" style="--rd:{delay}s" data-video="{MEDIA}{v}.mp4" data-title="{e(title)}">'
-                f'<span class="ic-box{" c" if c else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>{d}</p>'
-                f'<span class="demo">{icon(p, "play")}View demo</span></button>')
+        return (f'<article class="card card-spot ftile rv" style="--rd:{delay}s">'
+                f'<span class="ic-box{" c" if c else ""}">{icon(p, ic)}</span>'
+                f'<h3><button type="button" class="card-btn" data-video="{MEDIA}{v}.mp4" data-title="{e(title)}">{t}</button></h3><p>{d}</p>'
+                f'<span class="demo" aria-hidden="true">{icon(p, "play")}View demo</span></article>')
     return f'<article class="card card-spot rv" style="--rd:{delay}s"><span class="ic-box{" c" if c else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>{d}</p></article>'
 
 
@@ -1079,10 +1080,10 @@ def features():
 def tut_cards(p, keys=None):
     items = [t for t in TUTORIALS if keys is None or t[0] in keys]
     return "".join(
-        f'<button class="card tut rv" style="--rd:{(i % 2) * .06}s" data-video="{MEDIA}tutorial_{k}_2.mp4" data-title="{e(t)}">'
-        f'<span class="thumb"><img src="{p.u(f"assets/img/tut-{k}.webp")}" width="640" height="360" alt="" loading="lazy" decoding="async">'
-        f'<span class="play play-sm" aria-hidden="true"><span class="play-btn">{icon(p, "play")}</span></span></span>'
-        f'<span class="body"><h3>{t}</h3><p>{d}</p></span></button>'
+        f'<article class="card tut rv" style="--rd:{(i % 2) * .06}s">'
+        f'<div class="thumb"><img src="{p.u(f"assets/img/tut-{k}.webp")}" width="640" height="360" alt="" loading="lazy" decoding="async">'
+        f'<span class="play play-sm" aria-hidden="true"><span class="play-btn">{icon(p, "play")}</span></span></div>'
+        f'<div class="body"><h3><button type="button" class="card-btn" data-video="{MEDIA}tutorial_{k}_2.mp4" data-title="{e(t)}">{t}</button></h3><p>{d}</p></div></article>'
         for i, (k, t, d) in enumerate(items))
 
 
@@ -1185,7 +1186,7 @@ def download():
     <p class="lead">Your 15-day free trial is on its way.</p>
     <div class="dl" style="margin-top:36px;text-align:left">
       <div class="spinner">{icon(p, 'download')}</div>
-      <div><h2 id="dlstate">Downloading, please wait…</h2><p>If your download has not started automatically, please <a href="{INSTALLER}">click here</a>.</p></div>
+      <div><h2 id="dlstate">Downloading, please wait…</h2><p>If your download has not started automatically, <a href="{INSTALLER}">start the download manually</a>.</p></div>
     </div>
     <div class="dl dl-alt" hidden style="margin-top:36px;text-align:left">
       <div class="spinner" style="background:rgba(31,191,174,.14)">{icon(p, 'windows')}</div>

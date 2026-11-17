@@ -417,7 +417,7 @@ textarea.input{height:auto;min-height:150px;padding:14px 16px;resize:vertical;li
 .ftr-top{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px}
 @media (max-width:860px){.ftr-top{grid-template-columns:1fr 1fr}}
 .ftr p{color:var(--muted);font-size:.92rem;max-width:34ch;margin-top:14px}
-.ftr h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:14px;font-weight:600}
+.ftr .ftr-h{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:14px;font-weight:600}
 .ftr ul{list-style:none;padding:0;margin:0;display:grid;gap:9px;font-size:.93rem}
 .ftr ul a{color:var(--muted);transition:color .2s}
 .ftr ul a:hover{color:var(--text)}
@@ -878,3 +878,10 @@ h1,h2,h3{text-wrap:balance}
 /* Troubleshooting tiles: the link label ("Microsoft Support article", ...) is real information, so keep it visible on phones */
 @media (max-width:620px){[data-page=troubleshooting] .ftile{grid-template-columns:auto 1fr}[data-page=troubleshooting] .ftile .demo{font-size:.86rem;gap:8px;grid-column:2;grid-row:auto;align-self:start;margin-top:8px}[data-page=troubleshooting] .ftile .demo .i{width:14px;height:14px}}
 @media (max-width:380px){.phero h1{font-size:1.8rem}}
+
+/* Card title buttons: the button is the title, its ::after makes the whole card clickable */
+.card-btn{all:unset;cursor:pointer;font:inherit;color:inherit;letter-spacing:inherit}
+.card-btn::after{content:"";position:absolute;inset:0;border-radius:inherit;z-index:1}
+.card-btn:focus{outline:none}
+.card-btn:focus-visible::after{outline:2px solid var(--teal);outline-offset:3px}
+.ftile .ai-badge{position:relative;z-index:0}
