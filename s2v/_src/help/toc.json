@@ -9,7 +9,7 @@
   "file": "getting_started.htm",
   "pages": [
    {
-    "title": "System Requirements",
+    "title": "System requirements",
     "file": "system_requirements.htm"
    },
    {
@@ -61,7 +61,7 @@
     "file": "record_webcam.htm"
    },
    {
-    "title": "Voice over narration",
+    "title": "Voice-over narration",
     "file": "record_voice_narration.htm"
    },
    {
@@ -137,7 +137,7 @@
     "file": "text_to_speech.htm"
    },
    {
-    "title": "Voice over narration",
+    "title": "Voice-over properties",
     "file": "voice_recorder.htm"
    }
   ]

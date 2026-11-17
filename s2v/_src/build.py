@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://screentovideo.com"
 MEDIA = SITE + "/media/"
 HELP = "https://www.screentovideo.com/help/"
-VERSION = "2026.2"
+VERSION = ""  # set right after CHANGELOG below, from its newest entry
 YEAR = "2026"
 COMPANY = "Tatomir N. Alex PFA"
 SUPPORT = "support@screentovideo.com"
@@ -30,35 +30,46 @@ e = html.escape
 # --------------------------------------------------------------------------
 # Content
 # --------------------------------------------------------------------------
-TYPED = ["text animations", "transitions", "video effects", "sketches", "your webcam", "Text-to-Speech",
+TYPED = ["text animations", "AI blur effects", "transitions", "AI backgrounds", "video effects", "AI voice-overs", "sketches", "your webcam", "Text-to-Speech",
          "cursor effects", "chroma-key", "narration", "3D effects", "interactivity", "animations",
          "system sounds", "annotations", "shapes", "zoom areas", "imported media"]
 
 PILLARS = [
     ("screen", "Record your Screen", "With ScreenToVideo, you can capture an application window, a chosen area, or your entire screen with just one click."),
     ("cloud", "Publish and Share", "Export your MP4 video and share it online via Google Drive. Play on any device with the interactive HTML player."),
-    ("sparkles", "Built-in Editor", "Create amazing videos by adding texts, shapes, zoom effects, sounds, images, videos, and animations to your screen recording."),
+    ("sparkles", "Built-in Editor", "Create amazing videos by adding text, shapes, zoom effects, sounds, images, videos, animations, and AI effects to your screen recording."),
     ("zap", "Easy to Use", "ScreenToVideo has an intuitive interface and just the right tools to create a presentation in a matter of minutes!"),
 ]
 
-HOME_RECORD = ["Record your screen with just one click", "Record webcam to add a personal touch to your video",
+# "Record your Screen" card on the home page: each chip shows its own description when clicked
+REC_MODES = [
+    ("screen", "Full screen", "Capture your entire screen with one click \u2014 ideal for full walkthroughs and presentations."),
+    ("media", "Window", "Record a single application window. Fit To Application snaps the capture area to any open app."),
+    ("range", "Region", "Drag to select any area, reuse a recent one, or pick a preset size from 240p up to 4K UHD."),
+    ("webcam", "Webcam", "Add your webcam with AI background blur or a virtual background \u2014 no green screen needed."),
+    ("mic", "Microphone", "Narrate while you record, adjust the volume, and mute or unmute your mic with a hotkey."),
+    ("speaker", "System sound", "Capture every sound your computer plays, from app alerts to the audio of a video or game."),
+]
+
+HOME_RECORD = ["Record your screen with just one click", "Record your webcam with AI background blur or a virtual background \u2014 no green screen needed",
                "Add voice-over narration at capture time", "Capture any sound played by your computer",
-               "Use our Timer to be prepared for a great start"]
+               "Use the countdown timer to get ready for a great start"]
 HOME_EDIT = ["Crop, trim and split the screen recording", "Add professional transitions for the entire video or just for an object",
-             "Zoom area to focus a viewer’s attention", "Add customizable effects to your videos, texts, images, and shapes",
-             "Bring objects to life with animations", "Text-to-Speech powered by Google Cloud Text-to-Speech or Microsoft SAPI",
+             "Use zoom areas to focus your viewer’s attention", "Add customizable effects to your videos, texts, images, and shapes",
+             "Blur or replace the background of any video or image with AI",
+             "Bring objects to life with animations", "AI voice-overs with Google Cloud Text-to-Speech (your Google Cloud account) or Microsoft SAPI",
              "Preview all your changes before exporting the video in your favorite format",
              "Export the video to .mp4, .wmv, or .gif file format"]
 
 AUDIENCE = [
     ("briefcase", "Businesses", "Three out of four customers would rather learn about a product or service by watching a video. ScreenToVideo can be used to create engaging interactive presentations that boost conversion and retention rates."),
-    ("cap", "Students and Teachers", "Students are more likely to retain a message when watching a video than reading a text. ScreenToVideo provides an efficient way of learning by combining visual with audio information."),
+    ("cap", "Students and Teachers", "Students are more likely to retain a message when watching a video than when reading text. ScreenToVideo provides an efficient way of learning by combining visual and audio information."),
     ("palette", "Hobbyists", "The customizability and ease of use make ScreenToVideo the perfect tool to start video editing. Learn about well-known effects, transitions, and animations while building your own components."),
 ]
 
 F_RECORD = [
     ("screen", "Screen Recording", "Capture an application window, a chosen area, or your entire screen.", "features_screen_recording"),
-    ("webcam", "Webcam Recording", "Record your webcam with a virtual background to add a personal touch to your video.", "features_webcam_recording"),
+    ("webcam", "Webcam Recording", "Record your webcam with AI background blur or a virtual background \u2014 no green screen needed.", "features_webcam_recording"),
     ("mic", "Microphone", "Record your microphone while presenting, or add a voice-over while editing.", "features_microphone"),
     ("speaker", "System Sound", "Capture all sounds played on your computer, e.g. applications and games.", "features_system_sound"),
     ("pen", "Drawing Tools", "Draw, highlight, and write on screen while recording.", "features_drawing_tools"),
@@ -68,19 +79,20 @@ F_RECORD = [
 ]
 F_EDIT = [
     ("media", "Import Media", "Import and edit your image, video, and audio files directly in the project.", "features_import_media"),
-    ("balloon", "Annotations", "Annotate your presentation with dynamic texts enclosed in smooth shapes.", "features_annotations"),
-    ("sketch", "Sketch", "Focus the attention on specific areas with animated sketches.", "features_sketch"),
+    ("balloon", "Annotations", "Annotate your presentation with dynamic text enclosed in smooth shapes.", "features_annotations"),
+    ("sketch", "Sketch", "Focus attention on specific areas with animated sketches.", "features_sketch"),
     ("sparkles", "Effects", "Highlight or hide information using the built-in effects (blur, pixelate, etc.).", "features_video_effect"),
     ("shapes", "Shapes", "Use geometric shapes to mask objects.", "features_shapes"),
     ("cursor", "Cursor Effects", "Highlight your actions with custom cursor effects.", "features_cursor"),
-    ("move", "Zoom And Pan", "Change the perspective of the viewer to an interesting area.", "features_zoom_and_pan"),
+    ("move", "Zoom and Pan", "Change the perspective of the viewer to an interesting area.", "features_zoom_and_pan"),
     ("zoom", "Zoom Area", "Bring valuable content closer to your viewers’ eyes.", "features_zoom_area"),
-    ("person", "Virtual Background", "Replace media background using advanced AI models.", "features_ai_background"),
-    ("droplet", "Chroma-Key", "Professionally remove the uniform media background.", "features_chroma_key_2"),
+    ("sparkles", "AI Background Blur", "Blur the background of any video or image with AI to keep the focus on you.", "features_ai_blur_background"),
+    ("person", "AI Virtual Background", "Replace the background of any video or image with AI \u2014 no green screen needed.", "features_ai_virtual_background"),
+    ("droplet", "Chroma-Key", "Remove a solid-color background with professional results.", "features_chroma_key_2"),
     ("gauge", "Media Speed", "Speed up or slow down your video or audio.", "features_media_speed"),
-    ("brush", "Drawing Tools", "Draw, highlight, and write on image while editing.", "features_drawing"),
-    ("silence", "Remove Silences", "Automatically remove silent sections of your audio or video.", "features_remove_silences"),
-    ("tts", "Text-To-Speech", "Turn your script into a professional voice-over narration with Google TTS.", "features_tts"),
+    ("brush", "Drawing Tools", "Draw, highlight, and write on images while editing.", "features_drawing"),
+    ("silence", "AI Silence Removal", "Automatically find and cut silent pauses in your audio or video.", "features_remove_silences"),
+    ("tts", "AI Text-to-Speech", "Turn your script into a natural-sounding voice-over with Google\u2019s neural AI voices (uses your Google Cloud account).", "features_tts"),
     ("narrate", "Narrate", "Enhance the presentation with your voice while editing the video.", "features_narrate"),
     ("loudness", "Loudness Normalization", "Normalized audio from multiple sources fits perfectly into your video.", "features_loudness"),
     ("keyboard", "Keystrokes", "Annotate tutorials with your keystrokes without lifting a finger.", "features_keystroke"),
@@ -88,8 +100,8 @@ F_EDIT = [
     ("cube", "3D Transformations", "Show your content from a different angle with rotations on all three axes.", "features_transformations"),
     ("transition", "Transitions", "Move from one scene to another with continuous predefined transitions.", "features_video_transition"),
     ("variable", "Text Variables", "Show the elapsed time and other variables in texts.", "features_text_variable"),
-    ("copy", "Multiple Selection", "Select, copy, & paste multiple objects with their properties.", "features_multiple_selection"),
-    ("layers", "Arrange", "Set the perfect position both on the timeline and canvas.", "features_arrange"),
+    ("copy", "Multiple Selection", "Select, copy, and paste multiple objects with their properties.", "features_multiple_selection"),
+    ("layers", "Arrange", "Set the perfect position on both the timeline and the canvas.", "features_arrange"),
     ("range", "Timeline Selection", "Easily select, play, and remove timeline intervals.", "features_timeline_selection"),
     ("motion", "Animations", "Move and transform all objects with smooth custom animations.", "features_animations"),
     ("cc", "Closed Captions", "Create, import, and export closed captions for all your project videos.", "features_closed_captions"),
@@ -97,7 +109,7 @@ F_EDIT = [
     ("click", "Interactivity", "Create buttons and video events to provide more interaction with your viewers.", "features_interactivity"),
 ]
 F_PUBLISH = [
-    ("devices", "Export for ANY Device", "Choose the perfect export format to be displayed on any device – PC, phone, or tablet."),
+    ("devices", "Export for Any Device", "Choose the perfect export format to be displayed on any device – PC, phone, or tablet."),
     ("code", "HTML Player", "Embed your video in an HTML player that enables interactivity in any browser."),
     ("gif", "Animated GIF", "Create short animated GIFs for your entire video or just a section of it."),
     ("cloud", "Share Online", "Get a shareable link to your videos uploaded directly to Google Drive."),
@@ -106,15 +118,15 @@ F_EASY = [
     ("eye", "Preview Editor", "Preview all your changes before exporting the video in your favorite format."),
     ("timeline", "Timeline", "Keep track of the precise moments when your objects are displayed."),
     ("inspector", "Object Inspector", "Adjust all properties of your components in a neatly tabbed menu."),
-    ("tabs", "Multiple projects", "Work at more projects in parallel without leaving the main application window."),
+    ("tabs", "Multiple projects", "Work on several projects in parallel without leaving the main application window."),
 ]
 
 TUTORIALS = [
     ("record_screen", "Record the Screen", "ScreenToVideo manages the whole production cycle: from recording to editing and exporting. This tutorial reveals how simple it is to record your screen along with your webcam and microphone. All input sources come with many adjustable properties."),
     ("recorder_properties", "Setting Recorder Properties", "The recording window has an intuitive design with many options grouped in dropdowns. Set the parameters of the video and start your first project."),
-    ("add_text", "Add a text", "This video shows how simple it is to create a text area inside a rounded balloon. Both in and out transitions are added to provide a better user experience."),
+    ("add_text", "Add text", "This video shows how simple it is to create a text area inside a rounded balloon. Both in and out transitions are added to provide a better user experience."),
     ("sketch", "Use a sketch animation", "Sketch animations are very easy to use and can be adjusted to automatically revert and/or continuously loop. Combining them is a good way to draw the attention of your audience."),
-    ("texttospeech", "Use Google Cloud Text-to-Speech", "Do you want to use a professional voice? You can use Google Text-to-Speech to include audio to your video. Alternatively, you can choose among Microsoft voices."),
+    ("texttospeech", "Add an AI voice-over with Text-to-Speech", "Want a professional voice without recording one? Turn your script into a natural-sounding AI voice-over with Google\u2019s neural Text-to-Speech voices (using your Google Cloud account), or choose from the built-in Microsoft voices."),
     ("split", "Add a freeze frame", "Adding freeze frames can be incredibly useful when giving more details. Splitting and removing a segment of your screen recording is also very easy."),
     ("export_player", "Export video with an HTML player", "Exporting has never been so easy. You can embed your video in an HTML player that allows interactivity and choose what happens at the end. Multiple formats are available: MP4, WMV, and GIF."),
     ("interactivity", "Add interactivity to your screen recording", "Let your viewers directly interact with your demo by including buttons, video actions, markers, and a customizable video player."),
@@ -130,7 +142,7 @@ HELP_TOPICS = [
 ]
 
 SPECS = [
-    ("windows", "Operating System", "Microsoft Windows 11 / 10 / 8 / 7", "Required: 64 Bit versions only"),
+    ("windows", "Operating System", "Microsoft Windows 11 / 10 / 8 / 7", "Required: 64-bit versions only"),
     ("cpu", "Processor (CPU)", "Intel Core™ i-series or AMD Phenom® II and above", ""),
     ("resolution", "Screen Resolution", "1280 x 720, 32-bit color or above", ""),
     ("disk", "Hard Disk Space", "500 MB for product installation", ""),
@@ -152,11 +164,25 @@ PLANS = [
     dict(key="edu", icon="cap", name="Educational license", who="For Students and Teachers", base=79, product=61278,
          tiers=[[1, 79], [5, 63], [10, 55], [20, 52], [99, 50]], hot=False),
 ]
-PLAN_FEATURES = ["Full-featured recorder and editor", "Install on multiple devices", "In-app and website support",
+PLAN_FEATURES = ["Full-featured recorder and editor", "AI background blur, virtual backgrounds & voice-overs", "Install on multiple devices", "In-app and website support",
                  "Free lifetime upgrades and support", "No monthly/yearly fee is required", "30-day money-back guarantee",
                  "Windows compatibility"]
-DISCOUNTS = [(2, 5, "2 – 5 licenses", "20% off"), (6, 10, "6 – 10 licenses", "30% off"),
-             (11, 20, "11 – 20 licenses", "34% off"), (21, 99, "21+ licenses", "36% off")]
+DISCOUNTS = [(2, 5, "2 – 5 licenses"), (6, 10, "6 – 10 licenses"), (11, 20, "11 – 20 licenses"), (21, 99, "21+ licenses")]
+
+
+def discount_pct(plan, i):
+    # percent saved per license at discount tier i (0-3), from the plan's actual prices
+    return round((1 - plan["tiers"][i + 1][1] / plan["base"]) * 100)
+
+
+def discount_range(i):
+    # e.g. "36%" or "36\u201337%" when the two license types differ
+    vals = sorted({discount_pct(pl, i) for pl in PLANS})
+    return f"{vals[0]}%" if len(vals) == 1 else f"{vals[0]}\u2013{vals[-1]}%"
+
+
+def max_discount():
+    return max(discount_pct(pl, 3) for pl in PLANS)
 
 REDEEM = [  # partner code-redemption pages
     ("appsumo", "AppSumo", "Hey Sumo-Lings!"),
@@ -165,7 +191,7 @@ REDEEM = [  # partner code-redemption pages
     ("bypeople", "ByPeople", "Hey ByPeople user!"),
 ]
 
-UNINSTALL_REASONS = ["I can't start the program.", "It was not what I expected.", "I don’t like the design.",
+UNINSTALL_REASONS = ["I can’t start the program.", "It was not what I expected.", "I don’t like the design.",
                      "The program is hard to use.", "Errors and crashes.", "The program is too expensive.", "Other"]
 
 VP9 = '<a href="https://www.microsoft.com/en-us/p/vp9-video-extensions/9n4d0msmp0pt?activetab=pivot:overviewtab" target="_blank" rel="noopener">VP9 Video Extensions</a>'
@@ -202,11 +228,11 @@ improved webcam recording
 February 7, 2024 | 2024 (Build 3.1)
 added option to exclude certain windows from recording
 added encoding and decoding hardware acceleration
-added export to .mp4 with VP9 software &amp; hardware encoder (required {VP9})
+added export to .mp4 with VP9 software &amp; hardware encoder (requires {VP9})
 added export to .mp4 with AV1 hardware encoder
 added export to .wma with Windows Media Audio encoder
 added tools to edit video metadata (thumbnail, author, title, description, and copyright)
-added imports from AV1 encoded .mp4 files (webm/mkv, required {AV1})
+added import of AV1-encoded .mp4, .webm and .mkv files (requires {AV1})
 improved export for Windows Media Video files
 bug fixed: incorrectly captured images from some YUY2 webcams
 bug fixed: startup error after installing without previously uninstalling the app
@@ -218,13 +244,13 @@ added option to automatically remove silence from video/audio files
 added drag-and-drop import of media files from the explorer
 added multi-media import (e.g. images/videos)
 added option to replace an image while preserving the object’s properties
-updated Google Text-To-Speech voices (including Polyglot voices)
+updated Google Text-to-Speech voices (including Polyglot voices)
 improved the audio recorder
 improved timeline smoothness in the Editor
 bug fixed: screen recording panel incorrectly displayed for variable DPI
 bug fixed: VBR-encoded MP3 files incorrectly imported
 
-April 05, 2023 | 2023 (Build 3.2)
+April 5, 2023 | 2023 (Build 3.2)
 added new shapes/masks in the editor
 added ripple delete for single and multiple objects
 added timeline multiple selection using the mouse
@@ -235,15 +261,15 @@ improved the interface for variable DPI
 bug fixed: “Delete Selection” incorrectly disabled
 bug fixed: “Split All” incorrectly disabled
 
-February 02, 2023 | 2023 (Build 3.1)
+February 2, 2023 | 2023 (Build 3.1)
 added recording with any display orientation
 added the square mask for the webcam in the video recorder
 added custom outlines for captions
 added text-to-speech for captions
-added the square mask for many objects into the editor
+added the square mask for many objects in the editor
 added new effects: Emboss, Vignette, and Sepia
-updated Google Text-To-Speech voices, including Neural2 voices
-bug fixed: magnify/radial blur effect is drawing incorrectly when resizing the image/video
+updated Google Text-to-Speech voices, including Neural2 voices
+bug fixed: magnify/radial blur effect drawn incorrectly when resizing the image/video
 
 October 14, 2022 | 2022 (Build 3.6)
 enable/disable hotkeys when recording
@@ -266,12 +292,12 @@ added <a href="#" data-video="{MEDIA}features_drawing.mp4" data-title="Animated 
 May 19, 2022 | 2022 (Build 3.4)
 added advanced camera settings to improve the video quality
 added upload to Google Drive to share videos directly
-updated Google Text-To-Speech voices
+updated Google Text-to-Speech voices
 improved microphone recording flow in the editor
 
 April 5, 2022 | 2022 (Build 3.3)
-added ‘Alignment’ button on Screen Recorder Window
-added more freedom for zooming out the timeline
+added the ‘Alignment’ button to the Screen Recorder window
+added more freedom when zooming out of the timeline
 added option to change the registered license
 added option to extend the trial for another 15 days
 added property ‘Reflection’ for images and videos
@@ -290,17 +316,17 @@ added multiple capture methods for recording DirectX windows
 added customized playback speed in the editor
 added customized media speed for audio and video objects
 added auto-update button in the interface
-improved the quality of imported web and mkv files
+improved the quality of imported WebM and MKV files
 improved “Split &amp; Freeze” and “Text-to-Speech” tools
 improved audio recorder
 
 January 18, 2022 | 2022 (Build 3.1)
-quick record to animated WebP format up to 30 frames per second (required {VP9})
-take screenshots in WebP File Format
-adjust microphone volume in the recording setting
+quick record to animated WebP format up to 30 frames per second (requires {VP9})
+take screenshots in WebP format
+adjust the microphone volume in the recording settings
 mute/unmute your microphone while recording via hotkey or mouse
 import WebM file (VP8/VP9, Opus encoders)
-export frames as WebP file format
+export frames in WebP format
 normalize audio perceived loudness per object
 export audio objects to file (mp3, wav, or m4a)
 export projects as animated WebP files
@@ -309,26 +335,26 @@ normalize audio perceived loudness at export
 
 November 12, 2021 | 2021 (Build 3.12)
 quick record to animated GIF up to 30 frames per second
-take screenshots in High Efficiency Image File Format (required {HEIF})
-import WebP short animation (required {VP9})
-support two new image extensions: WebP (.webp) and High Efficiency Image File Format (.heif)
-support for animated gif with alpha transparency
+take screenshots in High Efficiency Image File Format (requires {HEIF})
+import WebP short animation (requires {VP9})
+support for two new image formats: WebP (.webp) and High Efficiency Image File Format (.heif)
+support for animated GIFs with alpha transparency
 import screenshots with one click
 added new borders and sketches
 timeline selection: edit/play/export/delete/ripple delete
-added progress bar to the exported video
+added a progress bar for the exported video
 export frame in High Efficiency Image File Format
 export project to m4a (audio only)
 export video with variable frame rate to reduce the file size
 added quality and optimization options when exporting to animated and/or transparent GIF
 improved audio recorder
-solved update notification bug
+fixed the update notification bug
 
 October 19, 2021 | 2021 (Build 3.11)
 import Scalable Vector Graphics (SVG) images
 create, import, and export closed captions
 display keystrokes automatically with the Keystroke object
-export Text-To-Speech generated audio files (.wav, .m4a, .mp3)
+export Text-to-Speech generated audio files (.wav, .m4a, .mp3)
 copy &amp; paste selected properties
 
 September 16, 2021 | 2021 (Build 3.10)
@@ -337,9 +363,9 @@ added adjustments for the exported playback speed
 added support for .mkv files (H264 video encoder and AAC audio encoder)
 added the option to change the temporary disk folder for better storage management
 enhanced the drawing experience with hotkeys
-improved the audio objects handling in the timeline
+improved the handling of audio objects in the timeline
 fixed Surface Pro camera recording
-fixed timeline interface for 4k display
+fixed the timeline interface on 4K displays
 
 June 17, 2021 | 2021 (Build 3.9)
 record webcam with virtual background (green screen required)
@@ -406,7 +432,7 @@ fixed minor bugs
 September 14, 2020 | 2020 (Build 3.31)
 added the ‘Resize Application’ screen recorder option to fill the capture area
 added the text property for an image, video, and screen recording
-zooming out option is included in the Zoom &amp; Pan property
+added a zoom-out option to the Zoom &amp; Pan property
 added new shapes, masks, and sketch animations
 properties can be displayed in groups (grouped properties)
 added helper lines for the timeline
@@ -418,7 +444,7 @@ added multi-selection with cut/copy/paste/move/align
 added in/out “flip” transition on objects
 added “flip” video transition
 added object alignment from menu or right panel
-added 3D rotations on all axis
+added 3D rotations on all axes
 added new options for the zoom area object: shadow, border, 3D transform, in/out transitions
 extended options for canvas and timeline menu
 user interface improvements
@@ -440,12 +466,12 @@ added video actions on the timeline
 added new properties to the sketch animation: loop, revert, and pause
 added live chat support
 added intro panel with how-to links
-added split&amp;freeze option
+added the Split &amp; Freeze option
 optimized MP4 video for better performance and streaming
 bugs fixed for Windows 7 (service pack 1, media foundation, missing encoders)
 
 March 30, 2020 | 2020 (Build 3.11)
-added optional embedding in HTML Video player
+added optional embedding in an HTML video player
 added compatibility with all browsers (including mobile devices)
 added multiple actions at the beginning and end of each video
 
@@ -471,7 +497,7 @@ added zoom and pan
 August 1, 2019 | 2020 (Build 1.10)
 added texts
 added sketch animations
-added video effects: Gaussian Blur, Directional Blur, Pixelate.
+added video effects: Gaussian Blur, Directional Blur, Pixelate
 added zoom area
 added chroma key effect (green screen)
 
@@ -481,16 +507,23 @@ first release – add shapes, images, videos
 first release – export to .mp4 and .wmv
 """
 
+# The site-wide version number is the newest changelog entry, so the two can never disagree
+VERSION = CHANGELOG.strip().splitlines()[0].split("|")[1].strip()
+
 
 FAQ = [
+    ("Does ScreenToVideo have AI features?", "Yes. AI background blur and AI virtual backgrounds work while you record your webcam and in the editor, on any video or image \u2014 no green screen needed. AI Text-to-Speech turns your script into a natural-sounding voice-over with Google\u2019s neural voices (using your Google Cloud account) or the built-in Microsoft voices, and AI silence removal cuts pauses from your recordings automatically. Every AI tool is included in the free trial."),
     ("Is there a free trial?", "Yes. You can download a fully featured 15-day free trial. All of ScreenToVideo\u2019s features are available, but your exported videos are watermarked. The projects you make with the trial are fully usable once you register."),
     ("Is it a subscription?", "No. ScreenToVideo is a one-time purchase with no monthly or yearly fee. The license is perpetual and never expires, and it includes free lifetime upgrades and support."),
     ("Can I install it on more than one computer?", "Yes. ScreenToVideo is licensed per user, not per machine, so the registered user can install it on as many computers as they own. Only the registered user may use the software."),
     ("Which formats can I export to?", "MP4, WMV, animated GIF and animated WebP, plus audio-only MP3, WAV and M4A. You can also embed your video in an interactive HTML player or upload it directly to Google Drive and get a shareable link."),
     ("What do I need to run it?", "A 64-bit version of Microsoft Windows 11, 10, 8 or 7, an Intel Core i-series or AMD Phenom II processor, 2 GB of RAM and 500 MB of disk space."),
-    ("Are there discounts for schools or teams?", "Yes. Students and teachers can get the Educational license for $79. Buying several licenses saves you 20% (2\u20135 licenses), 30% (6\u201310), 34% (11\u201320) or 36% (21+)."),
-    ("How do I receive my license key?", "Orders are handled securely by PayPro Global. As soon as your order is processed, you receive an e-mail with your registration key, which activates the full version."),
+    ("Are there discounts for schools or teams?", f"Yes. Students and teachers can get the Educational license for $79. Buying several licenses saves you {discount_range(0)} (2\u20135 licenses), {discount_range(1)} (6\u201310), {discount_range(2)} (11\u201320) or {discount_range(3)} (21+)."),
+    ("How do I receive my license key?", "Orders are handled securely by PayPro Global. As soon as your order is processed, you receive an email with your registration key, which activates the full version."),
     ("What if it\u2019s not right for me?", "Every purchase comes with a 30-day money-back guarantee."),
+    ("Does ScreenToVideo work on Mac?", "No. ScreenToVideo is a Windows app and needs a 64-bit version of Windows 11, 10, 8 or 7."),
+    ("Can I record my screen and webcam at the same time?", "Yes. You can record your screen together with your webcam, microphone and system sound, and add AI background blur or a virtual background to the webcam without a green screen."),
+    ("Do exported videos have a watermark?", "Only during the free trial. Once you register a license, your videos are exported without a watermark, and projects you made in the trial keep working."),
 ]
 
 
@@ -518,7 +551,7 @@ ASSET_V = build_assets()
 # "\u2026" marks text left out of a longer review; nothing else is changed.
 APPSUMO_PRODUCT = "https://appsumo.com/products/marketplace-screentovideo/"
 RATING, RATING_AS_OF = "4.7", "November 2026"
-HOME_REVIEWS = 12  # carousel cap; shows 3/2/1 at a time by screen width and loops around
+HOME_REVIEWS = 14  # carousel cap; shows 3/2/1 at a time by screen width and loops around
 REVIEWS = [
     ("Michael G.", "September 2026", "From purchase to ready in under five minutes",
      "In that short window, I completed the purchase, installed it, launched it, and understood enough of the interface to begin using it. \u2026 ScreenToVideo got me from zero to ready in under five minutes. That is an impressive first experience.",
@@ -541,6 +574,27 @@ REVIEWS = [
     ("StratosTutorials", "December 2021", "Great Deal and does what it says",
      "It is a stable product that works as expected and does exactly what you are saying. Also love that you are offering one licenses from unlimited personal installation, so I can install it in my 2 computers I have. \u2026 These features would improve the software and add more value to an already great product.",
      "reviews/great-deal-and-does-what-it-says-172001/"),
+    ("vsuarez", "November 2023", "Awesome to create video tutorials",
+     "Have used some tools for video-recording and this is the most useful and full of features I have seen. It is a pleasure to create video tutorials with lots of effects and control over the final result. Fully recommended!!",
+     "reviews/awesome-to-create-video-tutorials-273802/"),
+    ("Letsan", "March 2022", "Amazing for video tutorials",
+     "This thing records flawlessly. \u2026 And for me the biggest value is in how mouse pointer and clicks are highlighted in quick recording. It is just sooo much better than plain screen recording like other tools. \u2026 the \u201cQuick Recording\u201d option is a godsend, letting me record a compelling, easy to follow tutorial in just minutes.",
+     "reviews/amazing-for-video-tutorials-185220/"),
+    ("Sumo-linger", "October 2023", "Simple and Super",
+     "I\u2019ve been using this for a year now and I\u2019m not a heavy user - It\u2019s a simple tool, but boy is it useful. It does what it says on the tin and it does it well. It\u2019s light weight, so doesn\u2019t use up all of your resources. \u2026 For the price it\u2019s simply amazing value!",
+     "reviews/simple-and-super-271248/"),
+    ("Verified buyer", "March 2024", "Pretty decent tool",
+     "Pretty good tool on the onset with a lightweight (loads fast) and polished feel. Felt the robustness with this tool as recordings were done pretty fast with a fast render time and no glitches and productions were great. Love the cursor effects, \u2018remove silence\u2019 feature, video effects and \u2018zoom and pan\u2019.",
+     "reviews/pretty-decent-tool-295825/"),
+    ("nedjuric", "March 2021", "Awesome Deal - Great All in One tool",
+     "\u2026 in this great offer you get two fantastic products - screen recorder and video editor. In my opinion these apps are complete mature products that contain all the necessary options you need. The support is awesome, authors are willing to accept all ideas and suggestions for new features \u2026",
+     "reviews/awesome-deal-great-all-in-one-tool-111303/"),
+    ("websam", "June 2022", "Solid Tool for Screen Recording",
+     "I\u2019m not sure how I stumbled across this deal but I am glad I did. \u2026 This tool has so many great features. Enough for most people.",
+     "reviews/solid-tool-for-screen-recording-198925/"),
+    ("TheInfoGuy", "June 2024", "A must needed tool - really excellent recorder.",
+     "I used another tool that was not as fast, with limited edit options, etc. This one does a terrific job with plenty of features. Well done!",
+     "reviews/a-must-needed-tool-really-excellent-re-307865/"),
 ]
 
 
@@ -567,8 +621,29 @@ LOGO = ('<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><circle c
 NAV = [("", "Home"), ("features/", "Features"), ("how-to/", "How-To"), ("support/", "Support"), ("buy/", "Pricing")]
 
 
-def layout(p, *, title, desc, content, active=None, page="", track=None, robots=None, extra_body="", nochat=False, canon=None):
+CRUMB_NAMES = {"features": "Features", "how-to": "Video Tutorials", "support": "Support", "buy": "Pricing", "download": "Download",
+               "changelog": "Changelog", "contact": "Contact", "system-requirements": "System Requirements",
+               "troubleshooting": "Troubleshooting", "eula": "License Agreement", "privacy-policy": "Privacy Policy",
+               "website-terms-and-conditions-of-use": "Terms of Use"}
+
+
+def ld_json(d):
+    return f'<script type="application/ld+json">{json.dumps(d, ensure_ascii=False)}</script>'
+
+
+def ld_breadcrumbs(items):
+    # items: [(name, absolute url), ...] starting after Home
+    trail = [("Home", SITE + "/")] + items
+    return ld_json({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": i + 1, "name": n, "item": u} for i, (n, u) in enumerate(trail)]})
+
+
+def layout(p, *, title, desc, content, active=None, page="", track=None, robots=None, extra_body="", nochat=False, canon=None, crumbs=None, ld=""):
     canon = canon or f"{SITE}/{p.slug + '/' if p.slug else ''}"
+    if crumbs is None and p.slug in CRUMB_NAMES:
+        crumbs = [(CRUMB_NAMES[p.slug], canon)]
+    if crumbs and not robots:
+        ld += ld_breadcrumbs(crumbs)
     nav = "".join(
         f'<a href="{p.u(h) if h else (p.r or "./")}"{" aria-current=page" if active == h else ""}>{t}</a>' for h, t in NAV)
     attrs = f' data-page="{page}"' + (f' data-track="{track}"' if track else "") + (" data-nochat" if nochat else "")
@@ -588,12 +663,16 @@ def layout(p, *, title, desc, content, active=None, page="", track=None, robots=
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{canon}">
 <meta property="og:image" content="{SITE}/assets/img/og.jpg">
+<meta property="og:image:alt" content="ScreenToVideo screen recorder and video editor">
+<meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{p.u('favicon.svg')}" type="image/svg+xml">
 <link rel="icon" href="{p.u('favicon.png')}" sizes="32x32">
+<link rel="apple-touch-icon" href="{p.u('apple-touch-icon.png')}">
 <link rel="stylesheet" href="{p.u('assets/css/site.min.css')}?v={ASSET_V['css']}">
 <script>document.documentElement.classList.add('js')</script>
 <script src="{p.u('assets/js/site.js')}?v={ASSET_V['js']}" defer></script>
+{ld}
 <script type="speculationrules">{{"prefetch":[{{"where":{{"and":[{{"href_matches":"/*"}},{{"not":{{"href_matches":"/*.exe"}}}},{{"not":{{"selector_matches":"[target],[download]"}}}}]}},"eagerness":"moderate"}}]}}</script>
 </head>
 <body{attrs}>
@@ -715,9 +794,9 @@ def home():
     p = Page("")
     words = "|".join(TYPED)
     viz = [
-        '<div class="viz chips">' + "".join(
-            f'<span class="chip{" on" if i == 0 else ""}">{icon(p, ic)}{t}</span>' for i, (ic, t) in enumerate(
-                [("screen", "Full screen"), ("media", "Window"), ("range", "Region"), ("webcam", "Webcam"), ("mic", "Microphone"), ("speaker", "System sound")])) + '</div>',
+        '<div class="viz chips" role="group" aria-label="Recording modes">' + "".join(
+            f'<button type="button" class="chip{" on" if i == 0 else ""}" aria-pressed="{"true" if i == 0 else "false"}" data-desc="{e(dsc)}">{icon(p, ic)}{t}</button>'
+            for i, (ic, t, dsc) in enumerate(REC_MODES)) + '</div>',
         '<div class="viz fmt"><span>.mp4</span><span>.gif</span><span>.wmv</span><span>HTML</span><span>Drive</span></div>',
         '<div class="viz wave" aria-hidden="true">' + "".join(
             f'<i style="--h:{h}%;--d:-{i * .09:.2f}s"></i>' for i, h in enumerate([30, 55, 80, 45, 95, 60, 35, 70, 100, 50, 30, 65, 85, 40, 25, 60, 90, 55, 35, 75, 50, 30])) + '</div>',
@@ -725,24 +804,24 @@ def home():
     ]
     order = [0, 1, 2, 3]
     bento = "".join(
-        f'<article class="card card-spot rv" style="--rd:{k * .06}s"><div class="ic-box{" c" if k % 3 == 0 else ""}">{icon(p, PILLARS[i][0])}</div><h3>{PILLARS[i][1]}</h3><p>{PILLARS[i][2]}</p>{viz[i]}</article>'
+        f'<article class="card card-spot rv" style="--rd:{k * .06}s"><div class="ic-box{" c" if k % 3 == 0 else ""}">{icon(p, PILLARS[i][0])}</div><h3>{PILLARS[i][1]}</h3>'
+        + (f'<p class="rec-desc" aria-live="polite">{REC_MODES[0][2]}</p>' if i == 0 else f'<p>{PILLARS[i][2]}</p>') + f'{viz[i]}</article>'
         for k, i in enumerate(order))
     content = f"""
 <section class="hero center">
   <div class="glow"></div><div class="grid-bg"></div>
   <div class="wrap">
-    <a class="pill rv" href="{p.u('changelog/')}"><b>New</b>Version {VERSION}<span class="hide-sm">&nbsp;— AI background blur &amp; more</span>{icon(p, 'arrow')}</a>
+    <a class="pill rv" href="{p.u('changelog/')}"><b>New</b><span><span class="hide-sm">Version {VERSION}: </span>Improved AI background blur</span>{icon(p, 'arrow')}</a>
     <h1 class="rv" style="--rd:.05s">Create Video Tutorials <span class="typed-line">with <span class="typed" data-words="{e(words)}">{TYPED[0]}</span><span class="caret" aria-hidden="true"></span></span></h1>
-    <p class="lead rv" style="--rd:.1s">The most customizable Screen Recorder and Video Editor designed to create impressive presentations from scratch.</p>
+    <p class="lead rv" style="--rd:.1s">The most customizable screen recorder and video editor, with AI background blur, virtual backgrounds, voice-overs and silence removal. Create impressive presentations from scratch.</p>
     <div class="btns rv" style="--rd:.15s">
       <a class="btn btn-primary btn-lg" href="{p.u('download/')}">{icon(p, 'download')}Download Free Trial</a>
       <a class="btn btn-ghost btn-lg" href="{p.u('features/')}">See All Features{icon(p, 'arrow')}</a>
     </div>
-    <p class="note rv" style="--rd:.2s">{icon(p, 'check')}Fully featured 15-day free trial. ScreenToVideo requires Microsoft Windows 7 or newer.</p>
+    <p class="note rv" style="--rd:.2s">{icon(p, 'check')}Fully featured 15-day free trial. Requires Windows 7 or newer (64-bit).</p>
     <div class="shot rv" style="--rd:.25s">
       <div class="shot-media">
         <img src="assets/img/hero-editor.webp" width="1280" height="720" alt="The ScreenToVideo editor: adding a text balloon to a project, with the properties panel and timeline" fetchpriority="high">
-        <video class="loop" data-src="assets/video/hero-loop.mp4" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
         <button class="watch" data-video="{MEDIA}home_editor_2.mp4" data-title="ScreenToVideo Editor"><span>{icon(p, 'play')}</span>Watch overview</button>
       </div>
     </div>
@@ -785,6 +864,7 @@ def home():
   </div>
 </div></section>
 
+{ai_section(p)}
 {reviews(p)}
 <section class="sec"><div class="wrap">
   <div class="head center rv"><div class="eyebrow">Everything in one app</div><h2>Powerful <span class="grad">Screen Recorder and Video Editor</span></h2></div>
@@ -797,8 +877,8 @@ def home():
 {cta(p)}
 """
     content += ld_home()
-    return write("", layout(p, title="Powerful Screen Recorder and Video Editor - Free Trial",
-                            desc="Create interactive tutorials by adding text, shapes, zoom effects, sounds, images, animations, and so much more to your screen recording.",
+    return write("", layout(p, title="ScreenToVideo: AI Screen Recorder & Video Editor for Windows",
+                            desc="Screen recorder and video editor for Windows with AI background blur, virtual backgrounds and voice-overs. Create video tutorials fast. Free 15-day trial.",
                             content=content, active="", page="home", track="home", extra_body=modal(p)))
 
 
@@ -815,6 +895,23 @@ def rating_stars(p):
     return (f'<span class="stars-rate" role="img" aria-label="{RATING} out of 5 stars">'
             f'<span class="stars stars-off" aria-hidden="true">{"".join(icon(p, "star") for _ in range(5))}</span>'
             f'<span class="stars stars-on" aria-hidden="true" style="width:{px:.1f}px">{"".join(icon(p, "star") for _ in range(5))}</span></span>')
+
+
+AI_CARDS = [
+    ("sparkles", "AI Background Blur", "Blur a messy room behind you \u2014 while recording your webcam, or later in the editor on any video or image.", "features_ai_blur_background"),
+    ("person", "AI Virtual Background", "Replace the background behind you, while recording your webcam or later on any video or image. No green screen needed.", "features_ai_virtual_background"),
+    ("tts", "AI Voice-Overs", "Type your script and get a natural-sounding narration from Google\u2019s neural voices (with your Google Cloud account) or the built-in Microsoft voices.", "features_tts"),
+    ("silence", "AI Silence Removal", "Find and cut the pauses in your recording automatically, so your video gets to the point.", "features_remove_silences"),
+]
+
+
+def ai_section(p):
+    cards = "".join(ftile(p, ic, t, d, v, i % 2 == 1, i * .05, badge=False) for i, (ic, t, d, v) in enumerate(AI_CARDS))
+    return f'''<section class="sec"><div class="wrap">
+  <div class="head center rv"><div class="eyebrow">AI built in</div><h2>Let AI do the <span class="grad">tedious work</span></h2>
+  <p class="lead">Professional-looking videos without a studio: AI cleans up your background, narrates your script and trims the dead air.</p></div>
+  <div class="grid g4 ai-grid">{cards}</div>
+</div></section>'''
 
 
 def reviews(p):
@@ -857,7 +954,7 @@ def pricing_band(p):
     <div>
       <div class="eyebrow">Pricing</div>
       <h2>Pay once. <span class="grad">Own it forever.</span></h2>
-      <p class="lead">No subscription. Free lifetime upgrades and support, multi-license discounts up to 36%, and a 30-day money-back guarantee.</p>
+      <p class="lead">No subscription. Free lifetime upgrades and support, multi-license discounts up to {max_discount()}%, and a 30-day money-back guarantee.</p>
       <div class="btns" style="margin-top:24px"><a class="btn btn-primary" href="{p.u('buy/')}">See pricing{icon(p, 'arrow')}</a><a class="btn btn-ghost" href="{p.u('download/')}">Try free for 15 days</a></div>
     </div>
     <div class="minis">{mini("Regular license", "For Individuals and Businesses", 119, True)}{mini("Educational license", "For Students and Teachers", 79, False)}</div>
@@ -877,7 +974,7 @@ def faq(p, keys=None, title="Questions, answered"):
 
 
 COMPARE = [
-    ("All recording and editing features", True, True),
+    ("All recording, editing and AI features", True, True),
     ("Export to MP4, WMV, GIF, WebP & HTML player", True, True),
     ("Upload and share via Google Drive", True, True),
     ("Videos without watermark", False, True),
@@ -900,23 +997,44 @@ def compare(p):
 </div></section>"""
 
 
+def ld_faq(keys=None):
+    sel = [f for i, f in enumerate(FAQ) if keys is None or i in keys]
+    return ld_json({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in sel]})
+
+
 def ld_home():
     data = [
-        {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ScreenToVideo",
-         "operatingSystem": "Windows 11, Windows 10, Windows 8, Windows 7", "applicationCategory": "MultimediaApplication",
-         "softwareVersion": VERSION, "url": SITE + "/", "downloadUrl": INSTALLER,
-         "description": "Powerful screen recorder and video editor. Capture an application window, a chosen area, or your entire screen and add texts, shapes, zoom effects, sounds, images and animations.",
-         "offers": [{"@type": "Offer", "name": "Regular license", "price": "119", "priceCurrency": "USD"},
-                    {"@type": "Offer", "name": "Educational license", "price": "79", "priceCurrency": "USD"}]},
+        {"@context": "https://schema.org", "@type": "SoftwareApplication", "@id": SITE + "/#app", "name": "ScreenToVideo",
+         "operatingSystem": "Windows 11, Windows 10, Windows 8, Windows 7 (64-bit)", "applicationCategory": "MultimediaApplication",
+         "applicationSubCategory": "Screen recorder and video editor",
+         "softwareVersion": VERSION, "url": SITE + "/", "downloadUrl": INSTALLER, "installUrl": SITE + "/download/",
+         "image": SITE + "/assets/img/og.jpg", "screenshot": SITE + "/assets/img/hero-editor.webp",
+         "description": "Screen recorder and video editor for Windows with AI background blur, AI virtual backgrounds, AI voice-overs and AI silence removal. Record your screen, webcam, microphone and system sound, then add text, shapes, zoom effects, transitions and animations, and export to MP4, GIF, WMV or an interactive HTML player.",
+         "softwareRequirements": "64-bit Windows 11, 10, 8 or 7; Intel Core i-series or AMD Phenom II; 2 GB RAM; 500 MB disk space",
+         "featureList": [t for _, t, *_ in F_RECORD + F_EDIT + F_PUBLISH + F_EASY],
+         "publisher": {"@id": SITE + "/#org"},
+         "offers": [{"@type": "Offer", "name": "Regular license", "price": "119", "priceCurrency": "USD", "url": SITE + "/buy/", "availability": "https://schema.org/InStock"},
+                    {"@type": "Offer", "name": "Educational license", "price": "79", "priceCurrency": "USD", "url": SITE + "/buy/", "availability": "https://schema.org/InStock"},
+                    {"@type": "Offer", "name": "15-day free trial", "price": "0", "priceCurrency": "USD", "url": SITE + "/download/"}]},
+        {"@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", "name": "ScreenToVideo", "legalName": COMPANY,
+         "url": SITE + "/", "logo": SITE + "/apple-touch-icon.png", "email": SUPPORT, "foundingDate": "2019"},
+        {"@context": "https://schema.org", "@type": "WebSite", "@id": SITE + "/#site", "name": "ScreenToVideo", "url": SITE + "/", "publisher": {"@id": SITE + "/#org"}},
         {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
             {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in FAQ]},
     ]
     return "".join(f'<script type="application/ld+json">{json.dumps(d, ensure_ascii=False)}</script>' for d in data)
 
 
-def ftile(p, ic, t, d, v=None, c=False, delay=0):
+AI_TILES = {"Webcam Recording", "AI Background Blur", "AI Virtual Background", "AI Text-to-Speech", "AI Silence Removal"}
+
+
+def ftile(p, ic, t, d, v=None, c=False, delay=0, badge=True):
+    title = t  # plain name, used for the video popup title
+    if badge and t in AI_TILES:
+        t = f'{t}<span class="ai-badge">AI</span>' if not t.startswith("AI ") else f'{t[3:]}<span class="ai-badge">AI</span>'
     if v:
-        return (f'<button class="card card-spot ftile rv" style="--rd:{delay}s" data-video="{MEDIA}{v}.mp4" data-title="{e(t)}">'
+        return (f'<button class="card card-spot ftile rv" style="--rd:{delay}s" data-video="{MEDIA}{v}.mp4" data-title="{e(title)}">'
                 f'<span class="ic-box{" c" if c else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>{d}</p>'
                 f'<span class="demo">{icon(p, "play")}View demo</span></button>')
     return f'<article class="card card-spot rv" style="--rd:{delay}s"><span class="ic-box{" c" if c else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>{d}</p></article>'
@@ -930,7 +1048,7 @@ def features():
         ("publishing", "Publishing", "Publish and share", F_PUBLISH, False, False, "g4"),
         ("easy", "Workflow", "Easy to use", F_EASY, False, True, "g4"),
     ]
-    sub = "".join(f'<a href="#{gid}">{name}</a>' for gid, name, *_ in groups) + '<a href="#audience">Who it’s for</a>'
+    sub = "".join(f'<a href="#{gid}">{name}</a>' for gid, name, *_ in groups)
     body = ""
     for gid, name, title, items, vids, c, g in groups:
         tiles = "".join(ftile(p, ic, t, d, (rest[0] if vids else None), c, (i % 4) * .05) for i, (ic, t, d, *rest) in enumerate(items))
@@ -946,9 +1064,9 @@ def features():
               f'<input type="search" placeholder="Search {n} features" autocomplete="off" data-fsearch></label>')
     content += f'<nav class="subnav" aria-label="Feature categories"><div class="wrap"><div class="subnav-links">{sub}</div>{search}</div></nav>' + body
     content += '<div class="wrap"><p class="fempty" hidden>No features match your search. <a href="#" data-fclear>Clear search</a></p></div>'
-    content += '<div id="audience"></div>' + audience(p) + cta(p, second=(p.u("how-to/"), "Watch tutorials"))
-    return write("features", layout(p, title="ScreenToVideo - features",
-                                    desc="ScreenToVideo main features: Great screen recorder. Easy-to-use video editor. Export your project as MP4 video so that it can be played on any device.",
+    content += cta(p, second=(p.u("how-to/"), "Watch tutorials"))
+    return write("features", layout(p, title="Screen Recorder & Video Editor Features - ScreenToVideo",
+                                    desc=f"All {len(F_RECORD) + len(F_EDIT) + len(F_PUBLISH) + len(F_EASY)} ScreenToVideo features: screen and webcam recording, AI background blur and voice-overs, annotations, zoom, effects and export to MP4, GIF and more.",
                                     content=content, active="features/", page="features", track="features", extra_body=modal(p)))
 
 
@@ -966,9 +1084,9 @@ def howto():
     p = Page("how-to")
     content = page_hero(p, "How-To", "Learn ScreenToVideo <span class=\"grad\">in minutes</span>",
                         "Short video tutorials that walk you through recording, editing and exporting your first project.")
-    content += f'<section class="sec-sm" style="padding-top:0"><div class="wrap"><div class="grid g2">{tut_cards(p)}</div></div></section>'
+    content += f'<section class="sec-sm" style="padding-top:0"><div class="wrap"><h2 class="sr">Video tutorials</h2><div class="grid g2">{tut_cards(p)}</div></div></section>'
     content += cta(p, "Try the full-featured trial version for free", "or see more demos on the features page!")
-    return write("how-to", layout(p, title="How-To", desc="Create amazing videos by adding texts, shapes, zoom effects, sounds, and images to your screen recording.",
+    return write("how-to", layout(p, title="Video Tutorials - ScreenToVideo", desc="Short ScreenToVideo video tutorials: record your screen, add text and sketch animations, use AI text-to-speech, add freeze frames and export with an HTML player.",
                                   content=content, active="how-to/", page="howto", track="howto", extra_body=modal(p)))
 
 
@@ -976,20 +1094,20 @@ def install():
     p = Page("install")
     content = page_hero(p, "Installation complete", "Thank you for installing <span class=\"grad\">ScreenToVideo!</span>",
                         "Below you can find some short tutorials on how to create your video in a matter of minutes.")
-    content += f'<section class="sec-sm" style="padding-top:0"><div class="wrap"><div class="grid g3">{tut_cards(p, ["record_screen", "recorder_properties", "export_player"])}</div>'
+    content += f'<section class="sec-sm" style="padding-top:0"><div class="wrap"><h2 class="sr">Quick tutorials</h2><div class="grid g3">{tut_cards(p, ["record_screen", "recorder_properties", "export_player"])}</div>'
     content += f'<div class="btns rv" style="justify-content:center;margin-top:40px"><a class="btn btn-primary" href="{p.u("features/")}">See All Features{icon(p, "arrow")}</a><a class="btn btn-ghost" href="{p.u("how-to/")}">More tutorials</a></div></div></section>'
-    return write("install", layout(p, title="Thank you for installing ScreenToVideo!", desc="Create amazing videos by adding texts, shapes, zoom effects, sounds, and images to your screen recording.",
+    return write("install", layout(p, title="Thank you for installing ScreenToVideo!", desc="ScreenToVideo is installed. Watch three short tutorials to record your screen, set up the recorder and export your first video in minutes.",
                                    content=content, page="install", track="install", extra_body=modal(p), robots="noindex"))
 
 
 def support():
     p = Page("support")
     cards = "".join(
-        f'<a class="card card-spot ftile rv" style="--rd:{(i % 3) * .05}s" href="{p.u('help/' + f)}"><span class="ic-box{" c" if i % 2 else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>Read the step-by-step guide in our help center.</p><span class="demo">{icon(p, "arrow")}Read more</span></a>'
+        f'<a class="card card-spot ftile rv" style="--rd:{(i % 3) * .05}s" href="{p.u('help/' + f)}"><span class="ic-box{" c" if i % 2 else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>{help_covers(f)}</p><span class="demo">{icon(p, "arrow")}Read the guide</span></a>'
         for i, (ic, t, f) in enumerate(HELP_TOPICS))
     content = page_hero(p, "Support", "Welcome to the ScreenToVideo <span class=\"grad\">support page</span>",
-                        "If you would like to know more about how to use our program, feel free to take a look at our online help system below.")
-    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap">
+                        "If you would like to know more about how to use our program, feel free to take a look at our help center below.")
+    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap"><h2 class="sr">Help topics</h2>
   <div class="grid g3">{cards}</div>
   <div class="grid g3" style="margin-top:16px">
     <a class="card card-spot rv" href="mailto:{SUPPORT}"><span class="ic-box c">{icon(p, 'mail')}</span><h3>Email support</h3><p>If you cannot find the answers you are looking for, please don’t hesitate to contact us at <span class="link">{SUPPORT}</span> and we will get back to you within 24 hours.</p></a>
@@ -997,7 +1115,7 @@ def support():
     <a class="card card-spot rv" style="--rd:.1s" href="{p.u('how-to/')}"><span class="ic-box">{icon(p, 'play')}</span><h3>Video tutorials</h3><p>Watch short tutorials on recording, editing, adding text-to-speech, and exporting your project.</p></a>
   </div>
 </div></section>"""
-    return write("support", layout(p, title="ScreenToVideo - support", desc="Create amazing HD videos by adding text, shapes, zoom effects, sounds, and images to your screen recording.",
+    return write("support", layout(p, title="Support - ScreenToVideo", desc="ScreenToVideo support: step-by-step help guides, video tutorials, troubleshooting for Windows components and email support with replies within 24 hours.",
                                    content=content, active="support/", page="support", track="support"))
 
 
@@ -1006,12 +1124,12 @@ def buy():
     plans = ""
     for pl in PLANS:
         rows = '<div><span>Multi-license discounts</span><span></span></div>' + "".join(
-            f'<div data-min="{mn}" data-max="{mx}"><span>{lbl}</span><b>{off}</b></div>' for mn, mx, lbl, off in DISCOUNTS)
+            f'<div data-min="{mn}" data-max="{mx}"><span>{lbl}</span><b>{discount_pct(pl, i)}% off</b></div>' for i, (mn, mx, lbl) in enumerate(DISCOUNTS))
         plans += f"""<article class="card plan{' hot' if pl['hot'] else ''} rv" data-plan="{pl['key']}" data-base="{pl['base']}" data-product="{pl['product']}" data-tiers="{e(json.dumps([[1, pl['base']]] + pl['tiers'][1:]))}">
   {'<span class="badge">Most popular</span>' if pl['hot'] else ''}
   <span class="ic-box{' c' if pl['hot'] else ''}">{icon(p, pl['icon'])}</span>
   <h3>{pl['name']}</h3><p class="for">{pl['who']}</p>
-  <div class="price"><b>${pl['base']}</b><span>one time fee</span></div>
+  <div class="price"><b>${pl['base']}</b><span>one-time fee</span></div>
   {checks(PLAN_FEATURES, c=pl['hot'])}
   <div class="tiers">{rows}</div>
   <div class="qty"><label for="q-{pl['key']}">Licenses</label>
@@ -1021,16 +1139,16 @@ def buy():
   <a class="btn {'btn-primary' if pl['hot'] else 'btn-teal'} btn-lg btn-block buy" href="{STORE.format(id=pl['product'])}"><span>Buy Now (${pl['base']})</span>{icon(p, 'arrow')}</a>
 </article>"""
     infos = [
-        ("shield", "Secure Payments", ["Our orders are handled by PayPro Global processing service. PayPro Global is an electronic payment processing service that guarantees secure transfer and processing of your payment information."]),
-        ("key", "The License", ["As soon as your order is processed, you will receive an e-mail containing the registration key. The key is used to activate the full version of the software.",
-                                "The license is perpetual and never expires so you are legally entitled to use the full version of ScreenToVideo as long as you need it.",
-                                "ScreenToVideo is licensed on a per-user basis, which means that it is licensed to the registered user, not the machine it is installed on. This allows the registered user to install the software on as many machines as he/she owns, but only the registered user may use the software."]),
+        ("shield", "Secure Payments", ["Orders are handled by the PayPro Global payment processing service. PayPro Global is an electronic payment processing service that guarantees secure transfer and processing of your payment information."]),
+        ("key", "The License", ["As soon as your order is processed, you will receive an email containing the registration key. The key is used to activate the full version of the software.",
+                                "The license is perpetual and never expires, so you are legally entitled to use the full version of ScreenToVideo as long as you need it.",
+                                "ScreenToVideo is licensed on a per-user basis, which means that it is licensed to the registered user, not the machine it is installed on. This allows the registered user to install the software on as many machines as they own, but only the registered user may use the software."]),
         ("refresh", "Updates", ["Your purchase of ScreenToVideo includes FREE lifetime upgrades and support."]),
     ]
     info = "".join(f'<article class="card rv" style="--rd:{i * .06}s"><span class="ic-box{" c" if i == 1 else ""}">{icon(p, ic)}</span><h3>{t}</h3>' + "".join(f"<p>{x}</p>" for x in ps) + "</article>" for i, (ic, t, ps) in enumerate(infos))
     content = page_hero(p, "Pricing", "Get a <span class=\"grad\">lifetime license</span>",
                         "Pay once, own it forever. Free lifetime upgrades and support, with a 30-day money-back guarantee.")
-    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap">
+    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap"><h2 class="sr">Licenses</h2>
   <div style="max-width:960px;margin:0 auto">
     <div class="coupon" id="coupon">
       <p>Use coupon code <code id="couponcode" data-copy title="Click to copy">SV50OFF</code> at checkout to get <em>50% OFF!</em></p>
@@ -1042,10 +1160,11 @@ def buy():
   <div class="grid g3 infos" style="margin-top:clamp(56px,8vw,96px)">{info}</div>
 </div></section>
 {compare(p)}
-{faq(p, [1, 2, 5, 6, 7], "Buying questions")}
+{faq(p, [2, 3, 6, 7, 8], "Buying questions")}
+{ld_faq([2, 3, 6, 7, 8])}
 {cta(p, "Not sure yet? Try it free for 15 days.", "All features are available in the trial — your projects stay fully usable after you register.", (p.u('features/'), 'See All Features'))}"""
-    return write("buy", layout(p, title="ScreenToVideo - Pricing",
-                               desc="Create interactive videos by adding texts, shapes, zoom effects, sounds, images and animations to your screen recording. This screen recorder can be used for creating video tutorials and other educational and training purposes.",
+    return write("buy", layout(p, title="Pricing: Lifetime License, No Subscription - ScreenToVideo",
+                               desc="Buy ScreenToVideo once and own it forever: $119 regular or $79 educational license, free lifetime upgrades, multi-license discounts and a 30-day money-back guarantee.",
                                content=content, active="buy/", page="buy", track="pricing"))
 
 
@@ -1065,9 +1184,9 @@ def download():
       <div class="spinner" style="background:rgba(31,191,174,.14)">{icon(p, 'windows')}</div>
       <div>
         <h2>ScreenToVideo is a Windows app</h2>
-        <p>It looks like you\u2019re not on a Windows PC. Download it here, or copy the link and open it on your Windows PC.</p>
+        <p>It looks like you\u2019re not on a Windows PC. Copy the link and open it on your Windows PC, or download the installer anyway.</p>
         <div class="btns" style="margin-top:16px">
-          <a class="btn btn-primary btn-sm" href="{INSTALLER}">{icon(p, 'download')}Download</a>
+          <a class="btn btn-primary btn-sm" href="{INSTALLER}">{icon(p, 'download')}Download anyway</a>
           <button class="btn btn-ghost btn-sm" type="button" data-copylink="{SITE}/download/">{icon(p, 'copy')}<span>Copy link</span></button>
         </div>
       </div>
@@ -1078,12 +1197,12 @@ def download():
   <div class="grid g2" style="max-width:960px;margin:0 auto">
     <article class="card rv"><span class="ic-box c">{icon(p, 'clock')}</span><h3>15-day Free Trial Version</h3><p>All of ScreenToVideo’s features are available, but your exported videos are watermarked.</p><p style="margin-top:10px">The projects that you have made with a trial version of ScreenToVideo will be fully usable with a registered version.</p></article>
     <article class="card rv" style="--rd:.05s"><span class="ic-box">{icon(p, 'download')}</span><h3>Install ScreenToVideo</h3><ol class="steps" style="margin-top:14px"><li>When prompted, save the file to a convenient location on your computer.</li><li>Open the file, then the setup program will guide you through the rest of the process.</li></ol></article>
-    <article class="card rv"><span class="ic-box">{icon(p, 'close')}</span><h3>Uninstall ScreenToVideo</h3><ol class="steps" style="margin-top:14px"><li>Ensure ScreenToVideo and its help window are closed.</li><li>Click on the Windows Start button.</li><li>Select Control Panel (or Settings → Apps on Windows 10/11).</li><li>Double click on Add or Remove Programs (Programs and Features).</li><li>Select ScreenToVideo, click on the Remove button, and click Yes.</li></ol></article>
-    <article class="card rv" style="--rd:.05s"><span class="ic-box c">{icon(p, 'book')}</span><h3>Help file</h3><p>If you would like to know more about how to use our program, feel free to take a look at our <a href="{p.u('how-to/')}">how-to guide</a> or <a href="{p.u('help/')}">help center</a>.</p><p style="margin-top:10px">Check the <a href="{p.u('system-requirements/')}">system requirements</a> or the <a href="{p.u('troubleshooting/')}">troubleshooting page</a> if anything doesn’t work as expected.</p></article>
+    <article class="card rv"><span class="ic-box">{icon(p, 'close')}</span><h3>Uninstall ScreenToVideo</h3><ol class="steps" style="margin-top:14px"><li>Ensure ScreenToVideo and its help window are closed.</li><li>Click the Windows Start button.</li><li>Select Control Panel (or Settings → Apps on Windows 10/11).</li><li>Double-click Add or Remove Programs (Programs and Features).</li><li>Select ScreenToVideo, click the Remove button, and click Yes.</li></ol></article>
+    <article class="card rv" style="--rd:.05s"><span class="ic-box c">{icon(p, 'book')}</span><h3>Help center</h3><p>If you would like to know more about how to use our program, feel free to take a look at our <a href="{p.u('how-to/')}">how-to guide</a> or <a href="{p.u('help/')}">help center</a>.</p><p style="margin-top:10px">Check the <a href="{p.u('system-requirements/')}">system requirements</a> or the <a href="{p.u('troubleshooting/')}">troubleshooting page</a> if anything doesn’t work as expected.</p></article>
   </div>
 </div></section>"""
-    return write("download", layout(p, title="ScreenToVideo - download",
-                                    desc="Download ScreenToVideo. Free Trial. Create amazing HD videos by adding text, shapes, zoom effects, sounds, and images to your screen recording.",
+    return write("download", layout(p, title="Download the Free Trial for Windows - ScreenToVideo",
+                                    desc="Download the free 15-day trial of ScreenToVideo, the screen recorder and video editor with AI background blur and voice-overs, for Windows 11, 10, 8 and 7.",
                                     content=content, page="download", track="download"))
 
 
@@ -1113,11 +1232,7 @@ def changelog():
             years.append(y)
         items, beta = "", ""
         for it in b[1:]:
-            if it == "!BETA":
-                beta = (f'<div class="callout">{icon(p, "download")}<div>'
-                        f'<p>To benefit from the latest improvements and bug fixes, we suggest that you replace the current with the beta version from the following link:</p>'
-                        f'<p><a href="{SITE}/beta/svsetup32b2.exe">{SITE}/beta/svsetup32b2.exe</a></p>'
-                        f'<p class="muted">After reinstalling ScreenToVideo, you will lose the project history, but not the projects themselves.</p></div></div>')
+            if it == "!BETA":  # the beta installer it pointed to no longer exists (404), so the note is not shown
                 continue
             cls, lbl = classify(it)
             counts[cls] += 1
@@ -1141,8 +1256,8 @@ def changelog():
     content += (f'<nav class="subnav" aria-label="Changelog years and filters"><div class="wrap"><div class="subnav-links">{yl}</div>'
                 f'<div class="clfs" role="group" aria-label="Filter changes">{chips}</div></div></nav>')
     content += f'<section class="sec-sm"><div class="wrap narrow"><p class="cl-sum muted">{len(blocks)} releases \u00b7 {total} changes since July 2019</p><div class="cl">{out}</div></div></section>'
-    return write("changelog", layout(p, title="ScreenToVideo - changelog",
-                                     desc="Create amazing videos by adding texts, shapes, zoom effects, sounds and images to your screen recording. The program can be used for creating video tutorials and other educational and training purposes",
+    return write("changelog", layout(p, title="Changelog & Release Notes - ScreenToVideo",
+                                     desc="Every ScreenToVideo release since 2019: new features, improvements and fixes, including AI background blur, AI virtual backgrounds and silence removal.",
                                      content=content, page="changelog", track="changelog", extra_body=modal(p)))
 
 
@@ -1151,14 +1266,14 @@ def sysreq():
     rows = "".join(
         f'<article class="card spec rv" style="--rd:{i * .05}s"><span class="ic-box{" c" if i == 0 else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>{v}{f"<small>{n}</small>" if n else ""}</p></article>'
         for i, (ic, t, v, n) in enumerate(SPECS))
-    content = page_hero(p, "System requirements", "Runs on any <span class=\"grad\">modern Windows PC</span>",
+    content = page_hero(p, "System requirements", "Runs on almost any <span class=\"grad\">Windows PC</span>",
                         "ScreenToVideo is lightweight. Here’s what you need to record, edit and export.")
-    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap narrow">
+    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap narrow"><h2 class="sr">Requirements</h2>
   <div class="specs">{rows}</div>
   <div class="callout rv" style="margin-top:20px">{icon(p, 'wrench')}<div><p>Using Windows 7, an N/KN edition or Windows Server? You may need extra Windows components. See <a href="{p.u('troubleshooting/')}">Troubleshooting</a>.</p></div></div>
 </div></section>
 {cta(p)}"""
-    return write("system-requirements", layout(p, title="ScreenToVideo - requirements", desc=DEFAULT_DESC, content=content, page="sysreq"))
+    return write("system-requirements", layout(p, title="System Requirements - ScreenToVideo", desc="ScreenToVideo system requirements: 64-bit Windows 11, 10, 8 or 7, an Intel Core i-series or AMD Phenom II CPU, 2 GB of RAM and 500 MB of disk space.", content=content, page="sysreq"))
 
 
 def troubleshooting():
@@ -1168,12 +1283,12 @@ def troubleshooting():
         for i, (t, a, u, lbl) in enumerate(TROUBLE))
     content = page_hero(p, "Troubleshooting", "Install the required <span class=\"grad\">Windows components</span>",
                         "We use Windows components to provide the best integration. This page helps you install the required packs containing video encoders, decoders and players.")
-    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap">
+    content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap"><h2 class="sr">Windows components</h2>
   <div class="grid g2">{rows}</div>
   <div class="callout c rv" style="margin-top:20px">{icon(p, 'chat')}<div><p>If you need more help, do not hesitate to <a href="mailto:{SUPPORT}">contact our support team</a> or start a live chat.</p></div></div>
 </div></section>"""
-    return write("troubleshooting", layout(p, title="ScreenToVideo - troubleshooting",
-                                           desc="Create amazing HD videos by adding texts, shapes, zoom effects, sounds, and images to your screen recording.",
+    return write("troubleshooting", layout(p, title="Troubleshooting Windows Components - ScreenToVideo",
+                                           desc="Install the Windows components ScreenToVideo needs: Windows 7 SP1, the Media Feature Pack for N/KN editions, and Media Foundation for Windows Server.",
                                            content=content, page="troubleshooting"))
 
 
@@ -1209,14 +1324,14 @@ def contact():
     <div class="grid" style="gap:16px">
       <article class="card rv" style="--rd:.05s"><span class="ic-box c">{icon(p, 'mail')}</span><h3>Email</h3><p>Support: <a href="mailto:{SUPPORT}">{SUPPORT}</a></p><p style="margin-top:6px">Careers &amp; partnerships: <a href="mailto:{CONTACT}">{CONTACT}</a></p></article>
       <article class="card rv" style="--rd:.1s"><span class="ic-box">{icon(p, 'users')}</span><h3>About us</h3>
-        <p>Founded in 2019, we are an Information Technology company developing screen recording and video editing software for home and office.</p>
+        <p>Founded in 2019, we are an information technology company developing screen recording and video editing software for home and office.</p>
         <p style="margin-top:10px">Our developers have 20+ years of experience in this area and want to build the complete toolbox for amateurs and professional editors alike. That is the reason behind our main product – ScreenToVideo.</p>
         <p style="margin-top:10px">After an incredible growth year, our team renamed the company to {COMPANY} in 2025. If you want to be part of our adventure, please <a href="mailto:{CONTACT}">contact us</a>.</p></article>
     </div>
   </div>
 </div></section>"""
-    return write("contact", layout(p, title="ScreenToVideo - contact",
-                                   desc="Create amazing videos by adding texts, shapes, zoom effects, sounds and images to your screen recording. This screen recorder can be used for creating video tutorials and other educational and training purposes.",
+    return write("contact", layout(p, title="Contact Us - ScreenToVideo",
+                                   desc="Contact the ScreenToVideo team with a question, bug report, license issue or feature request. We usually reply within 24 hours.",
                                    content=content, page="contact"))
 
 
@@ -1236,7 +1351,7 @@ def uninstall():
     <div><button class="btn btn-primary btn-lg" type="submit">Send feedback{icon(p, 'arrow')}</button></div>
   </form>
 </div></section>"""
-    return write("uninstall", layout(p, title="ScreenToVideo - Uninstall", desc=DEFAULT_DESC, content=content, page="uninstall", track="uninstall", robots="noindex"))
+    return write("uninstall", layout(p, title="ScreenToVideo - Uninstall", desc="ScreenToVideo has been uninstalled. Tell us why so we can make the screen recorder and video editor better.", content=content, page="uninstall", track="uninstall", robots="noindex"))
 
 
 def redeem(slug, partner, hello):
@@ -1244,16 +1359,17 @@ def redeem(slug, partner, hello):
     content = page_hero(p, f"{partner} customers", f"{e(hello)}",
                         f"Please enter your name, email, and {partner} code to get your registration details.")
     content += f"""<section class="sec-sm" style="padding-top:0"><div class="wrap narrow">
-  <form class="card panel form rv" data-form data-subject="{partner} code redemption" data-ok="Thank you! We’ll email your registration details shortly.">
-    <div class="row2">{field('First Name', 'First Name', auto='given-name')}{field('Last Name', 'Last Name', auto='family-name')}</div>
-    {field('Email', 'Email Address', 'email', auto='email')}
-    {field(f'{partner} code', f'{partner} code')}
+  <form class="card panel form rv" data-redeem="{SITE}/license/{slug}.php" data-partner="{partner}">
+    <div class="row2">{field('first', 'First Name', auto='given-name')}{field('last', 'Last Name', auto='family-name')}</div>
+    {field('email', 'Email Address', 'email', auto='email')}
+    {field('code', f'{partner} code', auto='off')}
     {HONEYPOT}
     <div class="form-msg" role="status"></div>
+    <div class="redeem-result" aria-live="polite" hidden></div>
     <div><button class="btn btn-primary btn-lg" type="submit">Get my registration details{icon(p, 'arrow')}</button></div>
   </form>
 </div></section>"""
-    return write(slug, layout(p, title="ScreenToVideo", desc=DEFAULT_DESC, content=content, page="redeem", robots="noindex"))
+    return write(slug, layout(p, title=f"Redeem Your {partner} Code - ScreenToVideo", desc="Redeem your partner code to get your ScreenToVideo registration details by email.", content=content, page="redeem", robots="noindex"))
 
 
 def gdrive():
@@ -1272,7 +1388,7 @@ def gdrive():
     <p class="note" style="justify-content:center">{icon(p, 'cloud')}Upload to Google Drive</p>
   </div>
 </div></section>"""
-    return write("uploadtogoogledrive", layout(p, title="ScreenToVideo - Upload to Google Drive", desc=DEFAULT_DESC, content=content,
+    return write("uploadtogoogledrive", layout(p, title="ScreenToVideo - Upload to Google Drive", desc="Connect ScreenToVideo to Google Drive to upload your videos and share them with a link.", content=content,
                                                page="gdrive", track="uploadtogd", robots="noindex", nochat=True))
 
 
@@ -1290,7 +1406,7 @@ def eula():
         ("1. Registered version", ["A single registered copy of ScreenToVideo may either be used by a single person who uses the software himself or herself on one or more computers, or installed on a single computer and used by multiple people, but not both.",
                                    "You may access the registered version of ScreenToVideo through a network, provided that you have obtained individual licenses for the software covering all computers that will run the software from the network. For instance, if seven different workstations will access ScreenToVideo on the network, you will need a seven-user ScreenToVideo license, whether they use ScreenToVideo at different times or concurrently.",
                                    "With a registered copy of ScreenToVideo, you are able to create an unlimited number of freely distributable, royalty-free video files."]),
-        ("2. Shareware version / evaluation and registration", ["This is not free software. Subject to the terms below, you are hereby licensed to use this software for evaluation purposes without charge for a period of 15 days. If you use this software after the 15 day evaluation period a registration fee is required for the Full Version."]),
+        ("2. Shareware version / evaluation and registration", ["This is not free software. Subject to the terms below, you are hereby licensed to use this software for evaluation purposes without charge for a period of 15 days. If you use this software after the 15-day evaluation period, a registration fee is required for the Full Version."]),
         ("3. Copyright", ["The Software is confidential copyrighted information of Aladni Software. You shall not modify, decompile, disassemble, decrypt, extract, or otherwise reverse engineer software. The Software may not be leased, assigned, or sublicensed, in whole or in part. The commercial version of ScreenToVideo may either be used by a single person who uses the Software personally on one or more computers, or installed on a single workstation used non-simultaneously by multiple people, but not both. You may access a version of ScreenToVideo through a network, provided that you have obtained individual commercial licenses for the Software covering all workstations that will access the Software through the network."]),
         ("4. Limitation of support", ["If you are using the Software free of charge under the terms of this agreement, you are not entitled to support or telephone assistance."]),
         ("5. Multi-user packages, company licenses", ["If the copy of the Software you received was accompanied by a printed or other form of “hard-copy” License whose terms vary from this agreement, then the hard-copy License governs your use of the Software."]),
@@ -1298,71 +1414,73 @@ def eula():
                                        "A good data processing procedure dictates that any program be thoroughly tested with non-critical data before relying on it.",
                                        "The user must assume the entire risk of using the program.",
                                        '<span class="caps">ANY LIABILITY OF THE SELLER WILL BE LIMITED EXCLUSIVELY TO PRODUCT REPLACEMENT OR REFUND OF PURCHASE PRICE.</span>']),
-        ("7. High-risk activities", ["The Software is not fault-tolerant and is not designed, manufactured, or intended for use or resale as online control equipment in hazardous environments requiring fail-safe performance, such as in the operation of nuclear facilities, air traffic control, aircraft navigation or communication systems, direct life support machines, or weapons systems, in which the failure of the Software could lead directly to death, personal injury, or severe physical or environmental damage (“High-Risk Activities”). Aladni Software specifically disclaims any expression or implied warranty of fitness for High-Risk Activities."]),
-        ("8. Distribution of evaluation version", ["Provided that you verify that you are distributing the evaluation version you are hereby licensed to make as many copies of the evaluation version of this software and documentation as you wish; give exact copies of the original evaluation version to anyone, and distribute the evaluation version of the software and documentation in its unmodified form via electronic means. There is no charge for any of the above.",
-                                                   "You are specifically prohibited from charging, or requesting donations, for any such copies, however, made; and from distributing the software and/or documentation with other products (commercial or otherwise) without prior written permission."]),
+        ("7. High-risk activities", ["The Software is not fault-tolerant and is not designed, manufactured, or intended for use or resale as online control equipment in hazardous environments requiring fail-safe performance, such as in the operation of nuclear facilities, air traffic control, aircraft navigation or communication systems, direct life support machines, or weapons systems, in which the failure of the Software could lead directly to death, personal injury, or severe physical or environmental damage (“High-Risk Activities”). Aladni Software specifically disclaims any express or implied warranty of fitness for High-Risk Activities."]),
+        ("8. Distribution of evaluation version", ["Provided that you verify that you are distributing the evaluation version, you are hereby licensed to make as many copies of the evaluation version of this software and documentation as you wish; give exact copies of the original evaluation version to anyone, and distribute the evaluation version of the software and documentation in its unmodified form via electronic means. There is no charge for any of the above.",
+                                                   "You are specifically prohibited from charging, or requesting donations, for any such copies, however made; and from distributing the software and/or documentation with other products (commercial or otherwise) without prior written permission."]),
     ]
-    intro = "<p><strong>You should read carefully the following terms and conditions before using this software.</strong> Unless you have a different license agreement signed by Aladni Software the use or installation of this software indicates your acceptance of this license agreement and warranty.</p>"
-    return legal("eula", "ScreenToVideo - a powerful screen recorder and video editor", "License Agreement", DEFAULT_DESC, S, intro)
+    intro = "<p><strong>You should carefully read the following terms and conditions before using this software.</strong> Unless you have a different license agreement signed by Aladni Software, the use or installation of this software indicates your acceptance of this license agreement and warranty.</p>"
+    return legal("eula", "License Agreement (EULA) - ScreenToVideo", "License Agreement", "The ScreenToVideo end-user license agreement: registered and evaluation versions, copyright, support, multi-user licenses and warranty.", S, intro)
 
 
 def privacy():
     S = [
         ("1. What data do we collect and how do we use it?", [
             "<strong>Information you provide to us.</strong> When you participate in, access, purchase or sign up to any of our services, activities, or online content, such as subscriptions, newsletters, surveys, competitions, or events, we receive personal information about you which we use to be able to provide these services. This may consist of data including your name, email address, postal address, and telephone number. You will be able to select how we use your information for marketing purposes and you can update your marketing preferences at any time.",
-            "<strong>Account information.</strong> Some of our online services (like file sharing and subscription for software products) require a password-protected account. We collect and associate with your account, the information you provide to us when you do activities such as signing up for your account or making purchases for our Services (like your full name, email address, and billing address).",
-            "<strong>Usage information.</strong> We collect information related to how you use the Services, including actions you take when using our Services (like editing, viewing, and sharing Your Stuff, changing themes, activating software license, and logging in and out of your account). We use this information to improve our Services, develop new services and features, and protect you as well as other ScreentoVideo users.",
+            "<strong>Account information.</strong> Some of our online services (like file sharing and subscription for software products) require a password-protected account. We collect and associate with your account the information you provide to us when you do activities such as signing up for your account or making purchases for our Services (like your full name, email address, and billing address).",
+            "<strong>Usage information.</strong> We collect information related to how you use the Services, including actions you take when using our Services (like editing, viewing, and sharing Your Stuff, changing themes, activating software license, and logging in and out of your account). We use this information to improve our Services, develop new services and features, and protect you as well as other ScreenToVideo users.",
             "<strong>Device information.</strong> We also collect information from and about the devices you use to access the Services. This includes things like IP addresses, system language, the type of browser and device you use, the version of our software, the web page you visited before coming to our sites, and identifiers associated with your devices. Your devices (depending on their settings) may also transmit location information to the Services.",
             "<strong>Crash reports and diagnostic information.</strong> We may also collect diagnostic reports to help troubleshoot software bugs, fix significant errors, and improve overall user experience. These reports may include things like file names, hardware model, process information, app, and device information. To collect this information, we will ask for your consent in advance.",
             "<strong>Cookies and other technologies.</strong> We use technologies like cookies to provide, improve, protect, and promote our Services. For example, cookies help us with things like remembering your username for your next visit, understanding how you are interacting with our Services, and improving them based on that information. You can set your browser to not accept cookies, but this may limit your ability to use the Services.",
             "<strong>Marketing.</strong> We do not send you any marketing material unless you voluntarily subscribe to our newsletters (opt-in). We collect your email address and other information you submit when you subscribe. If you do not want to receive marketing materials from us anymore, simply click the ‘Unsubscribe’ link in any email at any time (opt-out)."]),
         ("2. Legally process personal data", [
             "We will not share your personal data with other parties except as provided below:",
-            "2.1. We may share personal information with Service Providers. We provide certain Services and Software through Service Providers. We may share your personal identification information with such Service Providers to fulfill orders, deliver packages, send postally or email, administer contests or sweepstakes, manage customer lists, analyze data, provide marketing assistance, process credit card, and other payments, operate the Website, troubleshoot, and provide customer service. We will also share your information with Service Providers to accomplish our administrative tasks.",
-            "2.2. We may disclose the User’s personal data if ScreentoVideo is under a duty to disclose or share such personal data in order to comply with any legal obligation, or in order to protect the rights, property, or safety of its business, its customers or others.",
-            "2.3. We may also transmit your personal information with companies that help us to run our business by processing personal information on behalf of us for the purposes identified above. Such companies include providers of payment processing services, data analysis services providers, fraud monitoring and prevention providers, email delivery service providers, social media, and other marketing platforms and service providers.",
-            "2.4. The collected personal data may be transferred by ScreentoVideo to recipients that are located outside the European Union and such destinations may not have laws that protect the User’s personal data to the same extent as in the European Union. ScreentoVideo ensures that the User’s personal data processed by ScreentoVideo or by its suppliers and partners operating outside the European Union are treated securely and are protected against unauthorized access, loss or destruction, unlawful processing, and any processing which is inconsistent with the purposes set out in this privacy policy.",
-            "2.5. We may use third party track tools (such as Adwords, Bing, Criteo, fabric, Facebook, Firebase, Flurry, Google Analytics, Hotjar, LinkedIn, Pardot, Quora, JPUSH) to track the information on how users use the products and websites, such information will be stored in third-party servers. Such third party track tools may send the data analysis report for ScreentoVideo’s above-mentioned purpose.",
-            "2.6. We may store the collected information on the servers leased from providers of third party server service."]),
+            "2.1. We may share personal information with Service Providers. We provide certain Services and Software through Service Providers. We may share your personal identification information with such Service Providers to fulfill orders, deliver packages, send mail or email, administer contests or sweepstakes, manage customer lists, analyze data, provide marketing assistance, process credit card and other payments, operate the Website, troubleshoot, and provide customer service. We will also share your information with Service Providers to accomplish our administrative tasks.",
+            "2.2. We may disclose the User’s personal data if ScreenToVideo is under a duty to disclose or share such personal data in order to comply with any legal obligation, or in order to protect the rights, property, or safety of its business, its customers or others.",
+            "2.3. We may also transmit your personal information to companies that help us to run our business by processing personal information on behalf of us for the purposes identified above. Such companies include providers of payment processing services, data analysis services providers, fraud monitoring and prevention providers, email delivery service providers, social media, and other marketing platforms and service providers.",
+            "2.4. The collected personal data may be transferred by ScreenToVideo to recipients that are located outside the European Union and such destinations may not have laws that protect the User’s personal data to the same extent as in the European Union. ScreenToVideo ensures that the User’s personal data processed by ScreenToVideo or by its suppliers and partners operating outside the European Union are treated securely and are protected against unauthorized access, loss or destruction, unlawful processing, and any processing which is inconsistent with the purposes set out in this privacy policy.",
+            "2.5. We may use third-party tracking tools (such as Adwords, Bing, Criteo, fabric, Facebook, Firebase, Flurry, Google Analytics, Hotjar, LinkedIn, Pardot, Quora, JPUSH) to track the information on how users use the products and websites; such information will be stored on third-party servers. Such third-party tracking tools may send the data analysis report for ScreenToVideo’s above-mentioned purpose.",
+            "2.6. We may store the collected information on the servers leased from providers of third-party server services.",
+            "2.7. <strong>Google Ads.</strong> Our website uses the Google Ads tag, provided by Google, to measure how our ads perform \u2014 for example, when someone who clicked one of our ads downloads ScreenToVideo. Until you click \u201cAccept\u201d in our cookie banner, the tag runs in Google Consent Mode with ad storage, ad user data, ad personalization and analytics storage set to \u201cdenied\u201d: no advertising cookies are stored, and Google receives only limited signals without cookies. If you accept, Google may set cookies and use them to measure conversions and to personalize ads. You can change your choice at any time by clearing this website\u2019s data in your browser, after which the cookie banner is shown again. To learn how Google uses this information, see the <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener\">Google Privacy Policy</a> and <a href=\"https://policies.google.com/technologies/partner-sites\" target=\"_blank\" rel=\"noopener\">How Google uses information from sites that use its services</a>.",
+            "2.8. <strong>Tawk.to live chat.</strong> Our website includes a live chat widget provided by tawk.to inc., so you can contact us directly from any page. The widget loads on our pages and may set cookies and process technical information about your visit, such as your IP address, browser, and the pages you view, in order to provide the chat. If you start a chat, the messages and any details you enter, such as your name or email address, are processed and stored by tawk.to so that we can reply to you. For more information, see the <a href=\"https://www.tawk.to/privacy-policy/\" target=\"_blank\" rel=\"noopener\">tawk.to Privacy Policy</a>."]),
         ("3. Storage and retention of data", [
-            "<strong>User Controls.</strong> You can access, amend, download, and delete your personal information by logging into your ScreentoVideo account and going to your account settings page.",
+            "<strong>User Controls.</strong> You can access, amend, download, and delete your personal information by logging into your ScreenToVideo account and going to your account settings page.",
             "<strong>Retention.</strong> When you sign up for an account with us, we’ll retain information associated with your account for as long as your account is in existence or as long as we need it to provide you the Services. If you delete your account, we will initiate the deletion of this information immediately. But please note: (1) there might be some latency in deleting this information from our servers and back-up storage; and (2) we may retain this information if necessary to comply with our legal obligations, resolve disputes, or enforce our agreements. Other information will be retained until you ask us to delete it."]),
         ("4. Security", ["We are committed to protecting the personal data we hold. In accordance with GDPR, we adopt appropriate technical and organizational measures to help prevent unauthorized access to your information and ensure data is held securely. We also require any third parties to whom we may transfer personal data to have appropriate security measures in place. We ask third parties to complete Data Security Questionnaires so we can be sure they are a safe place for your data."]),
         ("5. Your right to control and access your information", [
             "You have control over your personal information and how it is collected, used, and shared. For example, you have a right to:",
             "5.1. Access and take your data. You can download copies of Your Stuff from our website. You can also ask us for a copy of the personal data you provided to us.",
             "5.2. Change or correct personal data. You can manage your account and the content contained in it, as well as edit some of your profile details, through your account settings page.",
-            "5.3. Erase or delete all or some of Your Stuff in your ScreentoVideo account. You can delete each of the files you uploaded in your account, through your ‘My Maps’ page.",
-            "5.4. Delete your entire account. You can delete your ScreentoVideo account, as well as any information related to it once for all, through your account settings page.",
-            "5.5. Unsubscribe from our newsletters. Simply click any ‘Unsubscribe’ link in any marketing email you received to make your email address deleted from our mailing list.",
+            "5.3. Erase or delete all or some of Your Stuff in your ScreenToVideo account. You can delete each of the files you uploaded in your account, through your ‘My Maps’ page.",
+            "5.4. Delete your entire account. You can delete your ScreenToVideo account, as well as any information related to it once and for all, through your account settings page.",
+            "5.5. Unsubscribe from our newsletters. Simply click any ‘Unsubscribe’ link in any marketing email you received to have your email address deleted from our mailing list.",
             "5.6. Your right to withdraw consent. Whenever you have given us your consent to use your personal data, you have the right to change your mind at any time and withdraw that consent.",
-            "5.7. The User has the right to define general or specific instructions regarding storage, deletion, and use of its personal data after death."]),
+            "5.7. The User has the right to define general or specific instructions regarding storage, deletion, and use of their personal data after death."]),
         ("6. Policy changes", ["If we are involved in a reorganization, merger, acquisition, or sale of our assets, your information may be transferred as part of that deal. We will notify you (for example, via a message to the email address associated with your account) of any such deal and outline your choices in that event. We may revise this Privacy Policy from time to time and will post the most current version on our website. If a revision meaningfully reduces your rights, we will notify you."]),
-        ("7. Contact us", [f'Have questions or concerns about ScreentoVideo, our Services, and privacy? Contact our Data Protection Officer at <a href="mailto:{SUPPORT}">{SUPPORT}</a>. If they can’t answer your question, you have the right to contact your local data protection supervisory authority.']),
+        ("7. Contact us", [f'Have questions or concerns about ScreenToVideo, our Services, and privacy? Contact our Data Protection Officer at <a href="mailto:{SUPPORT}">{SUPPORT}</a>. If they can’t answer your question, you have the right to contact your local data protection supervisory authority.']),
     ]
-    intro = ("<p>ScreentoVideo (afterward collectively referred to as, “we”, “us”, and “ours”) fully respects your privacy. This policy covers the processing of personal data by ScreentoVideo, which is committed to protecting the privacy of your personal information whilst striving to provide the very best user experience. We want our websites to be safe and enjoyable for everyone.</p>"
-             "<p>The operations of ScreentoVideo are in accordance with the European Union’s General Data Protection Regulation (GDPR), effective May 25, 2018. ScreentoVideo has made the GDPR a priority, and we are and have always been fully aligned with the regulation’s intended result: the protection of your privacy and personal data.</p>")
-    return legal("privacy-policy", "ScreenToVideo - a powerful screen recorder and video editor", "Privacy Policy", DEFAULT_DESC, S, intro)
+    intro = ("<p>ScreenToVideo (collectively referred to as “we”, “us”, and “our”) fully respects your privacy. This policy covers the processing of personal data by ScreenToVideo, which is committed to protecting the privacy of your personal information whilst striving to provide the very best user experience. We want our websites to be safe and enjoyable for everyone.</p>"
+             "<p>The operations of ScreenToVideo are in accordance with the European Union’s General Data Protection Regulation (GDPR), effective May 25, 2018. ScreenToVideo has made the GDPR a priority, and we are and have always been fully aligned with the regulation’s intended result: the protection of your privacy and personal data.</p>")
+    return legal("privacy-policy", "Privacy Policy - ScreenToVideo", "Privacy Policy", "How ScreenToVideo collects, uses, stores and protects your personal data under the GDPR, and how you can access, change or delete it.", S, intro)
 
 
 def terms():
     S = [
-        ("Copyright", ["This website and its materials (including, but not limited to texts, graphics, logos, sounds, and software) are the copyrighted material of ScreenToVideo. All rights reserved.",
+        ("Copyright", ["This website and its materials (including, but not limited to, text, graphics, logos, sounds, and software) are the copyrighted material of ScreenToVideo. All rights reserved.",
                        "No part of this publication may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of ScreenToVideo excluding the following situations:",
                        "1. You may print or download extracts to a local hard disk for your personal and non-commercial use only.",
                        "2. You may copy the content to individual third parties for their personal use, but only if you acknowledge the website as the source of the material."]),
         ("Indemnity", ["You hereby indemnify to the fullest extent ScreenToVideo from and against any and all liabilities, costs, demands, causes of action, damages, and expenses (including reasonable attorney’s fees) arising out of or in any way related to your breach of any of the provisions of these Terms."]),
         ("Disclaimer", ["Although every precaution has been taken in advance in order to verify the accuracy of the information contained herein, neither we nor any third parties provide any warranty or guarantee the accuracy, timeliness, performance, completeness, or suitability of the information, materials, and software found or offered on this website for any particular purpose. You acknowledge that such information and materials may contain inaccuracies or errors and we expressly exclude liability for any of such inaccuracies or errors to the fullest extent permitted by law.",
-                        "You may use any information, materials, or software on this website which is entirely at your own risk. It shall be your own responsibility to ensure that any products, services, or information available through this website meet your specific requirements."]),
+                        "Your use of any information, materials, or software on this website is entirely at your own risk. It shall be your own responsibility to ensure that any products, services, or information available through this website meet your specific requirements."]),
         ("Links to Other Websites", ["Our Service may contain links to third-party websites or services that are not owned or controlled by ScreenToVideo.",
-                                     "We have no control over and assume no responsibility for, the content, privacy policies, or practices of any third-party websites or services. Therefore, you are fully responsible for yourself during browsing the third-party websites for encountering any risks.",
+                                     "We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites or services. Therefore, you are fully responsible for any risks you encounter while browsing third-party websites.",
                                      "We strongly advise you to read the terms and conditions and privacy policies of any third-party websites or services that you visit."]),
         ("Download Software", ["ScreenToVideo makes certain software products available via the ScreenToVideo.com website. Although you are free to download any software presented there, you are not allowed to reproduce or redistribute it."]),
-        ("Feedback", ["We always value hearing from our users whether they have any questions, expectations, or comments, and are always interested in learning about your suggestions which can promote us to make our software better. If you choose to submit comments, ideas, or feedback, you agree that we are free to use them without any restriction or compensation to you."]),
+        ("Feedback", ["We always value hearing from our users, whether they have questions, expectations, or comments, and are always interested in learning about your suggestions that can help us make our software better. If you choose to submit comments, ideas, or feedback, you agree that we are free to use them without any restriction or compensation to you."]),
     ]
-    intro = "<p>Welcome to ScreenToVideo.com. By accessing this website, you agree to comply with and be bound by the following terms and conditions. ScreenToVideo reserves the right to change these terms and conditions, and the products, services, prices, and programs mentioned in its site at any time, as well as seek all remedies in law and in equity for any violation of these terms and conditions.</p>"
-    return legal("website-terms-and-conditions-of-use", "Website Terms And Conditions Of Use - ScreenToVideo", "Website Terms and Conditions of Use",
-                 "Create amazing videos by adding texts, shapes, zoom effects, sounds and images to your screen recording and export them to mp4.", S, intro)
+    intro = "<p>Welcome to ScreenToVideo.com. By accessing this website, you agree to comply with and be bound by the following terms and conditions. ScreenToVideo reserves the right to change these terms and conditions, and the products, services, prices, and programs mentioned on its site at any time, as well as seek all remedies in law and in equity for any violation of these terms and conditions.</p>"
+    return legal("website-terms-and-conditions-of-use", "Terms of Use - ScreenToVideo", "Website Terms and Conditions of Use",
+                 "The terms and conditions for using the ScreenToVideo website: copyright, indemnity, disclaimer, links to other websites, software downloads and feedback.", S, intro)
 
 
 def notfound():
@@ -1371,7 +1489,56 @@ def notfound():
     p.r = "/"  # GitHub Pages / most hosts serve 404.html at any depth
     content = page_hero(p, "404", "This page <span class=\"grad\">doesn’t exist</span>", "The page you’re looking for may have moved. Try one of these instead.",
                         extra=f'<div class="btns" style="margin-top:28px"><a class="btn btn-primary" href="/">Go home</a><a class="btn btn-ghost" href="/features/">Features</a><a class="btn btn-ghost" href="/support/">Support</a></div>')
-    return write("404", layout(p, title="Page not found - ScreenToVideo", desc=DEFAULT_DESC, content=content, page="404", robots="noindex"))
+    return write("404", layout(p, title="Page not found - ScreenToVideo", desc="This page doesn’t exist. Find ScreenToVideo features, pricing, downloads and support from here.", content=content, page="404", robots="noindex"))
+
+
+BUILD_DATE = __import__("datetime").date.today().isoformat()
+
+
+def llms_txt():
+    # Plain-language summary for AI assistants and AI search (llmstxt.org format)
+    feats = lambda lst: "\n".join(f"- {t}: {d}" for _, t, d, *_ in lst)
+    faq = "\n".join(f"### {q}\n{a}\n" for q, a in FAQ)
+    help_links = "\n".join(f"- [{sec['title']}]({SITE}/help/{sec['file']})" for sec in help_toc())
+    return f"""# ScreenToVideo
+
+> ScreenToVideo is a screen recorder and video editor for Windows (11, 10, 8 and 7, 64-bit) with AI background blur, AI virtual backgrounds, AI silence removal and AI voice-overs (Google Cloud Text-to-Speech, using the customer's own Google Cloud account, or built-in Microsoft voices). It is a one-time purchase ($119 regular, $79 educational) with free lifetime upgrades and a free, fully featured 15-day trial.
+
+ScreenToVideo is made by {COMPANY} and has been developed since 2019. It records the screen (full screen, a window or a region), webcam, microphone and system sound, and includes a full video editor for adding text, shapes, zoom and pan, effects, transitions, animations, captions and interactivity. Videos export to MP4, WMV, animated GIF, animated WebP, audio-only formats, an interactive HTML player, or directly to Google Drive. It is rated {RATING} out of 5 on AppSumo.
+
+## Key facts
+- Platform: Windows only (64-bit Windows 11, 10, 8 or 7). No Mac version.
+- Price: one-time license, no subscription. Regular $119, Educational $79. Multi-license discounts from {discount_range(0)} (2-5) to {discount_range(3)} (21+). 30-day money-back guarantee.
+- Free trial: 15 days, all features; exported videos are watermarked until a license is registered.
+- Licensing: per user; the registered user can install it on all of their own computers.
+- System requirements: Intel Core i-series or AMD Phenom II, 2 GB RAM, 500 MB disk space, 1280x720 screen.
+- Current version: {VERSION}.
+
+## Pages
+- [Home]({SITE}/): overview, AI tools, reviews and pricing
+- [Features]({SITE}/features/): all {len(F_RECORD) + len(F_EDIT) + len(F_PUBLISH) + len(F_EASY)} features with demo videos
+- [Pricing]({SITE}/buy/): licenses and discounts
+- [Download]({SITE}/download/): free 15-day trial
+- [Video tutorials]({SITE}/how-to/)
+- [Changelog]({SITE}/changelog/): every release since 2019
+- [System requirements]({SITE}/system-requirements/)
+- [Help center]({SITE}/help/): step-by-step guides
+- [Contact]({SITE}/contact/): {SUPPORT}
+
+## Help center
+{help_links}
+
+## Recording features
+{feats(F_RECORD)}
+
+## Editing features
+{feats(F_EDIT)}
+
+## Publishing features
+{feats(F_PUBLISH)}
+
+## Frequently asked questions
+{faq}"""
 
 
 def extras():
@@ -1379,9 +1546,13 @@ def extras():
     pages = ["", "features/", "how-to/", "support/", "buy/", "download/", "changelog/", "contact/", "system-requirements/",
              "troubleshooting/", "eula/", "privacy-policy/", "website-terms-and-conditions-of-use/"]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
-        f"  <url><loc>{SITE}/{x}</loc></url>\n" for x in pages + ["help/"] + ["help/" + pg["file"] for sec in help_toc() for pg in [sec] + sec["pages"]]) + "</urlset>\n"
+        f"  <url><loc>{SITE}/{x}</loc><lastmod>{BUILD_DATE}</lastmod></url>\n" for x in pages + ["help/"] + ["help/" + pg["file"] for sec in help_toc() for pg in [sec] + sec["pages"]]) + "</urlset>\n"
     (ROOT / "sitemap.xml").write_text(sm)
-    (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
+    ai_bots = ["GPTBot", "OAI-SearchBot", "ChatGPT-User", "ClaudeBot", "Claude-SearchBot", "Claude-User", "PerplexityBot", "Google-Extended", "Applebot-Extended", "CCBot"]
+    (ROOT / "robots.txt").write_text("User-agent: *\nAllow: /\n\n# AI search and assistants are welcome\n"
+                                     + "".join(f"User-agent: {bot}\nAllow: /\n\n" for bot in ai_bots)
+                                     + f"Sitemap: {SITE}/sitemap.xml\n")
+    (ROOT / "llms.txt").write_text(llms_txt())
 
 
 
@@ -1393,6 +1564,18 @@ HELP_DIR = ROOT / "_src/help"
 HELP_ICONS = {f: ic for ic, _, f in HELP_TOPICS}
 
 
+def help_covers(f):
+    # One line describing what a help section covers, from its sub-page titles
+    sec = next((x for x in help_toc() if x["file"] == f), None)
+    names = [pg["title"] for pg in (sec["pages"] if sec else [])]
+    if not names:
+        return "Step-by-step guide in our help center."
+    names = [names[0]] + [n[0].lower() + n[1:] if not n[:2].isupper() else n for n in names[1:]]
+    if len(names) > 5:
+        return ", ".join(names[:5]) + " and more."
+    return (", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]) + "."
+
+
 def help_toc():
     return [sec for sec in json.loads((HELP_DIR / "toc.json").read_text()) if sec["file"] != "overview.htm"]
 
@@ -1401,10 +1584,10 @@ def help_body(f):
     return (HELP_DIR / f.replace(".htm", ".html")).read_text()
 
 
-def help_text(html):
-    t = re.sub(r"<summary>.*?</summary>", " ", html)
+def help_text(frag):
+    t = re.sub(r"<summary>.*?</summary>", " ", frag)
     t = re.sub(r"<[^>]+>", " ", t)
-    return re.sub(r"\s+", " ", t.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")).strip()
+    return re.sub(r"\s+", " ", html.unescape(t)).strip()
 
 
 def help_search(p, big=False):
@@ -1428,7 +1611,7 @@ def help_nav(p, toc, cur):
 def help_contact(p):
     return f"""<div class="hc-contact">
   <span class="ic-box c">{icon(p, 'chat')}</span>
-  <div><h3>Still need help?</h3><p>Email us at <a href="mailto:{SUPPORT}">{SUPPORT}</a> and we’ll get back to you within 24 hours.</p></div>
+  <div><h2>Still need help?</h2><p>Email us at <a href="mailto:{SUPPORT}">{SUPPORT}</a> and we’ll get back to you within 24 hours.</p></div>
   <a class="btn btn-ghost btn-sm" href="{p.u('contact/')}">Contact support{icon(p, 'arrow')}</a>
 </div>"""
 
@@ -1455,7 +1638,7 @@ def help_home(p, toc, f):
   </div>
 </div></section>"""
     out = ROOT / "help" / f
-    out.write_text(layout(p, title="Help Center - ScreenToVideo", canon=f"{SITE}/help/",
+    out.write_text(layout(p, title="Help Center - ScreenToVideo", canon=f"{SITE}/help/", crumbs=[("Help Center", SITE + "/help/")],
                           desc="ScreenToVideo help center: step-by-step guides for recording your screen, editing your project and exporting your video.",
                           content=content, active="support/", page="help", track="help"), encoding="utf-8")
     return out
@@ -1480,7 +1663,13 @@ def help_page(p, toc, flat, i):
     pn += (f'<a class="hc-prev" href="{prev["file"]}"><small>Previous</small><span>{icon(p, "arrow", "i back")}{e(prev["title"])}</span></a>' if prev else "<span></span>")
     pn += (f'<a class="hc-next" href="{nxt["file"]}"><small>Next</small><span>{e(nxt["title"])}{icon(p, "arrow")}</span></a>' if nxt else "<span></span>")
     pn += "</nav>"
-    desc = help_text(body)[:155].rsplit(" ", 1)[0] + "…"
+    txt = help_text(body)
+    if txt:
+        desc = txt[:155].rsplit(" ", 1)[0] + "…" if len(txt) > 155 else txt
+    else:
+        # screenshot-only article: describe it and give the images meaningful alt text
+        desc = f'{pg["title"]} in ScreenToVideo, explained step by step with annotated screenshots.'
+        body = body.replace('<img alt ', f'<img alt="{e(pg["title"])} in ScreenToVideo" ')
     content = f"""<section class="hc"><div class="wrap hc-grid">
   <aside class="hc-side">{help_search(p)}{help_nav(p, toc, f)}</aside>
   <article class="hc-main">
@@ -1493,7 +1682,12 @@ def help_page(p, toc, flat, i):
   </article>
 </div></section>"""
     out = ROOT / "help" / f
-    out.write_text(layout(p, title=f'{pg["title"]} - ScreenToVideo Help', canon=f"{SITE}/help/{f}", desc=desc,
+    trail = [("Help Center", SITE + "/help/")] + ([(sec["title"], f"{SITE}/help/{sec['file']}")] if sec else []) + [(pg["title"], f"{SITE}/help/{f}")]
+    art = ld_json({"@context": "https://schema.org", "@type": "TechArticle", "headline": pg["title"], "description": desc,
+                   "url": f"{SITE}/help/{f}", "inLanguage": "en", "about": {"@type": "SoftwareApplication", "name": "ScreenToVideo"},
+                   "author": {"@type": "Organization", "name": "ScreenToVideo", "url": SITE + "/"},
+                   "publisher": {"@type": "Organization", "name": "ScreenToVideo", "url": SITE + "/"}})
+    out.write_text(layout(p, title=f'{pg["title"]} - ScreenToVideo Help', canon=f"{SITE}/help/{f}", desc=desc, crumbs=trail, ld=art,
                           content=content, active="support/", page="help", track="help"), encoding="utf-8")
     return out
 

@@ -1,0 +1,116 @@
+# ScreenToVideo
+
+> ScreenToVideo is a screen recorder and video editor for Windows (11, 10, 8 and 7, 64-bit) with AI background blur, AI virtual backgrounds, AI silence removal and AI voice-overs (Google Cloud Text-to-Speech, using the customer's own Google Cloud account, or built-in Microsoft voices). It is a one-time purchase ($119 regular, $79 educational) with free lifetime upgrades and a free, fully featured 15-day trial.
+
+ScreenToVideo is made by Tatomir N. Alex PFA and has been developed since 2019. It records the screen (full screen, a window or a region), webcam, microphone and system sound, and includes a full video editor for adding text, shapes, zoom and pan, effects, transitions, animations, captions and interactivity. Videos export to MP4, WMV, animated GIF, animated WebP, audio-only formats, an interactive HTML player, or directly to Google Drive. It is rated 4.7 out of 5 on AppSumo.
+
+## Key facts
+- Platform: Windows only (64-bit Windows 11, 10, 8 or 7). No Mac version.
+- Price: one-time license, no subscription. Regular $119, Educational $79. Multi-license discounts from 20% (2-5) to 36–37% (21+). 30-day money-back guarantee.
+- Free trial: 15 days, all features; exported videos are watermarked until a license is registered.
+- Licensing: per user; the registered user can install it on all of their own computers.
+- System requirements: Intel Core i-series or AMD Phenom II, 2 GB RAM, 500 MB disk space, 1280x720 screen.
+- Current version: 2026.1.
+
+## Pages
+- [Home](https://screentovideo.com/): overview, AI tools, reviews and pricing
+- [Features](https://screentovideo.com/features/): all 45 features with demo videos
+- [Pricing](https://screentovideo.com/buy/): licenses and discounts
+- [Download](https://screentovideo.com/download/): free 15-day trial
+- [Video tutorials](https://screentovideo.com/how-to/)
+- [Changelog](https://screentovideo.com/changelog/): every release since 2019
+- [System requirements](https://screentovideo.com/system-requirements/)
+- [Help center](https://screentovideo.com/help/): step-by-step guides
+- [Contact](https://screentovideo.com/contact/): support@screentovideo.com
+
+## Help center
+- [Getting Started](https://screentovideo.com/help/getting_started.htm)
+- [Creating a new project](https://screentovideo.com/help/creating_a_new_project.htm)
+- [Recording media](https://screentovideo.com/help/recording_media.htm)
+- [Editing a project](https://screentovideo.com/help/editing_a_project.htm)
+- [Configuring object properties](https://screentovideo.com/help/configuring_object_properties.htm)
+- [Exporting your project](https://screentovideo.com/help/exporting_your_project.htm)
+
+## Recording features
+- Screen Recording: Capture an application window, a chosen area, or your entire screen.
+- Webcam Recording: Record your webcam with AI background blur or a virtual background — no green screen needed.
+- Microphone: Record your microphone while presenting, or add a voice-over while editing.
+- System Sound: Capture all sounds played on your computer, e.g. applications and games.
+- Drawing Tools: Draw, highlight, and write on screen while recording.
+- Screenshots: Take screenshots in the middle of the action.
+- Adjustment: Application & Video mode for smooth, high-quality videos.
+- Quick Results: Record directly to mp4/gif with no export time.
+
+## Editing features
+- Import Media: Import and edit your image, video, and audio files directly in the project.
+- Annotations: Annotate your presentation with dynamic text enclosed in smooth shapes.
+- Sketch: Focus attention on specific areas with animated sketches.
+- Effects: Highlight or hide information using the built-in effects (blur, pixelate, etc.).
+- Shapes: Use geometric shapes to mask objects.
+- Cursor Effects: Highlight your actions with custom cursor effects.
+- Zoom and Pan: Change the perspective of the viewer to an interesting area.
+- Zoom Area: Bring valuable content closer to your viewers’ eyes.
+- AI Background Blur: Blur the background of any video or image with AI to keep the focus on you.
+- AI Virtual Background: Replace the background of any video or image with AI — no green screen needed.
+- Chroma-Key: Remove a solid-color background with professional results.
+- Media Speed: Speed up or slow down your video or audio.
+- Drawing Tools: Draw, highlight, and write on images while editing.
+- AI Silence Removal: Automatically find and cut silent pauses in your audio or video.
+- AI Text-to-Speech: Turn your script into a natural-sounding voice-over with Google’s neural AI voices (uses your Google Cloud account).
+- Narrate: Enhance the presentation with your voice while editing the video.
+- Loudness Normalization: Normalized audio from multiple sources fits perfectly into your video.
+- Keystrokes: Annotate tutorials with your keystrokes without lifting a finger.
+- Text Animations: Animate your text with a variety of transitions and textures.
+- 3D Transformations: Show your content from a different angle with rotations on all three axes.
+- Transitions: Move from one scene to another with continuous predefined transitions.
+- Text Variables: Show the elapsed time and other variables in texts.
+- Multiple Selection: Select, copy, and paste multiple objects with their properties.
+- Arrange: Set the perfect position on both the timeline and the canvas.
+- Timeline Selection: Easily select, play, and remove timeline intervals.
+- Animations: Move and transform all objects with smooth custom animations.
+- Closed Captions: Create, import, and export closed captions for all your project videos.
+- Progress Bar: Illustrate the elapsed time by adding a minimalist progress bar to your videos.
+- Interactivity: Create buttons and video events to provide more interaction with your viewers.
+
+## Publishing features
+- Export for Any Device: Choose the perfect export format to be displayed on any device – PC, phone, or tablet.
+- HTML Player: Embed your video in an HTML player that enables interactivity in any browser.
+- Animated GIF: Create short animated GIFs for your entire video or just a section of it.
+- Share Online: Get a shareable link to your videos uploaded directly to Google Drive.
+
+## Frequently asked questions
+### Does ScreenToVideo have AI features?
+Yes. AI background blur and AI virtual backgrounds work while you record your webcam and in the editor, on any video or image — no green screen needed. AI Text-to-Speech turns your script into a natural-sounding voice-over with Google’s neural voices (using your Google Cloud account) or the built-in Microsoft voices, and AI silence removal cuts pauses from your recordings automatically. Every AI tool is included in the free trial.
+
+### Is there a free trial?
+Yes. You can download a fully featured 15-day free trial. All of ScreenToVideo’s features are available, but your exported videos are watermarked. The projects you make with the trial are fully usable once you register.
+
+### Is it a subscription?
+No. ScreenToVideo is a one-time purchase with no monthly or yearly fee. The license is perpetual and never expires, and it includes free lifetime upgrades and support.
+
+### Can I install it on more than one computer?
+Yes. ScreenToVideo is licensed per user, not per machine, so the registered user can install it on as many computers as they own. Only the registered user may use the software.
+
+### Which formats can I export to?
+MP4, WMV, animated GIF and animated WebP, plus audio-only MP3, WAV and M4A. You can also embed your video in an interactive HTML player or upload it directly to Google Drive and get a shareable link.
+
+### What do I need to run it?
+A 64-bit version of Microsoft Windows 11, 10, 8 or 7, an Intel Core i-series or AMD Phenom II processor, 2 GB of RAM and 500 MB of disk space.
+
+### Are there discounts for schools or teams?
+Yes. Students and teachers can get the Educational license for $79. Buying several licenses saves you 20% (2–5 licenses), 30% (6–10), 34% (11–20) or 36–37% (21+).
+
+### How do I receive my license key?
+Orders are handled securely by PayPro Global. As soon as your order is processed, you receive an email with your registration key, which activates the full version.
+
+### What if it’s not right for me?
+Every purchase comes with a 30-day money-back guarantee.
+
+### Does ScreenToVideo work on Mac?
+No. ScreenToVideo is a Windows app and needs a 64-bit version of Windows 11, 10, 8 or 7.
+
+### Can I record my screen and webcam at the same time?
+Yes. You can record your screen together with your webcam, microphone and system sound, and add AI background blur or a virtual background to the webcam without a green screen.
+
+### Do exported videos have a watermark?
+Only during the free trial. Once you register a license, your videos are exported without a watermark, and projects you made in the trial keep working.

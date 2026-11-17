@@ -80,6 +80,17 @@
   var typed = $('[data-words]');
   if (typed) {
     var words = typed.getAttribute('data-words').split('|');
+    // Reserve the height of the tallest word, so a long word that wraps never pushes the page down
+    var tline = typed.parentNode;
+    var fitTyped = function () {
+      var cur = typed.textContent, mx = 0;
+      tline.style.minHeight = '';
+      words.forEach(function (w) { typed.textContent = w; mx = Math.max(mx, tline.offsetHeight); });
+      typed.textContent = cur;
+      tline.style.minHeight = mx + 'px';
+    };
+    fitTyped();
+    var tRz; addEventListener('resize', function () { clearTimeout(tRz); tRz = setTimeout(fitTyped, 100); });
     if (reduced) typed.textContent = words[0];
     else {
       var wi = 0, ci = 0, del = false;
@@ -202,6 +213,17 @@
       });
     });
   }
+
+  // ---- Recording modes (home "Record your Screen" card) -------------------
+  $$('.chips .chip[data-desc]').forEach(function (c) {
+    c.addEventListener('click', function () {
+      var box = c.parentNode, desc = c.closest('.card').querySelector('.rec-desc');
+      $$('.chip', box).forEach(function (x) { var on = x === c; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); });
+      if (!desc || desc.textContent === c.getAttribute('data-desc')) return;
+      desc.classList.add('swap');
+      setTimeout(function () { desc.textContent = c.getAttribute('data-desc'); desc.classList.remove('swap'); }, reduced ? 0 : 150);
+    });
+  });
 
   // ---- Reviews carousel: endless in both directions ----------------------
   // A hidden copy of the cards sits on each side; once a scroll settles in a copy,
@@ -381,22 +403,6 @@
     });
   }
 
-  // ---- Hero loop (starts after load; paused off-screen) -------------------
-  var loop = $('video.loop[data-src]');
-  var conn = navigator.connection || {};
-  if (loop && !reduced && !conn.saveData && !/2g/.test(conn.effectiveType || '')) {
-    var startLoop = function () {
-      loop.src = loop.getAttribute('data-src');
-      loop.addEventListener('playing', function () { loop.classList.add('on'); }, { once: true });
-      var pl = loop.play(); if (pl && pl.catch) pl.catch(function () {});
-      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
-        es.forEach(function (x) { if (x.isIntersecting) { var q = loop.play(); if (q && q.catch) q.catch(function () {}); } else loop.pause(); });
-      }).observe(loop);
-    };
-    if (d.readyState === 'complete') setTimeout(startLoop, 300);
-    else addEventListener('load', function () { setTimeout(startLoop, 300); }, { once: true });
-  }
-
   // ---- Copy link buttons --------------------------------------------------
   $$('[data-copylink]').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -409,7 +415,7 @@
 
   // ---- Download (auto-start after 2s on Windows, like before) -------------
   var plat = ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '') + ' ' + navigator.userAgent;
-  var isWindows = /win/i.test(plat) && !/windows phone/i.test(plat);
+  var isWindows = /\bwin(dows|32|64)\b/i.test(plat) && !/windows phone/i.test(plat);
   if (page === 'download' && !isWindows) {
     var dmain = $('.dl:not(.dl-alt)'), alt = $('.dl-alt');
     if (dmain && alt) { dmain.hidden = true; alt.hidden = false; }
@@ -436,6 +442,29 @@
   }
 
   // ---- Forms --------------------------------------------------------------
+  // ---- Partner code redemption: same license script and parameters as the previous site
+  $$('form[data-redeem]').forEach(function (f) {
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if ($('.hp input', f) && $('.hp input', f).value) return; // bot
+      var out = $('.redeem-result', f), msg = $('.form-msg', f), btn = $('button[type=submit]', f);
+      var q = ['code', 'email', 'first', 'last'].map(function (k) { return k + '=' + encodeURIComponent(f.elements[k].value.trim()); }).join('&');
+      msg.className = 'form-msg'; msg.textContent = '';
+      out.hidden = false; out.className = 'redeem-result';
+      out.textContent = 'Checking your ' + f.getAttribute('data-partner') + ' code\u2026';
+      if (btn) btn.disabled = true;
+      fetch(f.getAttribute('data-redeem') + '?' + q)
+        .then(function (r) { if (!r.ok) throw 0; return r.text(); })
+        .then(function (html) { out.innerHTML = html; }) // HTML from our own license script, shown as on the previous site
+        .catch(function () {
+          out.hidden = true;
+          msg.className = 'form-msg err';
+          msg.textContent = 'We couldn\u2019t check your code right now. Please try again, or email ' + CFG.support + ' with your code.';
+        })
+        .then(function () { if (btn) btn.disabled = false; });
+    });
+  });
+
   $$('form[data-form]').forEach(function (f) {
     f.addEventListener('submit', function (e) {
       e.preventDefault();
