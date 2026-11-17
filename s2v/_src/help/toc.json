@@ -1,0 +1,159 @@
+[
+ {
+  "title": "Overview",
+  "file": "overview.htm",
+  "pages": []
+ },
+ {
+  "title": "Getting Started",
+  "file": "getting_started.htm",
+  "pages": [
+   {
+    "title": "System Requirements",
+    "file": "system_requirements.htm"
+   },
+   {
+    "title": "Installing",
+    "file": "installing.htm"
+   },
+   {
+    "title": "User interface",
+    "file": "user_interface.htm"
+   },
+   {
+    "title": "Trial mode",
+    "file": "trial_mode.htm"
+   },
+   {
+    "title": "Activating your license",
+    "file": "activate.htm"
+   }
+  ]
+ },
+ {
+  "title": "Creating a new project",
+  "file": "creating_a_new_project.htm",
+  "pages": [
+   {
+    "title": "Blank project",
+    "file": "blank_project.htm"
+   },
+   {
+    "title": "Screen recording project",
+    "file": "screen_recording_project.htm"
+   },
+   {
+    "title": "Webcam recording project",
+    "file": "webcam_recording_project.htm"
+   }
+  ]
+ },
+ {
+  "title": "Recording media",
+  "file": "recording_media.htm",
+  "pages": [
+   {
+    "title": "Screen",
+    "file": "record_screen.htm"
+   },
+   {
+    "title": "Webcam",
+    "file": "record_webcam.htm"
+   },
+   {
+    "title": "Voice over narration",
+    "file": "record_voice_narration.htm"
+   },
+   {
+    "title": "System sound",
+    "file": "record_system_sound.htm"
+   }
+  ]
+ },
+ {
+  "title": "Editing a project",
+  "file": "editing_a_project.htm",
+  "pages": [
+   {
+    "title": "Configuring project properties",
+    "file": "configuring_project_properties.htm"
+   },
+   {
+    "title": "Editing a project on the Canvas",
+    "file": "editing_your_project_on_the_canvas.htm"
+   },
+   {
+    "title": "Editing a project on the Timeline",
+    "file": "editing_your_project_on_the_timeline.htm"
+   }
+  ]
+ },
+ {
+  "title": "Configuring object properties",
+  "file": "configuring_object_properties.htm",
+  "pages": [
+   {
+    "title": "Screen recording",
+    "file": "screen_recording.htm"
+   },
+   {
+    "title": "Image",
+    "file": "image.htm"
+   },
+   {
+    "title": "Video",
+    "file": "video.htm"
+   },
+   {
+    "title": "Audio",
+    "file": "audio.htm"
+   },
+   {
+    "title": "Shape",
+    "file": "shape.htm"
+   },
+   {
+    "title": "Text",
+    "file": "text.htm"
+   },
+   {
+    "title": "Sketch animation",
+    "file": "sketch_animation.htm"
+   },
+   {
+    "title": "Video effect",
+    "file": "video_effect.htm"
+   },
+   {
+    "title": "Zoom area",
+    "file": "zoom_area.htm"
+   },
+   {
+    "title": "Video transition",
+    "file": "video_transition.htm"
+   },
+   {
+    "title": "Text-to-speech",
+    "file": "text_to_speech.htm"
+   },
+   {
+    "title": "Voice over narration",
+    "file": "voice_recorder.htm"
+   }
+  ]
+ },
+ {
+  "title": "Exporting your project",
+  "file": "exporting_your_project.htm",
+  "pages": [
+   {
+    "title": "Exporting your video",
+    "file": "exporting_your_video.htm"
+   },
+   {
+    "title": "Exporting a frame",
+    "file": "exporting_frame.htm"
+   }
+  ]
+ }
+]

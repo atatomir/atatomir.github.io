@@ -124,9 +124,9 @@ HELP_TOPICS = [
     ("book", "Getting Started", "getting_started.htm"),
     ("folder", "Creating a new project", "creating_a_new_project.htm"),
     ("webcam", "Recording media", "recording_media.htm"),
-    ("film", "Editing a project", "configuring_project_properties.htm"),
+    ("film", "Editing a project", "editing_a_project.htm"),
     ("inspector", "Configuring object properties", "configuring_object_properties.htm"),
-    ("export", "Exporting your video", "exporting_your_project.htm"),
+    ("export", "Exporting your project", "exporting_your_project.htm"),
 ]
 
 SPECS = [
@@ -494,6 +494,56 @@ FAQ = [
 ]
 
 
+def minify_css(css):
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    css = re.sub(r"\s+", " ", css)
+    css = re.sub(r"\s*([{};,>])\s*", r"\1", css)
+    css = re.sub(r":\s+", ":", css)
+    return css.replace(";}", "}").strip()
+
+
+def build_assets():
+    import hashlib
+    src = (ROOT / "assets/css/site.css").read_text()
+    (ROOT / "assets/css/site.min.css").write_text(minify_css(src))
+    h = lambda f: hashlib.sha1((ROOT / f).read_bytes()).hexdigest()[:8]
+    return {"css": h("assets/css/site.min.css"), "js": h("assets/js/site.js"), "svg": h("assets/icons.svg")}
+
+
+ASSET_V = build_assets()
+
+
+# AppSumo reviews \u2014 copied verbatim from
+# https://appsumo.com/products/marketplace-screentovideo/ (update RATING_AS_OF when refreshing).
+# "\u2026" marks text left out of a longer review; nothing else is changed.
+APPSUMO_PRODUCT = "https://appsumo.com/products/marketplace-screentovideo/"
+RATING, RATING_AS_OF = "4.7", "November 2026"
+HOME_REVIEWS = 12  # carousel cap; shows 3/2/1 at a time by screen width and loops around
+REVIEWS = [
+    ("Michael G.", "September 2026", "From purchase to ready in under five minutes",
+     "In that short window, I completed the purchase, installed it, launched it, and understood enough of the interface to begin using it. \u2026 ScreenToVideo got me from zero to ready in under five minutes. That is an impressive first experience.",
+     "reviews/from-purchase-to-ready-in-under-five-min-393622/"),
+    ("faydra_deon", "February 2024", "Yes, they offer the remove silence feature!",
+     "I purchased this application back in April 2021, and I literally (no exaggeration) use it daily. \u2026 Thanks for adding the feature. Now I don\u2019t have to switch to another tool for my editing!",
+     "reviews/yes-they-offer-the-remove-silence-featu-288746/"),
+    ("info7895", "October 2025", "Fantastic recording tool with advanced and easy to use features",
+     "This tool has value-to-price ratio perfectly balanced. It provides everything you need for tutorials and talking head videos in an easy-to-use platform. Their tutorials are fantastic and easy to understand. I am so happy to have found this gem on App Sumo. I have other screen recorders, but this one is the best because of its built in editing features.",
+     "reviews/fantastic-recording-tool-with-advanced-a-364878/"),
+    ("Natasha W.", "April 2026", "Super easy to use",
+     "I bought this software because I needed a way to record Zoom calls for workshops. It\u2019s so easy to use, and I see that it also has video editing capability. I haven\u2019t used all the functions yet, but it took me a couple of minutes to set it up and learn how to use it, so I\u2019m sure that this one is a keeper!",
+     "reviews/super-easy-to-use-380974/"),
+    ("Kira H.", "July 2025", "Easy Peasy Lemon Squeezy",
+     "No more OBS Studio for desktop screen recording! Easy to download and use, with quick editing of screen to capture, crop and get creating.",
+     "reviews/easy-peasy-lemon-squeezy-356040/"),
+    ("gramir", "August 2025", "Great product",
+     "It is my goto tool to record and edit videos as it is easy to handle, has a lot of powerful features and is updated on a regular basis.",
+     "reviews/great-product-358555/"),
+    ("StratosTutorials", "December 2021", "Great Deal and does what it says",
+     "It is a stable product that works as expected and does exactly what you are saying. Also love that you are offering one licenses from unlimited personal installation, so I can install it in my 2 computers I have. \u2026 These features would improve the software and add more value to an already great product.",
+     "reviews/great-deal-and-does-what-it-says-172001/"),
+]
+
+
 # --------------------------------------------------------------------------
 # Template helpers
 # --------------------------------------------------------------------------
@@ -507,7 +557,7 @@ class Page:
 
 
 def icon(p, name, cls="i"):
-    return f'<svg class="{cls}" aria-hidden="true"><use href="{p.u("assets/icons.svg")}#{name}"/></svg>'
+    return f'<svg class="{cls}" aria-hidden="true"><use href="{p.u("assets/icons.svg")}?v={ASSET_V["svg"]}#{name}"/></svg>'
 
 
 LOGO = ('<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13.6" fill="none" '
@@ -517,8 +567,8 @@ LOGO = ('<svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><circle c
 NAV = [("", "Home"), ("features/", "Features"), ("how-to/", "How-To"), ("support/", "Support"), ("buy/", "Pricing")]
 
 
-def layout(p, *, title, desc, content, active=None, page="", track=None, robots=None, extra_body="", nochat=False):
-    canon = f"{SITE}/{p.slug + '/' if p.slug else ''}"
+def layout(p, *, title, desc, content, active=None, page="", track=None, robots=None, extra_body="", nochat=False, canon=None):
+    canon = canon or f"{SITE}/{p.slug + '/' if p.slug else ''}"
     nav = "".join(
         f'<a href="{p.u(h) if h else (p.r or "./")}"{" aria-current=page" if active == h else ""}>{t}</a>' for h, t in NAV)
     attrs = f' data-page="{page}"' + (f' data-track="{track}"' if track else "") + (" data-nochat" if nochat else "")
@@ -541,9 +591,9 @@ def layout(p, *, title, desc, content, active=None, page="", track=None, robots=
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{p.u('favicon.svg')}" type="image/svg+xml">
 <link rel="icon" href="{p.u('favicon.png')}" sizes="32x32">
-<link rel="stylesheet" href="{p.u('assets/css/site.css')}">
+<link rel="stylesheet" href="{p.u('assets/css/site.min.css')}?v={ASSET_V['css']}">
 <script>document.documentElement.classList.add('js')</script>
-<script src="{p.u('assets/js/site.js')}" defer></script>
+<script src="{p.u('assets/js/site.js')}?v={ASSET_V['js']}" defer></script>
 <script type="speculationrules">{{"prefetch":[{{"where":{{"and":[{{"href_matches":"/*"}},{{"not":{{"href_matches":"/*.exe"}}}},{{"not":{{"selector_matches":"[target],[download]"}}}}]}},"eagerness":"moderate"}}]}}</script>
 </head>
 <body{attrs}>
@@ -553,7 +603,7 @@ def layout(p, *, title, desc, content, active=None, page="", track=None, robots=
     <a class="logo" href="{p.r or './'}" aria-label="ScreenToVideo home">{LOGO}</a>
     <nav class="nav" aria-label="Main">{nav}<a class="btn btn-primary" href="{p.u('download/')}">{icon(p, 'download')}Download Free Trial</a></nav>
     <a class="btn btn-primary btn-sm" href="{p.u('download/')}">{icon(p, 'download')}Download</a>
-    <button class="menu-btn" aria-label="Menu" aria-expanded="false" data-icons="{p.u('assets/icons.svg')}">{icon(p, 'menu')}</button>
+    <button class="menu-btn" aria-label="Menu" aria-expanded="false" data-icons="{p.u('assets/icons.svg')}?v={ASSET_V['svg']}">{icon(p, 'menu')}</button>
   </div>
 </header>
 <main id="main">
@@ -561,6 +611,7 @@ def layout(p, *, title, desc, content, active=None, page="", track=None, robots=
 </main>
 {footer(p)}
 {extra_body}
+<button class="totop" type="button" aria-label="Back to top">{icon(p, 'arrow', 'i up')}</button>
 <div class="consent" role="dialog" aria-label="Cookies">
   <p>We use cookies to improve your experience and measure our ads. See our <a href="{p.u('privacy-policy/')}">Privacy Policy</a>.</p>
   <div class="btns"><button class="btn btn-ghost btn-sm" data-consent="no">Decline</button><button class="btn btn-teal btn-sm" data-consent="yes">Accept</button></div>
@@ -586,7 +637,7 @@ def footer(p):
         </div>
       </div>
       {col('Product', [(p.u('features/'), 'Features'), (p.u('how-to/'), 'How-To'), (p.u('buy/'), 'Pricing'), (p.u('download/'), 'Download'), (p.u('changelog/'), 'Changelog')])}
-      {col('Help', [(p.u('support/'), 'Support'), (p.u('system-requirements/'), 'System Requirements'), (p.u('troubleshooting/'), 'Troubleshooting'), (p.u('contact/'), 'Contact')])}
+      {col('Help', [(p.u('support/'), 'Support'), (p.u('help/'), 'Help Center'), (p.u('system-requirements/'), 'System Requirements'), (p.u('troubleshooting/'), 'Troubleshooting'), (p.u('contact/'), 'Contact')])}
       {col('Legal', [(p.u('website-terms-and-conditions-of-use/'), 'Terms of Use'), (p.u('privacy-policy/'), 'Privacy Policy'), (p.u('eula/'), 'License Agreement')])}
     </div>
     <div class="ftr-bot">
@@ -680,7 +731,7 @@ def home():
 <section class="hero center">
   <div class="glow"></div><div class="grid-bg"></div>
   <div class="wrap">
-    <a class="pill rv" href="{p.u('changelog/')}"><b>New</b>Version {VERSION} — AI background blur &amp; more{icon(p, 'arrow')}</a>
+    <a class="pill rv" href="{p.u('changelog/')}"><b>New</b>Version {VERSION}<span class="hide-sm">&nbsp;— AI background blur &amp; more</span>{icon(p, 'arrow')}</a>
     <h1 class="rv" style="--rd:.05s">Create Video Tutorials <span class="typed-line">with <span class="typed" data-words="{e(words)}">{TYPED[0]}</span><span class="caret" aria-hidden="true"></span></span></h1>
     <p class="lead rv" style="--rd:.1s">The most customizable Screen Recorder and Video Editor designed to create impressive presentations from scratch.</p>
     <div class="btns rv" style="--rd:.15s">
@@ -690,8 +741,9 @@ def home():
     <p class="note rv" style="--rd:.2s">{icon(p, 'check')}Fully featured 15-day free trial. ScreenToVideo requires Microsoft Windows 7 or newer.</p>
     <div class="shot rv" style="--rd:.25s">
       <div class="shot-media">
-        <img src="assets/img/hero-editor.webp" width="1280" height="720" alt="The ScreenToVideo editor with a text annotation on the canvas and the timeline below" fetchpriority="high">
-        <button class="play" data-video="{MEDIA}home_editor_2.mp4" data-title="ScreenToVideo Editor" aria-label="Play the editor overview video"><span class="play-btn">{icon(p, 'play')}</span></button>
+        <img src="assets/img/hero-editor.webp" width="1280" height="720" alt="The ScreenToVideo editor: adding a text balloon to a project, with the properties panel and timeline" fetchpriority="high">
+        <video class="loop" data-src="assets/video/hero-loop.mp4" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+        <button class="watch" data-video="{MEDIA}home_editor_2.mp4" data-title="ScreenToVideo Editor"><span>{icon(p, 'play')}</span>Watch overview</button>
       </div>
     </div>
     <div class="strip rv">
@@ -704,11 +756,6 @@ def home():
 </section>
 
 <section class="sec"><div class="wrap">
-  <div class="head center rv"><div class="eyebrow">Everything in one app</div><h2>Powerful Screen Recorder <span class="grad">and Video Editor</span></h2></div>
-  <div class="bento">{bento}</div>
-</div></section>
-
-<section class="sec" style="padding-top:0"><div class="wrap">
   <div class="split">
     <div class="split-media rv">
       <img src="assets/img/home-recorder.webp" width="960" height="540" alt="ScreenToVideo screen recorder quick setup window" loading="lazy" decoding="async">
@@ -738,6 +785,12 @@ def home():
   </div>
 </div></section>
 
+{reviews(p)}
+<section class="sec"><div class="wrap">
+  <div class="head center rv"><div class="eyebrow">Everything in one app</div><h2>Powerful <span class="grad">Screen Recorder and Video Editor</span></h2></div>
+  <div class="bento">{bento}</div>
+</div></section>
+
 {audience(p)}
 {pricing_band(p)}
 {faq(p)}
@@ -747,6 +800,52 @@ def home():
     return write("", layout(p, title="Powerful Screen Recorder and Video Editor - Free Trial",
                             desc="Create interactive tutorials by adding text, shapes, zoom effects, sounds, images, animations, and so much more to your screen recording.",
                             content=content, active="", page="home", track="home", extra_body=modal(p)))
+
+
+def stars(p, n=5):
+    return '<span class="stars" aria-hidden="true">' + "".join(icon(p, "star") for _ in range(n)) + "</span>"
+
+
+def rating_stars(p):
+    # Gold stars clipped to the exact rating (4.7 -> four full stars + 70% of the fifth) over dim ones.
+    # Star 17px, gap 2px (see .stars in site.css).
+    r = float(RATING)
+    full = int(r)
+    px = full * 19 + (r - full) * 17
+    return (f'<span class="stars-rate" role="img" aria-label="{RATING} out of 5 stars">'
+            f'<span class="stars stars-off" aria-hidden="true">{"".join(icon(p, "star") for _ in range(5))}</span>'
+            f'<span class="stars stars-on" aria-hidden="true" style="width:{px:.1f}px">{"".join(icon(p, "star") for _ in range(5))}</span></span>')
+
+
+def reviews(p):
+    cards = "".join(
+        f'''<figure class="rvw" role="group" aria-roledescription="review" aria-label="{i + 1} of {min(HOME_REVIEWS, len(REVIEWS))}">
+  <div class="rev-top">{stars(p)}<span class="sr">5 out of 5 stars</span></div>
+  <h3>{e(t)}</h3>
+  <blockquote><p>\u201c{e(q)}\u201d</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">{e(n[0].upper())}</span><span class="rev-date">{d} \u00b7 AppSumo</span>
+  <a class="rev-link" href="{APPSUMO_PRODUCT}{u}" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo">{icon(p, "external")}</a></figcaption>
+</figure>''' for i, (n, d, t, q, u) in enumerate(REVIEWS[:HOME_REVIEWS]))
+    return f'''<section class="sec"><div class="wrap">
+  <div class="rev-head rv">
+    <div>
+      <div class="eyebrow">Customer reviews</div>
+      <h2>Loved by creators on <span class="grad">AppSumo</span></h2>
+    </div>
+    <a class="score" href="{APPSUMO_PRODUCT}#reviews" target="_blank" rel="noopener">
+      <b>{RATING}</b>
+      <span>{rating_stars(p)}<small>on AppSumo</small></span>
+    </a>
+  </div>
+  <div class="revs rv" tabindex="0" aria-label="Customer reviews" aria-roledescription="carousel">{cards}</div>
+  <div class="rev-nav rv">
+    <a class="btn btn-ghost" href="{APPSUMO_PRODUCT}#reviews" target="_blank" rel="noopener">Read more reviews on AppSumo{icon(p, "external")}</a>
+    <div class="rev-ctl">
+      <button type="button" class="rev-btn rev-prev" aria-label="Previous reviews">{icon(p, "arrow", "i back")}</button>
+      <button type="button" class="rev-btn rev-next" aria-label="Next reviews">{icon(p, "arrow")}</button>
+    </div>
+  </div>
+</div></section>'''
 
 
 def pricing_band(p):
@@ -766,12 +865,37 @@ def pricing_band(p):
 </div></section>"""
 
 
-def faq(p):
-    items = "".join(f'<details class="qa rv"><summary>{e(q)}<span class="pm" aria-hidden="true"></span></summary><p>{e(a)}</p></details>' for q, a in FAQ)
+def faq(p, keys=None, title="Questions, answered"):
+    sel = [f for i, f in enumerate(FAQ) if keys is None or i in keys]
+    items = "".join(f'<details class="qa rv"><summary>{e(q)}<span class="pm" aria-hidden="true"></span></summary><p>{e(a)}</p></details>' for q, a in sel)
     return f"""<section class="sec"><div class="wrap">
   <div class="faq">
-    <div class="rv"><div class="eyebrow">FAQ</div><h2>Questions, answered</h2><p class="muted">Can\u2019t find what you\u2019re looking for? <a href="{p.u('contact/')}">Contact us</a> \u2014 we reply within 24 hours.</p></div>
+    <div class="rv"><div class="eyebrow">FAQ</div><h2>{title}</h2><p class="muted">Can\u2019t find what you\u2019re looking for? <a href="{p.u('contact/')}">Contact us</a> \u2014 we reply within 24 hours.</p></div>
     <div class="qas">{items}</div>
+  </div>
+</div></section>"""
+
+
+COMPARE = [
+    ("All recording and editing features", True, True),
+    ("Export to MP4, WMV, GIF, WebP & HTML player", True, True),
+    ("Upload and share via Google Drive", True, True),
+    ("Videos without watermark", False, True),
+    ("Use beyond 15 days", False, True),
+    ("Free lifetime upgrades and support", False, True),
+]
+
+
+def compare(p):
+    yes = icon(p, "check")
+    dash = "\u2014"
+    rows = "".join(f'<div class="cmp-row"><span>{t}</span><span class="{"y" if a else "n"}">{yes if a else dash}</span><span class="y">{yes if b else dash}</span></div>' for t, a, b in COMPARE)
+    return f"""<section class="sec-sm"><div class="wrap narrow">
+  <div class="head center rv"><div class="eyebrow">Trial vs. full version</div><h2>Try everything first</h2><p class="lead">The free trial includes every feature. Projects you make with it stay fully usable after you register.</p></div>
+  <div class="cmp rv">
+    <div class="cmp-row cmp-head"><span></span><span>Free trial</span><span>Full license</span></div>
+    {rows}
+    <div class="cmp-row cmp-foot"><span></span><span><a class="btn btn-ghost btn-sm" href="{p.u('download/')}">Download</a></span><span><a class="btn btn-primary btn-sm" href="#pricing-top">Buy now</a></span></div>
   </div>
 </div></section>"""
 
@@ -834,7 +958,7 @@ def tut_cards(p, keys=None):
         f'<button class="card tut rv" style="--rd:{(i % 2) * .06}s" data-video="{MEDIA}tutorial_{k}_2.mp4" data-title="{e(t)}">'
         f'<span class="thumb"><img src="{p.u(f"assets/img/tut-{k}.webp")}" width="640" height="360" alt="" loading="lazy" decoding="async">'
         f'<span class="play play-sm" aria-hidden="true"><span class="play-btn">{icon(p, "play")}</span></span></span>'
-        f'<span class="body"><span class="step">TUTORIAL {i + 1:02d}</span><h3>{t}</h3><p>{d}</p></span></button>'
+        f'<span class="body"><h3>{t}</h3><p>{d}</p></span></button>'
         for i, (k, t, d) in enumerate(items))
 
 
@@ -861,7 +985,7 @@ def install():
 def support():
     p = Page("support")
     cards = "".join(
-        f'<a class="card card-spot ftile rv" style="--rd:{(i % 3) * .05}s" href="{HELP}{f}" target="_blank" rel="noopener"><span class="ic-box{" c" if i % 2 else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>Read the step-by-step guide in our online help system.</p><span class="demo">{icon(p, "arrow")}Read more</span></a>'
+        f'<a class="card card-spot ftile rv" style="--rd:{(i % 3) * .05}s" href="{p.u('help/' + f)}"><span class="ic-box{" c" if i % 2 else ""}">{icon(p, ic)}</span><h3>{t}</h3><p>Read the step-by-step guide in our help center.</p><span class="demo">{icon(p, "arrow")}Read more</span></a>'
         for i, (ic, t, f) in enumerate(HELP_TOPICS))
     content = page_hero(p, "Support", "Welcome to the ScreenToVideo <span class=\"grad\">support page</span>",
                         "If you would like to know more about how to use our program, feel free to take a look at our online help system below.")
@@ -912,11 +1036,13 @@ def buy():
       <p>Use coupon code <code id="couponcode" data-copy title="Click to copy">SV50OFF</code> at checkout to get <em>50% OFF!</em></p>
       <a class="btn btn-primary" id="btncode" href="{STORE.format(id=57852)}&coupon-code-to-add=SV50OFF"><span>Buy Now ($59.50)</span>{icon(p, 'arrow')}</a>
     </div>
-    <a class="sumo rv" href="{APPSUMO}" target="_blank" rel="sponsored noopener"><b>AppSumo</b> Record, edit, and share videos <span>Get the deal</span>{icon(p, 'external')}</a>
+    <a class="sumo rv" href="{APPSUMO}" target="_blank" rel="sponsored noopener"><b>AppSumo</b><em class="sumo-rate">{icon(p, 'star')}{RATING}</em> Record, edit, and share videos <span>Get the deal</span>{icon(p, 'external')}</a>
   </div>
-  <div class="plans">{plans}</div>
+  <div class="plans" id="pricing-top">{plans}</div>
   <div class="grid g3 infos" style="margin-top:clamp(56px,8vw,96px)">{info}</div>
 </div></section>
+{compare(p)}
+{faq(p, [1, 2, 5, 6, 7], "Buying questions")}
 {cta(p, "Not sure yet? Try it free for 15 days.", "All features are available in the trial — your projects stay fully usable after you register.", (p.u('features/'), 'See All Features'))}"""
     return write("buy", layout(p, title="ScreenToVideo - Pricing",
                                desc="Create interactive videos by adding texts, shapes, zoom effects, sounds, images and animations to your screen recording. This screen recorder can be used for creating video tutorials and other educational and training purposes.",
@@ -935,6 +1061,17 @@ def download():
       <div class="spinner">{icon(p, 'download')}</div>
       <div><h2 id="dlstate">Downloading, please wait…</h2><p>If your download has not started automatically, please <a href="{INSTALLER}">click here</a>.</p></div>
     </div>
+    <div class="dl dl-alt" hidden style="margin-top:36px;text-align:left">
+      <div class="spinner" style="background:rgba(31,191,174,.14)">{icon(p, 'windows')}</div>
+      <div>
+        <h2>ScreenToVideo is a Windows app</h2>
+        <p>It looks like you\u2019re not on a Windows PC. Download it here, or copy the link and open it on your Windows PC.</p>
+        <div class="btns" style="margin-top:16px">
+          <a class="btn btn-primary btn-sm" href="{INSTALLER}">{icon(p, 'download')}Download</a>
+          <button class="btn btn-ghost btn-sm" type="button" data-copylink="{SITE}/download/">{icon(p, 'copy')}<span>Copy link</span></button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 <section class="sec-sm" style="padding-top:0"><div class="wrap">
@@ -942,7 +1079,7 @@ def download():
     <article class="card rv"><span class="ic-box c">{icon(p, 'clock')}</span><h3>15-day Free Trial Version</h3><p>All of ScreenToVideo’s features are available, but your exported videos are watermarked.</p><p style="margin-top:10px">The projects that you have made with a trial version of ScreenToVideo will be fully usable with a registered version.</p></article>
     <article class="card rv" style="--rd:.05s"><span class="ic-box">{icon(p, 'download')}</span><h3>Install ScreenToVideo</h3><ol class="steps" style="margin-top:14px"><li>When prompted, save the file to a convenient location on your computer.</li><li>Open the file, then the setup program will guide you through the rest of the process.</li></ol></article>
     <article class="card rv"><span class="ic-box">{icon(p, 'close')}</span><h3>Uninstall ScreenToVideo</h3><ol class="steps" style="margin-top:14px"><li>Ensure ScreenToVideo and its help window are closed.</li><li>Click on the Windows Start button.</li><li>Select Control Panel (or Settings → Apps on Windows 10/11).</li><li>Double click on Add or Remove Programs (Programs and Features).</li><li>Select ScreenToVideo, click on the Remove button, and click Yes.</li></ol></article>
-    <article class="card rv" style="--rd:.05s"><span class="ic-box c">{icon(p, 'book')}</span><h3>Help file</h3><p>If you would like to know more about how to use our program, feel free to take a look at our <a href="{p.u('how-to/')}">how-to guide</a> or <a href="{HELP}getting_started.htm" target="_blank" rel="noopener">help file</a>.</p><p style="margin-top:10px">Check the <a href="{p.u('system-requirements/')}">system requirements</a> or the <a href="{p.u('troubleshooting/')}">troubleshooting page</a> if anything doesn’t work as expected.</p></article>
+    <article class="card rv" style="--rd:.05s"><span class="ic-box c">{icon(p, 'book')}</span><h3>Help file</h3><p>If you would like to know more about how to use our program, feel free to take a look at our <a href="{p.u('how-to/')}">how-to guide</a> or <a href="{p.u('help/')}">help center</a>.</p><p style="margin-top:10px">Check the <a href="{p.u('system-requirements/')}">system requirements</a> or the <a href="{p.u('troubleshooting/')}">troubleshooting page</a> if anything doesn’t work as expected.</p></article>
   </div>
 </div></section>"""
     return write("download", layout(p, title="ScreenToVideo - download",
@@ -959,28 +1096,34 @@ def classify(item):
     return "new", "New"
 
 
+def changelog_blocks():
+    return [b.strip().splitlines() for b in CHANGELOG.strip().split("\n\n")]
+
+
 def changelog():
     p = Page("changelog")
-    blocks = [b.strip().splitlines() for b in CHANGELOG.strip().split("\n\n")]
-    out, year = "", None
+    blocks = changelog_blocks()
+    out, year, years, counts = "", None, [], {"new": 0, "imp": 0, "fix": 0}
     for idx, b in enumerate(blocks):
         date, ver = [x.strip() for x in b[0].split("|")]
         y = date[-4:]
         if y != year:
-            out += f'<div class="cl-year rv" aria-hidden="true">{y}</div>'
+            out += ("</section>" if year else "") + f'<section class="cl-ysec" id="y{y}"><div class="cl-year rv" aria-hidden="true">{y}</div>'
             year = y
+            years.append(y)
         items, beta = "", ""
         for it in b[1:]:
             if it == "!BETA":
-                beta = (f'<div class="callout"><svg class="i" aria-hidden="true"><use href="{p.u("assets/icons.svg")}#download"/></svg><div>'
+                beta = (f'<div class="callout">{icon(p, "download")}<div>'
                         f'<p>To benefit from the latest improvements and bug fixes, we suggest that you replace the current with the beta version from the following link:</p>'
                         f'<p><a href="{SITE}/beta/svsetup32b2.exe">{SITE}/beta/svsetup32b2.exe</a></p>'
                         f'<p class="muted">After reinstalling ScreenToVideo, you will lose the project history, but not the projects themselves.</p></div></div>')
                 continue
             cls, lbl = classify(it)
+            counts[cls] += 1
             txt = re.sub(r"^(added |bug fixed: )", "", it)
             txt = txt[0].upper() + txt[1:] if not txt.startswith("<") else txt
-            items += f'<li><span class="tagl t-{cls}">{lbl}</span><span>{txt}</span></li>'
+            items += f'<li data-k="{cls}"><span class="tagl t-{cls}">{lbl}</span><span>{txt}</span></li>'
         slug = re.sub(r"[^a-z0-9]+", "-", ver.lower()).strip("-")
         out += f"""<article class="cl-item{' latest' if idx == 0 else ''} rv" id="v{slug}">
   <div class="cl-meta"><time>{date}</time><span class="cl-ver">v{ver}</span></div>
@@ -989,7 +1132,15 @@ def changelog():
 </article>"""
     content = page_hero(p, "Changelog", "What’s <span class=\"grad\">new</span>",
                         f"Every ScreenToVideo release since 2019. Your license includes all of them — free lifetime upgrades.")
-    content += f'<section class="sec-sm" style="padding-top:0"><div class="wrap narrow"><div class="cl">{out}</div></div></section>'
+    out += "</section>"
+    total = sum(counts.values())
+    chips = "".join(
+        f'<button type="button" class="clf{" on" if k == "all" else ""}" data-k="{k}" aria-pressed="{"true" if k == "all" else "false"}">{lbl} <span>{n}</span></button>'
+        for k, lbl, n in [("all", "All", total), ("new", "New", counts["new"]), ("imp", "Improved", counts["imp"]), ("fix", "Fixed", counts["fix"])])
+    yl = "".join(f'<a href="#y{y}">{y}</a>' for y in years)
+    content += (f'<nav class="subnav" aria-label="Changelog years and filters"><div class="wrap"><div class="subnav-links">{yl}</div>'
+                f'<div class="clfs" role="group" aria-label="Filter changes">{chips}</div></div></nav>')
+    content += f'<section class="sec-sm"><div class="wrap narrow"><p class="cl-sum muted">{len(blocks)} releases \u00b7 {total} changes since July 2019</p><div class="cl">{out}</div></div></section>'
     return write("changelog", layout(p, title="ScreenToVideo - changelog",
                                      desc="Create amazing videos by adding texts, shapes, zoom effects, sounds and images to your screen recording. The program can be used for creating video tutorials and other educational and training purposes",
                                      content=content, page="changelog", track="changelog", extra_body=modal(p)))
@@ -1228,15 +1379,144 @@ def extras():
     pages = ["", "features/", "how-to/", "support/", "buy/", "download/", "changelog/", "contact/", "system-requirements/",
              "troubleshooting/", "eula/", "privacy-policy/", "website-terms-and-conditions-of-use/"]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
-        f"  <url><loc>{SITE}/{x}</loc></url>\n" for x in pages) + "</urlset>\n"
+        f"  <url><loc>{SITE}/{x}</loc></url>\n" for x in pages + ["help/"] + ["help/" + pg["file"] for sec in help_toc() for pg in [sec] + sec["pages"]]) + "</urlset>\n"
     (ROOT / "sitemap.xml").write_text(sm)
     (ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
+
+
+
+# --------------------------------------------------------------------------
+# Help center: /help/*.htm (same URLs as the old HelpNDoc help, so links from the app keep working).
+# Articles are clean HTML fragments in _src/help/ (first imported by _src/import_help.py), images in /help/images/.
+# --------------------------------------------------------------------------
+HELP_DIR = ROOT / "_src/help"
+HELP_ICONS = {f: ic for ic, _, f in HELP_TOPICS}
+
+
+def help_toc():
+    return [sec for sec in json.loads((HELP_DIR / "toc.json").read_text()) if sec["file"] != "overview.htm"]
+
+
+def help_body(f):
+    return (HELP_DIR / f.replace(".htm", ".html")).read_text()
+
+
+def help_text(html):
+    t = re.sub(r"<summary>.*?</summary>", " ", html)
+    t = re.sub(r"<[^>]+>", " ", t)
+    return re.sub(r"\s+", " ", t.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")).strip()
+
+
+def help_search(p, big=False):
+    return (f'<div class="hc-search{" hc-search-lg" if big else ""}" data-index="search.json">'
+            f'{icon(p, "zoom")}<input type="search" placeholder="Search the help center" aria-label="Search the help center" autocomplete="off">'
+            f'<div class="hc-res" role="listbox" hidden></div></div>')
+
+
+def help_nav(p, toc, cur):
+    out = ""
+    for sec in toc:
+        here = cur == sec["file"] or any(pg["file"] == cur for pg in sec["pages"])
+        cur_a = lambda f: ' aria-current="page"' if f == cur else ""
+        sub = "".join(f'<li><a href="{pg["file"]}"{cur_a(pg["file"])}>{e(pg["title"])}</a></li>' for pg in sec["pages"])
+        out += (f'<li class="hc-sec{" on" if here else ""}"><a href="{sec["file"]}"{cur_a(sec["file"])}>{icon(p, HELP_ICONS.get(sec["file"], "book"))}'
+                f'<span>{e(sec["title"])}</span></a>{f"<ul>{sub}</ul>" if sub else ""}</li>')
+    return (f'<nav class="hc-nav" aria-label="Help contents"><details class="hc-navd" open><summary>{icon(p, "menu")}Contents</summary>'
+            f'<ul>{out}</ul></details></nav>')
+
+
+def help_contact(p):
+    return f"""<div class="hc-contact">
+  <span class="ic-box c">{icon(p, 'chat')}</span>
+  <div><h3>Still need help?</h3><p>Email us at <a href="mailto:{SUPPORT}">{SUPPORT}</a> and we’ll get back to you within 24 hours.</p></div>
+  <a class="btn btn-ghost btn-sm" href="{p.u('contact/')}">Contact support{icon(p, 'arrow')}</a>
+</div>"""
+
+
+def help_home(p, toc, f):
+    cards = ""
+    for i, sec in enumerate(toc):
+        links = "".join(f'<li><a href="{pg["file"]}">{e(pg["title"])}</a></li>' for pg in sec["pages"])
+        cards += (f'<article class="card hc-card rv" style="--rd:{(i % 3) * .05}s"><a class="hc-card-h" href="{sec["file"]}">'
+                  f'<span class="ic-box{" c" if i % 2 else ""}">{icon(p, HELP_ICONS.get(sec["file"], "book"))}</span><h2>{e(sec["title"])}</h2></a>'
+                  f'<ul>{links}</ul></article>')
+    content = f"""<section class="phero center hc-hero"><div class="glow"></div><div class="wrap">
+  <div class="eyebrow rv">Help Center</div>
+  <h1 class="rv" style="--rd:.05s">How can we <span class="grad">help?</span></h1>
+  <p class="lead rv" style="--rd:.1s">Step-by-step guides for recording, editing and exporting with ScreenToVideo.</p>
+  <div class="rv" style="--rd:.15s">{help_search(p, big=True)}</div>
+</div></section>
+<section class="sec-sm" style="padding-top:0"><div class="wrap">
+  <div class="grid g3 hc-cards">{cards}</div>
+  <div class="grid g3" style="margin-top:16px">
+    <a class="card card-spot rv" href="{p.u('how-to/')}"><span class="ic-box">{icon(p, 'play')}</span><h3>Video tutorials</h3><p>Watch short tutorials on recording, editing, adding text-to-speech, and exporting your project.</p></a>
+    <a class="card card-spot rv" style="--rd:.05s" href="{p.u('troubleshooting/')}"><span class="ic-box c">{icon(p, 'wrench')}</span><h3>Troubleshooting</h3><p>Install the Windows components required for recording and playback.</p></a>
+    <a class="card card-spot rv" style="--rd:.1s" href="mailto:{SUPPORT}"><span class="ic-box">{icon(p, 'mail')}</span><h3>Email support</h3><p>Can’t find an answer? Write to <span class="link">{SUPPORT}</span> and we’ll reply within 24 hours.</p></a>
+  </div>
+</div></section>"""
+    out = ROOT / "help" / f
+    out.write_text(layout(p, title="Help Center - ScreenToVideo", canon=f"{SITE}/help/",
+                          desc="ScreenToVideo help center: step-by-step guides for recording your screen, editing your project and exporting your video.",
+                          content=content, active="support/", page="help", track="help"), encoding="utf-8")
+    return out
+
+
+def help_page(p, toc, flat, i):
+    pg, sec = flat[i]
+    f = pg["file"]
+    body = help_body(f)
+    crumbs = f'<a href="./">Help Center</a>' + (f'{icon(p, "arrow")}<a href="{sec["file"]}">{e(sec["title"])}</a>' if sec else "")
+    extra = ""
+    if pg.get("pages"):
+        extra = '<div class="hc-kids">' + "".join(
+            f'<a class="hc-kid" href="{c["file"]}"><span>{e(c["title"])}</span>{icon(p, "arrow")}</a>' for c in pg["pages"]) + "</div>"
+    elif sec:
+        sib = [c for c in sec["pages"] if c["file"] != f]
+        if sib:
+            extra = '<div class="hc-also"><h2>See also</h2><ul>' + "".join(f'<li><a href="{c["file"]}">{e(c["title"])}</a></li>' for c in sib) + "</ul></div>"
+    prev = flat[i - 1][0] if i > 0 else None
+    nxt = flat[i + 1][0] if i + 1 < len(flat) else None
+    pn = '<nav class="hc-pn" aria-label="Previous and next article">'
+    pn += (f'<a class="hc-prev" href="{prev["file"]}"><small>Previous</small><span>{icon(p, "arrow", "i back")}{e(prev["title"])}</span></a>' if prev else "<span></span>")
+    pn += (f'<a class="hc-next" href="{nxt["file"]}"><small>Next</small><span>{e(nxt["title"])}{icon(p, "arrow")}</span></a>' if nxt else "<span></span>")
+    pn += "</nav>"
+    desc = help_text(body)[:155].rsplit(" ", 1)[0] + "…"
+    content = f"""<section class="hc"><div class="wrap hc-grid">
+  <aside class="hc-side">{help_search(p)}{help_nav(p, toc, f)}</aside>
+  <article class="hc-main">
+    <nav class="hc-crumbs" aria-label="Breadcrumb">{crumbs}</nav>
+    <h1>{e(pg["title"])}</h1>
+    <div class="hc-body">{body}</div>
+    {extra}
+    {pn}
+    {help_contact(p)}
+  </article>
+</div></section>"""
+    out = ROOT / "help" / f
+    out.write_text(layout(p, title=f'{pg["title"]} - ScreenToVideo Help', canon=f"{SITE}/help/{f}", desc=desc,
+                          content=content, active="support/", page="help", track="help"), encoding="utf-8")
+    return out
+
+
+def help_center():
+    p = Page("help")
+    toc = help_toc()
+    flat = []
+    for sec in toc:
+        flat.append((sec, None))
+        flat += [(pg, sec) for pg in sec["pages"]]
+    built = [help_home(p, toc, "index.html"), help_home(p, toc, "overview.htm")]
+    built += [help_page(p, toc, flat, i) for i in range(len(flat))]
+    idx = [{"t": pg["title"], "f": pg["file"], "s": sec["title"] if sec else "", "x": help_text(help_body(pg["file"]))} for pg, sec in flat]
+    (ROOT / "help/search.json").write_text(json.dumps(idx, ensure_ascii=False, separators=(",", ":")))
+    return built
 
 
 if __name__ == "__main__":
     built = [home(), features(), howto(), install(), support(), buy(), download(), changelog(), sysreq(), troubleshooting(),
              contact(), uninstall(), gdrive(), eula(), privacy(), terms(), notfound()]
     built += [redeem(*r) for r in REDEEM]
+    built += help_center()
     extras()
     for b in built:
         print(f"{b.relative_to(ROOT)}  {b.stat().st_size / 1024:.1f} KB")

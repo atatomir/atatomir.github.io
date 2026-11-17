@@ -17,9 +17,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.png" sizes="32x32">
-<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/site.min.css?v=b3f3f54e">
 <script>document.documentElement.classList.add('js')</script>
-<script src="assets/js/site.js" defer></script>
+<script src="assets/js/site.js?v=b91b303b" defer></script>
 <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/*.exe"}},{"not":{"selector_matches":"[target],[download]"}}]},"eagerness":"moderate"}]}</script>
 </head>
 <body data-page="home" data-track="home">
@@ -27,9 +27,9 @@
 <header class="hdr">
   <div class="wrap">
     <a class="logo" href="./" aria-label="ScreenToVideo home"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13.6" fill="none" stroke="#ff5a4e" stroke-width="3.2"/><circle cx="16" cy="16" r="8.2" fill="#ff5a4e"/></svg><span class="sr">ScreenToVideo</span><span class="wm" aria-hidden="true"><b>SCREEN</b><i>to</i><b>VIDEO</b></span></a>
-    <nav class="nav" aria-label="Main"><a href="./" aria-current=page>Home</a><a href="features/">Features</a><a href="how-to/">How-To</a><a href="support/">Support</a><a href="buy/">Pricing</a><a class="btn btn-primary" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#download"/></svg>Download Free Trial</a></nav>
-    <a class="btn btn-primary btn-sm" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#download"/></svg>Download</a>
-    <button class="menu-btn" aria-label="Menu" aria-expanded="false" data-icons="assets/icons.svg"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#menu"/></svg></button>
+    <nav class="nav" aria-label="Main"><a href="./" aria-current=page>Home</a><a href="features/">Features</a><a href="how-to/">How-To</a><a href="support/">Support</a><a href="buy/">Pricing</a><a class="btn btn-primary" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#download"/></svg>Download Free Trial</a></nav>
+    <a class="btn btn-primary btn-sm" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#download"/></svg>Download</a>
+    <button class="menu-btn" aria-label="Menu" aria-expanded="false" data-icons="assets/icons.svg?v=c900b8a4"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#menu"/></svg></button>
   </div>
 </header>
 <main id="main">
@@ -37,45 +37,41 @@
 <section class="hero center">
   <div class="glow"></div><div class="grid-bg"></div>
   <div class="wrap">
-    <a class="pill rv" href="changelog/"><b>New</b>Version 2026.2 — AI background blur &amp; more<svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></a>
+    <a class="pill rv" href="changelog/"><b>New</b>Version 2026.2<span class="hide-sm">&nbsp;— AI background blur &amp; more</span><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></a>
     <h1 class="rv" style="--rd:.05s">Create Video Tutorials <span class="typed-line">with <span class="typed" data-words="text animations|transitions|video effects|sketches|your webcam|Text-to-Speech|cursor effects|chroma-key|narration|3D effects|interactivity|animations|system sounds|annotations|shapes|zoom areas|imported media">text animations</span><span class="caret" aria-hidden="true"></span></span></h1>
     <p class="lead rv" style="--rd:.1s">The most customizable Screen Recorder and Video Editor designed to create impressive presentations from scratch.</p>
     <div class="btns rv" style="--rd:.15s">
-      <a class="btn btn-primary btn-lg" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#download"/></svg>Download Free Trial</a>
-      <a class="btn btn-ghost btn-lg" href="features/">See All Features<svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></a>
+      <a class="btn btn-primary btn-lg" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#download"/></svg>Download Free Trial</a>
+      <a class="btn btn-ghost btn-lg" href="features/">See All Features<svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></a>
     </div>
-    <p class="note rv" style="--rd:.2s"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#check"/></svg>Fully featured 15-day free trial. ScreenToVideo requires Microsoft Windows 7 or newer.</p>
+    <p class="note rv" style="--rd:.2s"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#check"/></svg>Fully featured 15-day free trial. ScreenToVideo requires Microsoft Windows 7 or newer.</p>
     <div class="shot rv" style="--rd:.25s">
       <div class="shot-media">
-        <img src="assets/img/hero-editor.webp" width="1280" height="720" alt="The ScreenToVideo editor with a text annotation on the canvas and the timeline below" fetchpriority="high">
-        <button class="play" data-video="https://screentovideo.com/media/home_editor_2.mp4" data-title="ScreenToVideo Editor" aria-label="Play the editor overview video"><span class="play-btn"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#play"/></svg></span></button>
+        <img src="assets/img/hero-editor.webp" width="1280" height="720" alt="The ScreenToVideo editor: adding a text balloon to a project, with the properties panel and timeline" fetchpriority="high">
+        <video class="loop" data-src="assets/video/hero-loop.mp4" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
+        <button class="watch" data-video="https://screentovideo.com/media/home_editor_2.mp4" data-title="ScreenToVideo Editor"><span><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#play"/></svg></span>Watch overview</button>
       </div>
     </div>
     <div class="strip rv">
-      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg#clock"/></svg><span><b>15-day free trial</b>All features included</span></div>
-      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg#infinity"/></svg><span><b>Lifetime license</b>No monthly/yearly fee</span></div>
-      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg#refresh"/></svg><span><b>Free upgrades</b>Lifetime updates &amp; support</span></div>
-      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg#shield"/></svg><span><b>30-day guarantee</b>Money-back, no questions</span></div>
+      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#clock"/></svg><span><b>15-day free trial</b>All features included</span></div>
+      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#infinity"/></svg><span><b>Lifetime license</b>No monthly/yearly fee</span></div>
+      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#refresh"/></svg><span><b>Free upgrades</b>Lifetime updates &amp; support</span></div>
+      <div><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#shield"/></svg><span><b>30-day guarantee</b>Money-back, no questions</span></div>
     </div>
   </div>
 </section>
 
 <section class="sec"><div class="wrap">
-  <div class="head center rv"><div class="eyebrow">Everything in one app</div><h2>Powerful Screen Recorder <span class="grad">and Video Editor</span></h2></div>
-  <div class="bento"><article class="card card-spot rv" style="--rd:0.0s"><div class="ic-box c"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#screen"/></svg></div><h3>Record your Screen</h3><p>With ScreenToVideo, you can capture an application window, a chosen area, or your entire screen with just one click.</p><div class="viz chips"><span class="chip on"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#screen"/></svg>Full screen</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#media"/></svg>Window</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#range"/></svg>Region</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#webcam"/></svg>Webcam</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#mic"/></svg>Microphone</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#speaker"/></svg>System sound</span></div></article><article class="card card-spot rv" style="--rd:0.06s"><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#cloud"/></svg></div><h3>Publish and Share</h3><p>Export your MP4 video and share it online via Google Drive. Play on any device with the interactive HTML player.</p><div class="viz fmt"><span>.mp4</span><span>.gif</span><span>.wmv</span><span>HTML</span><span>Drive</span></div></article><article class="card card-spot rv" style="--rd:0.12s"><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#sparkles"/></svg></div><h3>Built-in Editor</h3><p>Create amazing videos by adding texts, shapes, zoom effects, sounds, images, videos, and animations to your screen recording.</p><div class="viz wave" aria-hidden="true"><i style="--h:30%;--d:-0.00s"></i><i style="--h:55%;--d:-0.09s"></i><i style="--h:80%;--d:-0.18s"></i><i style="--h:45%;--d:-0.27s"></i><i style="--h:95%;--d:-0.36s"></i><i style="--h:60%;--d:-0.45s"></i><i style="--h:35%;--d:-0.54s"></i><i style="--h:70%;--d:-0.63s"></i><i style="--h:100%;--d:-0.72s"></i><i style="--h:50%;--d:-0.81s"></i><i style="--h:30%;--d:-0.90s"></i><i style="--h:65%;--d:-0.99s"></i><i style="--h:85%;--d:-1.08s"></i><i style="--h:40%;--d:-1.17s"></i><i style="--h:25%;--d:-1.26s"></i><i style="--h:60%;--d:-1.35s"></i><i style="--h:90%;--d:-1.44s"></i><i style="--h:55%;--d:-1.53s"></i><i style="--h:35%;--d:-1.62s"></i><i style="--h:75%;--d:-1.71s"></i><i style="--h:50%;--d:-1.80s"></i><i style="--h:30%;--d:-1.89s"></i></div></article><article class="card card-spot rv" style="--rd:0.18s"><div class="ic-box c"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#zap"/></svg></div><h3>Easy to Use</h3><p>ScreenToVideo has an intuitive interface and just the right tools to create a presentation in a matter of minutes!</p><div class="viz tl" aria-hidden="true"><div style="--l:0%;--w:62%"></div><div style="--l:18%;--w:40%;--c:var(--coral)"></div><div style="--l:40%;--w:45%;--c:#7f9cff"></div><div style="--l:8%;--w:30%"></div></div></article></div>
-</div></section>
-
-<section class="sec" style="padding-top:0"><div class="wrap">
   <div class="split">
     <div class="split-media rv">
       <img src="assets/img/home-recorder.webp" width="960" height="540" alt="ScreenToVideo screen recorder quick setup window" loading="lazy" decoding="async">
-      <button class="play play-sm" data-video="https://screentovideo.com/media/home_screen_recorder_2.mp4" data-title="Screen Recorder" aria-label="Play the screen recorder video"><span class="play-btn"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#play"/></svg></span></button>
+      <button class="play play-sm" data-video="https://screentovideo.com/media/home_screen_recorder_2.mp4" data-title="Screen Recorder" aria-label="Play the screen recorder video"><span class="play-btn"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#play"/></svg></span></button>
     </div>
     <div class="rv" style="--rd:.1s">
       <div class="eyebrow">Screen recorder</div>
       <h2>Record your screen in minutes</h2>
       <ul class="checks"><li>Record your screen with just one click</li><li>Record webcam to add a personal touch to your video</li><li>Add voice-over narration at capture time</li><li>Capture any sound played by your computer</li><li>Use our Timer to be prepared for a great start</li></ul>
-      <a class="btn btn-ghost" href="features/#recording">Learn more<svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></a>
+      <a class="btn btn-ghost" href="features/#recording">Learn more<svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></a>
     </div>
   </div>
 </div></section>
@@ -84,20 +80,87 @@
   <div class="split rev">
     <div class="split-media rv">
       <img src="assets/img/home-editor.webp" width="960" height="540" alt="ScreenToVideo editor adding an annotation balloon" loading="lazy" decoding="async">
-      <button class="play play-sm" data-video="https://screentovideo.com/media/home_editor_2.mp4" data-title="Video Editor" aria-label="Play the video editor video"><span class="play-btn"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#play"/></svg></span></button>
+      <button class="play play-sm" data-video="https://screentovideo.com/media/home_editor_2.mp4" data-title="Video Editor" aria-label="Play the video editor video"><span class="play-btn"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#play"/></svg></span></button>
     </div>
     <div class="rv" style="--rd:.1s">
       <div class="eyebrow">Video editor</div>
       <h2>All editing tools in one place</h2>
       <ul class="checks c"><li>Crop, trim and split the screen recording</li><li>Add professional transitions for the entire video or just for an object</li><li>Zoom area to focus a viewer’s attention</li><li>Add customizable effects to your videos, texts, images, and shapes</li><li>Bring objects to life with animations</li><li>Text-to-Speech powered by Google Cloud Text-to-Speech or Microsoft SAPI</li><li>Preview all your changes before exporting the video in your favorite format</li><li>Export the video to .mp4, .wmv, or .gif file format</li></ul>
-      <a class="btn btn-ghost" href="features/#editing">Learn more<svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></a>
+      <a class="btn btn-ghost" href="features/#editing">Learn more<svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></a>
     </div>
   </div>
 </div></section>
 
+<section class="sec"><div class="wrap">
+  <div class="rev-head rv">
+    <div>
+      <div class="eyebrow">Customer reviews</div>
+      <h2>Loved by creators on <span class="grad">AppSumo</span></h2>
+    </div>
+    <a class="score" href="https://appsumo.com/products/marketplace-screentovideo/#reviews" target="_blank" rel="noopener">
+      <b>4.7</b>
+      <span><span class="stars-rate" role="img" aria-label="4.7 out of 5 stars"><span class="stars stars-off" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="stars stars-on" aria-hidden="true" style="width:87.9px"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span></span><small>on AppSumo</small></span>
+    </a>
+  </div>
+  <div class="revs rv" tabindex="0" aria-label="Customer reviews" aria-roledescription="carousel"><figure class="rvw" role="group" aria-roledescription="review" aria-label="1 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>From purchase to ready in under five minutes</h3>
+  <blockquote><p>“In that short window, I completed the purchase, installed it, launched it, and understood enough of the interface to begin using it. … ScreenToVideo got me from zero to ready in under five minutes. That is an impressive first experience.”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">M</span><span class="rev-date">September 2026 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/from-purchase-to-ready-in-under-five-min-393622/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure><figure class="rvw" role="group" aria-roledescription="review" aria-label="2 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>Yes, they offer the remove silence feature!</h3>
+  <blockquote><p>“I purchased this application back in April 2021, and I literally (no exaggeration) use it daily. … Thanks for adding the feature. Now I don’t have to switch to another tool for my editing!”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">F</span><span class="rev-date">February 2024 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/yes-they-offer-the-remove-silence-featu-288746/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure><figure class="rvw" role="group" aria-roledescription="review" aria-label="3 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>Fantastic recording tool with advanced and easy to use features</h3>
+  <blockquote><p>“This tool has value-to-price ratio perfectly balanced. It provides everything you need for tutorials and talking head videos in an easy-to-use platform. Their tutorials are fantastic and easy to understand. I am so happy to have found this gem on App Sumo. I have other screen recorders, but this one is the best because of its built in editing features.”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">I</span><span class="rev-date">October 2025 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/fantastic-recording-tool-with-advanced-a-364878/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure><figure class="rvw" role="group" aria-roledescription="review" aria-label="4 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>Super easy to use</h3>
+  <blockquote><p>“I bought this software because I needed a way to record Zoom calls for workshops. It’s so easy to use, and I see that it also has video editing capability. I haven’t used all the functions yet, but it took me a couple of minutes to set it up and learn how to use it, so I’m sure that this one is a keeper!”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">N</span><span class="rev-date">April 2026 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/super-easy-to-use-380974/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure><figure class="rvw" role="group" aria-roledescription="review" aria-label="5 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>Easy Peasy Lemon Squeezy</h3>
+  <blockquote><p>“No more OBS Studio for desktop screen recording! Easy to download and use, with quick editing of screen to capture, crop and get creating.”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">K</span><span class="rev-date">July 2025 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/easy-peasy-lemon-squeezy-356040/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure><figure class="rvw" role="group" aria-roledescription="review" aria-label="6 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>Great product</h3>
+  <blockquote><p>“It is my goto tool to record and edit videos as it is easy to handle, has a lot of powerful features and is updated on a regular basis.”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">G</span><span class="rev-date">August 2025 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/great-product-358555/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure><figure class="rvw" role="group" aria-roledescription="review" aria-label="7 of 7">
+  <div class="rev-top"><span class="stars" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#star"/></svg></span><span class="sr">5 out of 5 stars</span></div>
+  <h3>Great Deal and does what it says</h3>
+  <blockquote><p>“It is a stable product that works as expected and does exactly what you are saying. Also love that you are offering one licenses from unlimited personal installation, so I can install it in my 2 computers I have. … These features would improve the software and add more value to an already great product.”</p></blockquote>
+  <figcaption><span class="av" aria-hidden="true">S</span><span class="rev-date">December 2021 · AppSumo</span>
+  <a class="rev-link" href="https://appsumo.com/products/marketplace-screentovideo/reviews/great-deal-and-does-what-it-says-172001/" target="_blank" rel="noopener" aria-label="Read the full review on AppSumo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a></figcaption>
+</figure></div>
+  <div class="rev-nav rv">
+    <a class="btn btn-ghost" href="https://appsumo.com/products/marketplace-screentovideo/#reviews" target="_blank" rel="noopener">Read more reviews on AppSumo<svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#external"/></svg></a>
+    <div class="rev-ctl">
+      <button type="button" class="rev-btn rev-prev" aria-label="Previous reviews"><svg class="i back" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></button>
+      <button type="button" class="rev-btn rev-next" aria-label="Next reviews"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></button>
+    </div>
+  </div>
+</div></section>
+<section class="sec"><div class="wrap">
+  <div class="head center rv"><div class="eyebrow">Everything in one app</div><h2>Powerful <span class="grad">Screen Recorder and Video Editor</span></h2></div>
+  <div class="bento"><article class="card card-spot rv" style="--rd:0.0s"><div class="ic-box c"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#screen"/></svg></div><h3>Record your Screen</h3><p>With ScreenToVideo, you can capture an application window, a chosen area, or your entire screen with just one click.</p><div class="viz chips"><span class="chip on"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#screen"/></svg>Full screen</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#media"/></svg>Window</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#range"/></svg>Region</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#webcam"/></svg>Webcam</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#mic"/></svg>Microphone</span><span class="chip"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#speaker"/></svg>System sound</span></div></article><article class="card card-spot rv" style="--rd:0.06s"><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#cloud"/></svg></div><h3>Publish and Share</h3><p>Export your MP4 video and share it online via Google Drive. Play on any device with the interactive HTML player.</p><div class="viz fmt"><span>.mp4</span><span>.gif</span><span>.wmv</span><span>HTML</span><span>Drive</span></div></article><article class="card card-spot rv" style="--rd:0.12s"><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#sparkles"/></svg></div><h3>Built-in Editor</h3><p>Create amazing videos by adding texts, shapes, zoom effects, sounds, images, videos, and animations to your screen recording.</p><div class="viz wave" aria-hidden="true"><i style="--h:30%;--d:-0.00s"></i><i style="--h:55%;--d:-0.09s"></i><i style="--h:80%;--d:-0.18s"></i><i style="--h:45%;--d:-0.27s"></i><i style="--h:95%;--d:-0.36s"></i><i style="--h:60%;--d:-0.45s"></i><i style="--h:35%;--d:-0.54s"></i><i style="--h:70%;--d:-0.63s"></i><i style="--h:100%;--d:-0.72s"></i><i style="--h:50%;--d:-0.81s"></i><i style="--h:30%;--d:-0.90s"></i><i style="--h:65%;--d:-0.99s"></i><i style="--h:85%;--d:-1.08s"></i><i style="--h:40%;--d:-1.17s"></i><i style="--h:25%;--d:-1.26s"></i><i style="--h:60%;--d:-1.35s"></i><i style="--h:90%;--d:-1.44s"></i><i style="--h:55%;--d:-1.53s"></i><i style="--h:35%;--d:-1.62s"></i><i style="--h:75%;--d:-1.71s"></i><i style="--h:50%;--d:-1.80s"></i><i style="--h:30%;--d:-1.89s"></i></div></article><article class="card card-spot rv" style="--rd:0.18s"><div class="ic-box c"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#zap"/></svg></div><h3>Easy to Use</h3><p>ScreenToVideo has an intuitive interface and just the right tools to create a presentation in a matter of minutes!</p><div class="viz tl" aria-hidden="true"><div style="--l:0%;--w:62%"></div><div style="--l:18%;--w:40%;--c:var(--coral)"></div><div style="--l:40%;--w:45%;--c:#7f9cff"></div><div style="--l:8%;--w:30%"></div></div></article></div>
+</div></section>
+
 <section class="sec aud"><div class="wrap">
   <div class="head center rv"><div class="eyebrow">Made for everyone</div><h2>Who is ScreenToVideo designed for?</h2></div>
-  <div class="grid g3"><article class="card card-spot rv" style="--rd:0.0s"><span class="num">01</span><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#briefcase"/></svg></div><h3>Businesses</h3><p>Three out of four customers would rather learn about a product or service by watching a video. ScreenToVideo can be used to create engaging interactive presentations that boost conversion and retention rates.</p></article><article class="card card-spot rv" style="--rd:0.08s"><span class="num">02</span><div class="ic-box c"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#cap"/></svg></div><h3>Students and Teachers</h3><p>Students are more likely to retain a message when watching a video than reading a text. ScreenToVideo provides an efficient way of learning by combining visual with audio information.</p></article><article class="card card-spot rv" style="--rd:0.16s"><span class="num">03</span><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#palette"/></svg></div><h3>Hobbyists</h3><p>The customizability and ease of use make ScreenToVideo the perfect tool to start video editing. Learn about well-known effects, transitions, and animations while building your own components.</p></article></div>
+  <div class="grid g3"><article class="card card-spot rv" style="--rd:0.0s"><span class="num">01</span><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#briefcase"/></svg></div><h3>Businesses</h3><p>Three out of four customers would rather learn about a product or service by watching a video. ScreenToVideo can be used to create engaging interactive presentations that boost conversion and retention rates.</p></article><article class="card card-spot rv" style="--rd:0.08s"><span class="num">02</span><div class="ic-box c"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#cap"/></svg></div><h3>Students and Teachers</h3><p>Students are more likely to retain a message when watching a video than reading a text. ScreenToVideo provides an efficient way of learning by combining visual with audio information.</p></article><article class="card card-spot rv" style="--rd:0.16s"><span class="num">03</span><div class="ic-box"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#palette"/></svg></div><h3>Hobbyists</h3><p>The customizability and ease of use make ScreenToVideo the perfect tool to start video editing. Learn about well-known effects, transitions, and animations while building your own components.</p></article></div>
 </div></section>
 <section class="sec-sm"><div class="wrap">
   <div class="band rv">
@@ -105,7 +168,7 @@
       <div class="eyebrow">Pricing</div>
       <h2>Pay once. <span class="grad">Own it forever.</span></h2>
       <p class="lead">No subscription. Free lifetime upgrades and support, multi-license discounts up to 36%, and a 30-day money-back guarantee.</p>
-      <div class="btns" style="margin-top:24px"><a class="btn btn-primary" href="buy/">See pricing<svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></a><a class="btn btn-ghost" href="download/">Try free for 15 days</a></div>
+      <div class="btns" style="margin-top:24px"><a class="btn btn-primary" href="buy/">See pricing<svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></a><a class="btn btn-ghost" href="download/">Try free for 15 days</a></div>
     </div>
     <div class="minis"><div class="mini hot"><div><b>Regular license</b><span>For Individuals and Businesses</span></div><div class="mini-price"><b>$119</b><span>one-time</span></div></div><div class="mini"><div><b>Educational license</b><span>For Students and Teachers</span></div><div class="mini-price"><b>$79</b><span>one-time</span></div></div></div>
   </div>
@@ -121,10 +184,10 @@
     <h2>Get started with no editing experience!</h2>
     <p class="lead">Fully featured 15-day free trial. Your projects carry over when you register.</p>
     <div class="btns" style="margin-top:28px">
-      <a class="btn btn-primary btn-lg" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#download"/></svg>Download Free Trial</a>
-      <a class="btn btn-ghost btn-lg" href="features/">See All Features<svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></a>
+      <a class="btn btn-primary btn-lg" href="download/"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#download"/></svg>Download Free Trial</a>
+      <a class="btn btn-ghost btn-lg" href="features/">See All Features<svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></a>
     </div>
-    <p class="note"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#windows"/></svg>Requires Microsoft Windows 7 or newer (64-bit)</p>
+    <p class="note"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#windows"/></svg>Requires Microsoft Windows 7 or newer (64-bit)</p>
   </div>
 </div></section>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ScreenToVideo", "operatingSystem": "Windows 11, Windows 10, Windows 8, Windows 7", "applicationCategory": "MultimediaApplication", "softwareVersion": "2026.2", "url": "https://screentovideo.com/", "downloadUrl": "https://screentovideo.com/svsetup.exe", "description": "Powerful screen recorder and video editor. Capture an application window, a chosen area, or your entire screen and add texts, shapes, zoom effects, sounds, images and animations.", "offers": [{"@type": "Offer", "name": "Regular license", "price": "119", "priceCurrency": "USD"}, {"@type": "Offer", "name": "Educational license", "price": "79", "priceCurrency": "USD"}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is there a free trial?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You can download a fully featured 15-day free trial. All of ScreenToVideo’s features are available, but your exported videos are watermarked. The projects you make with the trial are fully usable once you register."}}, {"@type": "Question", "name": "Is it a subscription?", "acceptedAnswer": {"@type": "Answer", "text": "No. ScreenToVideo is a one-time purchase with no monthly or yearly fee. The license is perpetual and never expires, and it includes free lifetime upgrades and support."}}, {"@type": "Question", "name": "Can I install it on more than one computer?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. ScreenToVideo is licensed per user, not per machine, so the registered user can install it on as many computers as they own. Only the registered user may use the software."}}, {"@type": "Question", "name": "Which formats can I export to?", "acceptedAnswer": {"@type": "Answer", "text": "MP4, WMV, animated GIF and animated WebP, plus audio-only MP3, WAV and M4A. You can also embed your video in an interactive HTML player or upload it directly to Google Drive and get a shareable link."}}, {"@type": "Question", "name": "What do I need to run it?", "acceptedAnswer": {"@type": "Answer", "text": "A 64-bit version of Microsoft Windows 11, 10, 8 or 7, an Intel Core i-series or AMD Phenom II processor, 2 GB of RAM and 500 MB of disk space."}}, {"@type": "Question", "name": "Are there discounts for schools or teams?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Students and teachers can get the Educational license for $79. Buying several licenses saves you 20% (2–5 licenses), 30% (6–10), 34% (11–20) or 36% (21+)."}}, {"@type": "Question", "name": "How do I receive my license key?", "acceptedAnswer": {"@type": "Answer", "text": "Orders are handled securely by PayPro Global. As soon as your order is processed, you receive an e-mail with your registration key, which activates the full version."}}, {"@type": "Question", "name": "What if it’s not right for me?", "acceptedAnswer": {"@type": "Answer", "text": "Every purchase comes with a 30-day money-back guarantee."}}]}</script>
@@ -136,13 +199,13 @@
         <a class="logo" href="./"><svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13.6" fill="none" stroke="#ff5a4e" stroke-width="3.2"/><circle cx="16" cy="16" r="8.2" fill="#ff5a4e"/></svg><span class="sr">ScreenToVideo</span><span class="wm" aria-hidden="true"><b>SCREEN</b><i>to</i><b>VIDEO</b></span></a>
         <p>ScreenToVideo is a powerful screen recorder and video editor. Capture an application window, a chosen area, or your entire screen with just one click.</p>
         <div class="social">
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://screentovideo.com/" target="_blank" rel="noopener" aria-label="Share on Facebook"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#facebook"/></svg></a>
-          <a href="https://twitter.com/share?url=https://screentovideo.com/" target="_blank" rel="noopener" aria-label="Share on X"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#xlogo"/></svg></a>
-          <a href="mailto:support@screentovideo.com" aria-label="Email us"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#mail"/></svg></a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://screentovideo.com/" target="_blank" rel="noopener" aria-label="Share on Facebook"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#facebook"/></svg></a>
+          <a href="https://twitter.com/share?url=https://screentovideo.com/" target="_blank" rel="noopener" aria-label="Share on X"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#xlogo"/></svg></a>
+          <a href="mailto:support@screentovideo.com" aria-label="Email us"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#mail"/></svg></a>
         </div>
       </div>
       <div><h4>Product</h4><ul><li><a href="features/">Features</a></li><li><a href="how-to/">How-To</a></li><li><a href="buy/">Pricing</a></li><li><a href="download/">Download</a></li><li><a href="changelog/">Changelog</a></li></ul></div>
-      <div><h4>Help</h4><ul><li><a href="support/">Support</a></li><li><a href="system-requirements/">System Requirements</a></li><li><a href="troubleshooting/">Troubleshooting</a></li><li><a href="contact/">Contact</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="support/">Support</a></li><li><a href="help/">Help Center</a></li><li><a href="system-requirements/">System Requirements</a></li><li><a href="troubleshooting/">Troubleshooting</a></li><li><a href="contact/">Contact</a></li></ul></div>
       <div><h4>Legal</h4><ul><li><a href="website-terms-and-conditions-of-use/">Terms of Use</a></li><li><a href="privacy-policy/">Privacy Policy</a></li><li><a href="eula/">License Agreement</a></li></ul></div>
     </div>
     <div class="ftr-bot">
@@ -152,9 +215,10 @@
   </div>
 </footer>
 <dialog class="modal" id="vmodal" aria-label="Video">
-  <div class="modal-top"><h3></h3><div class="modal-ctl"><button class="modal-nav" data-dir="-1" aria-label="Previous demo"><svg class="i flip" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></button><button class="modal-nav" data-dir="1" aria-label="Next demo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#arrow"/></svg></button><button class="modal-close" aria-label="Close video"><svg class="i" aria-hidden="true"><use href="assets/icons.svg#close"/></svg></button></div></div>
+  <div class="modal-top"><h3></h3><div class="modal-ctl"><button class="modal-nav" data-dir="-1" aria-label="Previous demo"><svg class="i flip" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></button><button class="modal-nav" data-dir="1" aria-label="Next demo"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></button><button class="modal-close" aria-label="Close video"><svg class="i" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#close"/></svg></button></div></div>
   <div class="modal-inner"><video controls playsinline preload="none"></video></div>
 </dialog>
+<button class="totop" type="button" aria-label="Back to top"><svg class="i up" aria-hidden="true"><use href="assets/icons.svg?v=c900b8a4#arrow"/></svg></button>
 <div class="consent" role="dialog" aria-label="Cookies">
   <p>We use cookies to improve your experience and measure our ads. See our <a href="privacy-policy/">Privacy Policy</a>.</p>
   <div class="btns"><button class="btn btn-ghost btn-sm" data-consent="no">Decline</button><button class="btn btn-teal btn-sm" data-consent="yes">Accept</button></div>

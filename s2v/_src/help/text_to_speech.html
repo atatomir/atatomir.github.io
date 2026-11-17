@@ -1,0 +1,49 @@
+<p>Text-to-speech properties can be edited by clicking on the object in the Timeline. </p>
+<p>In the Object Inspector, you can rename the object, edit its text.</p>
+<p>
+<img alt decoding="async" height="202" loading="lazy" src="images/tts.png" width="286"></p>
+<ol>
+<li><strong>Name</strong><br>
+The default name is 'Text-to-Speech X' ('Text-to-Speech 1', 'Text-to-Speech 2', and so onward), and this is visible in the name property of the object. You can change the name by deleting the default name and typing in another one.</li>
+<li><strong>Text - Microsoft Speech API</strong><br>
+<details class="more"><summary>Learn more</summary><div class="more-body">
+<div class="hm"><div class="hm-media"> <img alt decoding="async" height="488" loading="lazy" src="images/tts_sapi.png" width="326"></div><div class="hm-text">
+Use the slider to set the <strong>rate </strong>value or enter it manually (-10 to 10). 
+Use the slider to set the <strong>volume </strong>value or enter it manually (0 to 100%). 
+Click <strong>Convert </strong>to convert the text.
+</div></div>
+</div></details>
+</li>
+<li><strong>Text - Google Cloud Text-To-Speech</strong><br>
+<details class="more"><summary>Learn more</summary><div class="more-body">
+<div class="hm"><div class="hm-media"> <img alt decoding="async" height="488" loading="lazy" src="images/tts_google.png" width="326"></div><div class="hm-text">
+Use the slider to set the <strong>rate </strong>value or enter it manually (25 to 400%). 
+Use the slider to set the <strong>volume gain </strong>value or enter it manually (-10 to 10 dB). 
+Click <strong>Convert </strong>to convert the text.
+</div></div>
+<br>
+<div class="hm"><div class="hm-media"> <img alt decoding="async" height="238" loading="lazy" src="images/tts_api_key.png" width="606"></div><div class="hm-text">
+<ol>
+<li>In the Cloud Console, on the project selector page, select or create a Google Cloud project. </li>
+<li>Make sure that billing is enabled for your Google Cloud project. </li>
+<li>Enable the Cloud Text-to-Speech API. </li>
+<li>Click the menu button and select APIs & Services &gt; Credentials. </li>
+<li>On the Credentials page, click Create credentials &gt; API key. </li>
+<li>The API key created dialog displays your newly created API key. </li>
+<li>The new API key is listed on the Credentials page under API keys. </li>
+</ol>
+<div class="callout"> 
+<p>For more details, please follow this <a href="https://cloud.google.com/text-to-speech/docs/quickstart-protocol" rel="noopener" target="_blank">link</a>.</p>
+</div>
+</div></div>
+</div></details>
+</li>
+<li><strong>Volume Control</strong><br>
+<details class="more"><summary>Learn more</summary><div class="more-body">
+<div class="hm"><div class="hm-media"> <img alt decoding="async" height="110" loading="lazy" src="images/audio_volume.png" width="286"></div><div class="hm-text">
+Use the slider to set the <strong>volume </strong>value or enter it manually (0 to 200%). 
+Enter <strong>Fade In </strong>and <strong>Fade Out </strong>values to specify the audio transitions (in ms: 0 to 2000).
+</div></div>
+</div></details>
+</li>
+</ol>
