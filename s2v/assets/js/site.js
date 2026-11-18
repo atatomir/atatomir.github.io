@@ -4,7 +4,6 @@
 
   // ---- Config -------------------------------------------------------------
   var ORIGIN = 'https://screentovideo.com';
-  var PROD = /(^|\.)screentovideo\.com$/.test(location.hostname);
   var CFG = {
     adsId: 'AW-17501610339',
     downloadConversion: 'AW-17501610339/yF1oCJy2gowbEOPCtZlB',
@@ -59,7 +58,7 @@
   if (track === 'uploadtogd') track += (qs.get('status') || '').toLowerCase();
   if (track) {
     try {
-      if (PROD) fetch(CFG.tracker + '?page=' + encodeURIComponent(track) + '&referrer=' + encodeURIComponent(d.referrer),
+      fetch(CFG.tracker + '?page=' + encodeURIComponent(track) + '&referrer=' + encodeURIComponent(d.referrer),
         { mode: 'no-cors', keepalive: true, credentials: 'omit' }).catch(function () {});
     } catch (e) {}
   }
@@ -541,6 +540,6 @@
   }
   idle(function () {
     addScript('https://www.googletagmanager.com/gtag/js?id=' + CFG.adsId);
-    if (PROD && !body.hasAttribute('data-nochat')) { window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date(); addScript(CFG.tawk, { charset: 'UTF-8', crossorigin: '*' }); }
+    if (!body.hasAttribute('data-nochat')) { window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date(); addScript(CFG.tawk, { charset: 'UTF-8', crossorigin: '*' }); }
   }, page === 'download' ? 0 : 2500);
 })();
