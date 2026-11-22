@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1a12" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#eef7ef" media="(prefers-color-scheme: light)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Snail Sprint">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐌</text></svg>">
+<title>Snail Sprint</title>
+<script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0b1a12; --bg-glow:#163a24; --panel:#12251a; --panel-2:#183022; --border:rgba(160,220,180,.13);
+    --text:#eefaf1; --muted:#90b19c; --faint:#5f7d69;
+    --accent:#3ddc84; --accent-2:#18b5a4; --accent-ink:#04230f; --accent-soft:rgba(61,220,132,.16);
+    --ok:#3ddc84; --bad:#ff5b6e; --warn:#ffcf5c; --heat:#ff8a3d;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      color-scheme:light;
+      --bg:#eef7ef; --bg-glow:#d6efdb; --panel:#ffffff; --panel-2:#f1f8f2; --border:rgba(20,70,40,.12);
+      --text:#0f2418; --muted:#557563; --faint:#94ab9c;
+      --accent:#1fae5f; --accent-2:#0f9488; --accent-ink:#ffffff; --accent-soft:rgba(31,174,95,.13);
+      --ok:#14a86b; --bad:#e3384e; --warn:#d99a00; --heat:#f07020;
+      --shadow:0 10px 30px rgba(20,70,40,.15);
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{background:var(--bg);overscroll-behavior:none}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);
+       background:radial-gradient(120% 60% at 50% -10%,var(--bg-glow),var(--bg) 60%) fixed,var(--bg);
+       min-height:100vh;min-height:100dvh;touch-action:manipulation;
+       -webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+  input{-webkit-user-select:text;user-select:text}
+  .hidden{display:none!important}
+
+  /* ---------- menu / lobby pages ---------- */
+  .wrap{width:100%;max-width:480px;margin:0 auto;
+        padding:calc(10px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 14px;min-height:40px}
+  .topr{display:flex;gap:8px;align-items:center}
+  h1{font-size:21px;margin:0;line-height:1;white-space:nowrap}
+  h1 a{color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px}
+  h1 .logo{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;font-size:17px;
+           background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 4px 14px var(--accent-soft)}
+  .pill{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-size:13px;color:var(--muted);white-space:nowrap}
+  .pill b{color:var(--text);font-variant-numeric:tabular-nums}
+  .iconbtn{background:var(--panel);border:1px solid var(--border);border-radius:999px;width:38px;height:38px;padding:0;font-size:16px;display:grid;place-items:center;color:var(--text)}
+  h2{font-size:12px;margin:20px 0 8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+
+  button{font:inherit;font-size:15px;font-weight:650;border:1px solid var(--border);border-radius:14px;padding:12px;cursor:pointer;
+         background:var(--panel);color:var(--text);transition:transform .08s,opacity .2s,background .2s}
+  button:active{transform:scale(.97)}
+  button:disabled{opacity:.4;cursor:default}
+  .primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:var(--accent-ink);border-color:transparent;box-shadow:0 6px 18px var(--accent-soft)}
+  .accent{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .soft{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+  .ghost{background:transparent;color:var(--muted);border-color:transparent}
+  .big{font-size:17px;padding:15px;width:100%}
+  .wide{width:100%}
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+  .hero{position:relative;overflow:hidden;background:linear-gradient(155deg,color-mix(in srgb,var(--accent) 20%,var(--panel)),var(--panel) 62%)}
+  .hero h3{margin:0 0 4px;font-size:21px;padding-right:56px}
+  .hero p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.4;padding-right:56px}
+  .hero .em{position:absolute;top:14px;right:16px;font-size:40px;transform:scaleX(-1);filter:drop-shadow(0 4px 10px rgba(0,0,0,.25))}
+  .namerow{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:6px 6px 6px 12px;margin-bottom:12px}
+  .namerow label{font-size:13px;color:var(--muted);white-space:nowrap}
+  .namerow input{flex:1;min-width:0;font:inherit;font-size:16px;font-weight:700;background:transparent;border:0;color:var(--text);outline:none;padding:6px 4px}
+  .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin:14px 0 10px}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--border)}
+  .joinrow{display:flex;gap:8px}
+  .joinrow input{flex:1;min-width:0;font:inherit;font-size:22px;font-weight:800;letter-spacing:6px;text-transform:uppercase;text-align:center;
+       background:var(--panel-2);color:var(--text);border:2px solid var(--border);border-radius:14px;padding:10px;outline:none}
+  .joinrow input::placeholder{color:var(--faint);letter-spacing:4px}
+  .joinrow input:focus{border-color:var(--accent)}
+  .joinrow button{padding:12px 22px}
+  .msg{font-size:13px;color:var(--bad);margin-top:10px;line-height:1.4}
+  .msg:empty{display:none}
+
+  .rhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+  .rhead h3{margin:0;font-size:17px}
+  .livestat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--bad);flex:none}
+  .dot.on{background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
+  .dot.warn{background:var(--warn);animation:blink 1.2s infinite}
+  @keyframes blink{50%{opacity:.35}}
+  .roomlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .room{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:10px 10px 10px 12px;animation:fadein .3s}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px)}}
+  .ravatar{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:none;font-weight:800;
+           background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+  .rinfo{flex:1;min-width:0}
+  .rinfo b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rinfo small{color:var(--muted);font-size:12px}
+  .room button{padding:9px 16px}
+  .empty{text-align:center;color:var(--muted);font-size:13px;line-height:1.5;padding:14px 8px;border:1.5px dashed var(--border);border-radius:14px}
+
+  .opt{display:flex;align-items:center;gap:14px;width:100%;margin-bottom:10px;padding:14px 16px;text-align:left}
+  .opt .ic{font-size:24px;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--panel-2);flex:none}
+  .opt .tx{flex:1}
+  .opt small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:2px;line-height:1.35}
+  .opt .chev{color:var(--faint);font-size:22px}
+  .opt.main{border:2px solid color-mix(in srgb,var(--accent) 45%,transparent)}
+  .opt.main .ic{background:var(--accent-soft)}
+  .diffrow{display:flex;align-items:center;gap:6px;margin:-2px 0 12px;padding:5px;background:var(--panel);border:1px solid var(--border);border-radius:14px}
+  .diffrow span{font-size:12px;color:var(--muted);font-weight:700;padding:0 8px;white-space:nowrap}
+  .diffrow button{flex:1;padding:9px 6px;font-size:14px;border-radius:10px;border-color:transparent;background:transparent;color:var(--muted)}
+  .diffrow button.on{background:var(--accent-soft);color:var(--accent)}
+  .rules{font-size:13px;color:var(--muted);line-height:1.55;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-top:6px}
+  .rules summary{cursor:pointer;color:var(--text);font-weight:600}
+  .rules b{color:var(--text)}
+  .rules ul{margin:8px 0 0;padding-left:18px}
+  .pw{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin-top:8px}
+
+  /* lobby */
+  .lobby{text-align:center}
+  .lbltop{margin:0 0 6px;color:var(--muted);font-size:13px;font-weight:600}
+  .codebig{display:block;width:100%;font-size:44px;font-weight:900;letter-spacing:10px;padding:10px 0 10px 10px;margin-bottom:10px;
+           background:var(--panel-2);border:2px dashed var(--border);border-radius:16px;font-variant-numeric:tabular-nums}
+  .pubnote{font-size:13px;color:var(--accent);background:var(--accent-soft);border-radius:12px;padding:8px 10px;margin-bottom:10px}
+  .sharegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .sharegrid .wide{grid-column:1/-1}
+  .slots{display:flex;flex-direction:column;gap:8px;margin:4px 0 14px;text-align:left}
+  .slot{display:flex;align-items:center;gap:12px;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:10px 12px;min-height:58px}
+  .slot .sn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;flex:none;color:#fff;font-weight:800}
+  .slot .nm{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .slot .nm small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+  .slot.empty{border-style:dashed;color:var(--muted)}
+  .slot.empty .sn{background:transparent!important;border:2px dashed var(--border)}
+  .tag{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:3px 8px;flex:none}
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;color:var(--text);background:var(--panel-2);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:12px;text-align:left;cursor:pointer}
+  .toggle small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .switch{position:relative;width:46px;height:28px;flex:none}
+  .switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+  .switch i{position:absolute;inset:0;border-radius:999px;background:var(--border);transition:background .2s;pointer-events:none}
+  .switch i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+  .switch input:checked+i{background:var(--accent)}
+  .switch input:checked+i::after{transform:translateX(18px)}
+  .waiting{display:flex;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:14px;margin:6px 0 8px;min-height:22px}
+  .spin{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--accent);animation:spin .8s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- game screen ---------- */
+  .game{position:fixed;inset:0;overflow:hidden;background:#9fd8ff;touch-action:none;z-index:5;
+        -webkit-touch-callout:none}
+  .game canvas{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+  .glass{background:rgba(10,30,45,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.22);color:#fff}
+  .hud{position:absolute;left:0;right:0;top:0;padding:calc(8px + env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left));
+       display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:640px;margin:0 auto}
+  .hrow{display:flex;align-items:center;gap:8px}
+  .hbtn{pointer-events:auto;width:42px;height:42px;border-radius:14px;padding:0;font-size:17px;display:grid;place-items:center;flex:none}
+  .chip{border-radius:14px;height:42px;display:flex;align-items:center;padding:0 12px;flex:none}
+  .chip.pos{font-size:24px;font-weight:900;gap:2px}
+  .chip.pos small{font-size:13px;font-weight:700;opacity:.7;margin-top:6px}
+  .chip.time{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;min-width:66px;justify-content:center}
+  .prog{position:relative;flex:1;height:42px;border-radius:14px}
+  .prog .rail{position:absolute;left:14px;right:28px;top:50%;height:5px;margin-top:-2px;border-radius:9px;background:rgba(255,255,255,.25)}
+  .prog .flag{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:14px}
+  .prog i{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid rgba(0,0,0,.45)}
+  .prog i.me{width:16px;height:16px;margin:-8px 0 0 -8px;z-index:2;border-color:#fff}
+  .hrow2{display:flex;align-items:center;gap:8px;align-self:center;width:min(100%,340px);border-radius:999px;padding:6px 12px}
+  .hrow2 .lbl{font-size:10px;font-weight:800;letter-spacing:1px;opacity:.85;white-space:nowrap;min-width:76px}
+  .bar{flex:1;height:8px;border-radius:999px;background:rgba(255,255,255,.22);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#3ddc84,#ffcf5c,#ff8a3d)}
+  .bar.hot i{background:#ff5b6e;animation:blink .4s infinite}
+  .bar.ice i{background:linear-gradient(90deg,#9be7ff,#4cc3ff)}
+  .shield{font-size:16px;opacity:.25;transition:opacity .2s,transform .2s}
+  .shield.on{opacity:1;transform:scale(1.15)}
+  .active{font-size:13px;font-weight:800;border-radius:999px;padding:6px 12px;align-self:center;display:flex;gap:6px;align-items:center}
+  .active i{display:block;width:60px;height:5px;border-radius:9px;background:rgba(255,255,255,.25);overflow:hidden}
+  .active i b{display:block;height:100%;background:#fff;border-radius:9px}
+
+  .count{position:absolute;inset:0;display:grid;place-items:center;font-size:min(30vw,140px);font-weight:900;color:#fff;
+         text-shadow:0 6px 30px rgba(0,0,0,.45);pointer-events:none}
+  .count.go{color:#3ddc84}
+  .count span{animation:pop .5s ease-out}
+  @keyframes pop{from{transform:scale(1.6);opacity:0}}
+  .toast{position:absolute;left:50%;top:30%;transform:translate(-50%,8px);font-size:22px;font-weight:900;color:#fff;
+         text-shadow:0 2px 0 rgba(0,0,0,.25),0 3px 14px rgba(0,0,0,.5);pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;text-align:center;width:max-content;max-width:calc(100% - 32px)}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  .hint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(40px + env(safe-area-inset-bottom));border-radius:18px;padding:10px 16px;
+        font-size:14px;font-weight:700;line-height:1.7;text-align:center;pointer-events:none;transition:opacity .4s;width:max-content;max-width:calc(100% - 32px)}
+  .hint kbd{font:inherit;font-size:12px;background:rgba(255,255,255,.2);border-radius:5px;padding:1px 6px}
+  .hint.fade{opacity:0}
+  .watchTag{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom));font-size:12px;font-weight:800;letter-spacing:.8px;border-radius:999px;padding:7px 12px;pointer-events:none}
+
+  .ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,15,25,.45);
+      backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));overflow:auto;z-index:3}
+  .card{width:100%;max-width:360px;background:var(--panel);border:1px solid var(--border);border-radius:24px;padding:22px 18px 16px;text-align:center;box-shadow:var(--shadow);animation:fadein .25s}
+  .card h2{margin:0 0 6px;font-size:28px;color:var(--text);text-transform:none;letter-spacing:0;font-weight:900}
+  .card p{margin:0 0 12px;font-size:14px;line-height:1.45;color:var(--muted)}
+  .card .btns{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .results{display:flex;flex-direction:column;gap:6px;margin:6px 0 12px}
+  .results div{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:15px}
+  .results div.me{border:2px solid var(--accent);background:var(--accent-soft)}
+  .results b{width:34px;text-align:left;font-size:16px}
+  .results .n{flex:1;text-align:left;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .results .t{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+  .results i{width:14px;height:14px;border-radius:50%;flex:none}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="pages">
+  <div class="top">
+    <h1><a href="../games/"><span class="logo">🐌</span>Snail Sprint</a></h1>
+    <div class="topr">
+      <div class="pill" title="Best time vs AI">🏆 <b id="best">–</b></div>
+      <button class="iconbtn" id="sound" aria-label="Sound">🔊</button>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="panel hero">
+      <div class="em">🐌</div>
+      <h3>Race friends online</h3>
+      <p>Up to 3 snails, each on their own phone. Create a room and send the link, or type a friend's code.</p>
+      <div class="namerow"><label for="nick">Your name</label><input id="nick" maxlength="14" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done"></div>
+      <button class="primary big" id="create">Create private room</button>
+      <div class="or">or join with a code</div>
+      <div class="joinrow"><input id="joinCode" maxlength="5" placeholder="CODE" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false"><button id="join" class="accent">Join</button></div>
+      <div class="msg" id="menuMsg"></div>
+    </div>
+
+    <div class="panel">
+      <div class="rhead"><h3>Public rooms</h3><span class="livestat"><span class="dot" id="roomsDot"></span><span id="roomsState">Connecting…</span></span></div>
+      <div class="roomlist" id="roomList"></div>
+      <button class="soft wide" id="hostPublic">📣 Host a public room</button>
+    </div>
+
+    <h2>Play solo</h2>
+    <button class="opt main" id="vsAI"><span class="ic">🏁</span><span class="tx"><b>Race the AI</b><small>You against two AI snails, side by side on the start line</small></span><span class="chev">›</span></button>
+    <div class="diffrow" id="diffRow"><span>AI level</span><button data-d="easy">🙂 Easy</button><button data-d="normal">😐 Normal</button><button data-d="hard">😈 Hard</button></div>
+    <button class="opt" id="watchAI"><span class="ic">🤖</span><span class="tx"><b>Watch the AI race</b><small>Sit back while an AI drives your snail too</small></span><span class="chev">›</span></button>
+    <details class="rules"><summary>How to play</summary>
+      <ul>
+        <li><b>Swipe left / right</b> to switch lanes (keys: <b>← →</b>).</li>
+        <li><b>Hold anywhere</b> for rocket turbo (key: <b>Space</b>). Watch the heat bar: if it fills up you overheat.</li>
+        <li>Drive over 🟧 <b>boost pads</b> and through 💨 <b>speed zones</b>. Dodge 🪨 rocks and 🧂 salt.</li>
+        <li>Drive through 💎 <b>power crystals</b>: you get a random superpower instantly.</li>
+      </ul>
+      <div class="pw">
+        <span>🚀</span><span><b>Rocket</b>: huge speed, smashes through anything</span>
+        <span>👻</span><span><b>Ghost</b>: pass through obstacles</span>
+        <span>❄️</span><span><b>Cool rocket</b>: turbo with no heat</span>
+        <span>🛡️</span><span><b>Shield</b>: blocks one hit</span>
+        <span>⚡</span><span><b>Zap</b>: stuns the nearest rival</span>
+        <span>🧂</span><span><b>Salt drop</b>: leave a trap behind you</span>
+      </div>
+    </details>
+  </section>
+
+  <!-- LOBBY -->
+  <section id="lobby" class="hidden">
+    <div class="panel lobby">
+      <p class="lbltop" id="lobbyTop">Room code</p>
+      <button class="codebig" id="codeBig" title="Tap to copy">·····</button>
+      <div class="pubnote hidden" id="pubNote"></div>
+      <div class="sharegrid" id="shareBits">
+        <button id="copyLink" class="primary wide">🔗 Copy invite link</button>
+        <button id="copyCode">📋 Copy code</button>
+        <button id="shareLink">📨 Share…</button>
+      </div>
+      <div class="slots" id="slots"></div>
+      <label class="toggle" id="fillRow"><span>Fill empty spots with AI<small>Race with bots when fewer than 3 people join</small></span>
+        <span class="switch"><input type="checkbox" id="fill" checked><i></i></span></label>
+      <button class="primary big" id="startRace">Start race</button>
+      <div class="waiting" id="waitRow"><span class="spin"></span><span id="lobbyText">Waiting…</span></div>
+      <button class="ghost wide" id="leave">Leave room</button>
+    </div>
+  </section>
+</div>
+
+<!-- GAME -->
+<div class="game hidden" id="game">
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div class="hrow">
+      <button class="hbtn glass" id="pauseBtn" aria-label="Pause">⏸</button>
+      <div class="chip pos glass"><span id="pos">–</span><small id="of"></small></div>
+      <div class="prog glass" id="prog"><div class="rail"></div><span class="flag">🏁</span></div>
+      <div class="chip time glass" id="time">0.0s</div>
+    </div>
+    <div class="hrow2 glass"><span class="lbl" id="heatTxt">TURBO HEAT</span><div class="bar" id="bar"><i id="heatFill"></i></div><span class="shield" id="shield">🛡️</span></div>
+    <div class="active glass hidden" id="active"><span id="activeTxt"></span><i><b id="activeBar"></b></i></div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="count hidden" id="count"></div>
+  <div class="hint glass hidden" id="hint"></div>
+  <div class="watchTag glass hidden" id="watchTag">🤖 AI IS DRIVING</div>
+  <div class="ov hidden" id="ov">
+    <div class="card">
+      <h2 id="ovTitle"></h2>
+      <p id="ovText"></p>
+      <div class="results" id="results"></div>
+      <div class="btns" id="ovBtns"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const $ = id => document.getElementById(id);
+const cv = $('cv');
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch { return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch {} }
+};
+const fmt = s => s.toFixed(1) + 's';
+const ord = n => n + (['th','st','nd','rd'][n] || 'th');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cleanName = s => String(s || '').replace(/[\u0000-\u001f<>]/g, '').trim().slice(0, 14);
+const touchUI = !matchMedia('(hover:hover) and (pointer:fine)').matches;
+let best = +store.get('snail3d-best') || 0;
+const showBest = () => $('best').textContent = best ? fmt(best) : '–';
+showBest();
+
+$('nick').value = cleanName(store.get('snail-name')) || 'Snail' + (100 + Math.random() * 900 | 0);
+$('nick').addEventListener('input', () => store.set('snail-name', cleanName($('nick').value)));
+const myName = () => cleanName($('nick').value) || 'Snail';
+
+// ---------- sound (only ever plays while the race screen is open) ----------
+const SND = { on: store.get('snail-sound') !== '0', ctx:null };
+function actx(){
+  if (!SND.ctx){ const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; SND.ctx = new C(); }
+  if (SND.ctx.state === 'suspended') SND.ctx.resume();
+  return SND.ctx;
+}
+function tone(f, d, type = 'sine', vol = .15, slide = 0){
+  if (!SND.on || !gameOn() || document.hidden) return;
+  const a = actx(); if (!a) return;
+  const o = a.createOscillator(), g = a.createGain(), t = a.currentTime;
+  o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f + slide), t + d);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + d + .02);
+}
+function sfx(k){
+  if (k === 'beep') tone(520, .15, 'square', .07);
+  else if (k === 'go') tone(880, .35, 'square', .08);
+  else if (k === 'pick') { tone(660, .08, 'triangle', .13); setTimeout(() => tone(990, .12, 'triangle', .13), 70); }
+  else if (k === 'crystal') [700, 900, 1200].forEach((f, i) => setTimeout(() => tone(f, .1, 'triangle', .11), i * 60));
+  else if (k === 'power') tone(300, .45, 'sawtooth', .07, 900);
+  else if (k === 'pad') tone(400, .25, 'triangle', .1, 500);
+  else if (k === 'zap') tone(1400, .3, 'square', .06, -1200);
+  else if (k === 'crash') tone(180, .35, 'sawtooth', .11, -120);
+  else if (k === 'hot') tone(300, .4, 'sawtooth', .06, -200);
+  else if (k === 'win') [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .18, 'triangle', .12), i * 110));
+  else if (k === 'done') [523, 440].forEach((f, i) => setTimeout(() => tone(f, .2, 'triangle', .11), i * 140));
+}
+const soundUI = () => $('sound').textContent = SND.on ? '🔊' : '🔇';
+$('sound').onclick = () => { SND.on = !SND.on; store.set('snail-sound', SND.on ? '1' : '0'); soundUI(); };
+soundUI();
+const buzz = p => { try { navigator.vibrate?.(p); } catch {} };
+
+// ---------- constants ----------
+const LANES = 3, LW = 2.4, RACE = 1500, START_D = -2;
+const laneX = l => (l - 1) * LW;
+const KINDS = {
+  rock:   { deadly:true, r:.8 },
+  salt:   { deadly:true, r:.7 },
+  puddle: { r:1.0 },
+  lettuce:{ pickup:true, r:.75 },
+  dew:    { pickup:true, r:.7 },
+  crystal:{ r:.75 },      // per-snail: everyone can grab each crystal once
+  pad:    { r:2.0 },      // boost pad, never used up
+};
+const POWERS = {
+  rocket:{ e:'🚀', name:'Rocket',      w:22, dur:2.6 },
+  ghost: { e:'👻', name:'Ghost',       w:16, dur:4 },
+  ice:   { e:'❄️', name:'Cool rocket', w:16, dur:5 },
+  shield:{ e:'🛡️', name:'Shield',      w:16 },
+  zap:   { e:'⚡', name:'Zap',         w:16 },
+  salt:  { e:'🧂', name:'Salt drop',   w:14 },
+};
+const PW_CODE = { rocket:'r', ghost:'g', ice:'i' }, PW_FROM = { r:'rocket', g:'ghost', i:'ice' };
+const COLORS = [ { hex:0xf07b3f, css:'#f07b3f' }, { hex:0x3f8cff, css:'#3f8cff' }, { hex:0xb05cf5, css:'#b05cf5' } ];
+const START_LANES = [1, 0, 2];
+// AI personalities: Shelly is careful and loves crystals, Slick is reckless and loves zapping.
+const BOTS = [
+  { name:'Shelly', ai:{ react:.24, look:1.05, lo:25, hi:80, mistake:.05, greed:1.2, risk:.02, aggro:.3, weave:.03 } },
+  { name:'Slick',  ai:{ react:.3,  look:.9,  lo:10, hi:96, mistake:.08, greed:.6,  risk:.1,  aggro:.8, weave:.08 } },
+];
+const DIFFS = {
+  easy:  { speed:.86, react:1.7, mistake:.14, look:.75 },
+  normal:{ speed:.93, react:1.3, mistake:.07, look:.9 },
+  hard:  { speed:1,   react:1,   mistake:0,   look:1 },
+};
+const botAI = (i, diff) => { const b = BOTS[i].ai, D = DIFFS[diff] || DIFFS.normal; return { ...b, react:b.react * D.react, mistake:b.mistake + D.mistake, look:b.look * D.look, speed:D.speed }; };
+const AUTOPILOT = { react:.14, look:1.2, lo:25, hi:85, mistake:.02, greed:.9, risk:0, aggro:.5, weave:0, speed:1 };
+let diff = DIFFS[store.get('snail-diff')] ? store.get('snail-diff') : 'normal';
+
+function mulberry32(a){ return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// ---------- the winding, rolling path ----------
+// The track is described by distance d along it: it sways left/right (cx) and rolls up/down (hy).
+// Lanes and collisions all work in (d, lateral) space; only drawing maps that onto the 3D curve.
+let PH = [0, 0, 0, 0], CX0 = 0, HY0 = 0;
+const cxRaw = d => 12 * Math.sin(d / 150 + PH[0]) + 5 * Math.sin(d / 64 + PH[1]);
+const hyRaw = d => 5 * Math.sin(d / 120 + PH[2]) + 1.8 * Math.sin(d / 50 + PH[3]);
+const cx = d => cxRaw(d) - CX0;
+const hy = d => hyRaw(d) - HY0;
+const cxd = d => 12 / 150 * Math.cos(d / 150 + PH[0]) + 5 / 64 * Math.cos(d / 64 + PH[1]);
+const hyd = d => 5 / 120 * Math.cos(d / 120 + PH[2]) + 1.8 / 50 * Math.cos(d / 50 + PH[3]);
+const yaw = d => -Math.atan(cxd(d));
+function setPath(seed){
+  const R = mulberry32(seed ^ 0x9e3779b9);
+  PH = [R() * 6.28, R() * 6.28, R() * 6.28, R() * 6.28];
+  CX0 = 0; HY0 = 0; CX0 = cxRaw(0); HY0 = hyRaw(0);
+}
+function wpos(d, lat, up = 0, v = new THREE.Vector3()){ return v.set(cx(d) + lat, hy(d) + up, -d); }
+// meadow height: the track sits in a gentle valley with hills rising on both sides
+function side(l, d){ const a = Math.abs(l); return a < 6.5 ? -.08 : -.08 + Math.pow(a - 6.5, 1.25) * .05 * (.75 + .35 * Math.sin(l * .13 + d * .05)); }
+const groundY = (x, d) => hy(d) + side(x - cx(d), d);
+
+// ---------- three setup: a sunny garden ----------
+const renderer = new THREE.WebGLRenderer({ canvas:cv, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, 1, .1, 600);
+const HORIZON = 0xd9f1ff;
+scene.background = new THREE.Color(HORIZON);
+scene.fog = new THREE.Fog(HORIZON, 55, 190);
+scene.add(new THREE.HemisphereLight(0xe6f5ff, 0x6f9b4a, 1.05));
+const sun = new THREE.DirectionalLight(0xfff0d2, 2.4);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left:-24, right:24, top:24, bottom:-24, near:1, far:90 });
+sun.shadow.bias = -.0006; sun.shadow.normalBias = .03;
+scene.add(sun, sun.target);
+const SUN_OFF = new THREE.Vector3(-14, 28, 6);
+
+// sky dome with a gradient, a glowing sun and puffy clouds; it follows the camera
+const sky = new THREE.Group();
+scene.add(sky);
+{
+  const mat = new THREE.ShaderMaterial({
+    side:THREE.BackSide, depthWrite:false,
+    uniforms:{ top:{ value:new THREE.Color(0x3d9cf0) }, bottom:{ value:new THREE.Color(HORIZON) } },
+    vertexShader:'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader:'uniform vec3 top; uniform vec3 bottom; varying vec3 vP; void main(){ float h = normalize(vP).y; gl_FragColor = vec4(mix(bottom, top, clamp(pow(max(h, 0.0), 0.55), 0.0, 1.0)), 1.0);\n#include <colorspace_fragment>\n}',
+  });
+  sky.add(new THREE.Mesh(new THREE.SphereGeometry(450, 32, 16), mat));
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d'), grd = g.createRadialGradient(64, 64, 6, 64, 64, 64);
+  grd.addColorStop(0, 'rgba(255,255,240,1)'); grd.addColorStop(.25, 'rgba(255,246,205,.95)'); grd.addColorStop(.5, 'rgba(255,232,160,.35)'); grd.addColorStop(1, 'rgba(255,232,160,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 128, 128);
+  const st = new THREE.CanvasTexture(c); st.colorSpace = THREE.SRGBColorSpace;
+  const sunS = new THREE.Sprite(new THREE.SpriteMaterial({ map:st, fog:false, depthWrite:false, transparent:true }));
+  sunS.scale.set(100, 100, 1); sunS.position.set(-150, 190, -330); sky.add(sunS);
+  const cloudMat = new THREE.MeshLambertMaterial({ color:0xffffff, emissive:0xe2f0fb, emissiveIntensity:.5, fog:false });
+  const cloudGeo = new THREE.IcosahedronGeometry(1, 2);
+  for (let i = 0; i < 16; i++){
+    const cg = new THREE.Group();
+    const n = 4 + Math.random() * 4 | 0;
+    for (let j = 0; j < n; j++){
+      const m = new THREE.Mesh(cloudGeo, cloudMat);
+      const r = 4 + Math.random() * 5;
+      m.scale.set(r * 1.3, r * .75, r);
+      m.position.set((j - n / 2) * 5 + Math.random() * 3, Math.random() * 2.5, Math.random() * 4);
+      cg.add(m);
+    }
+    const a = (i / 16) * Math.PI * 2 + Math.random() * .3;
+    cg.position.set(Math.sin(a) * 260, 70 + Math.random() * 60, Math.cos(a) * 260);
+    cg.lookAt(0, cg.position.y, 0);
+    sky.add(cg);
+  }
+}
+
+function canvasTex(w, h, draw, repeat){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'));
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  if (repeat) t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  return t;
+}
+const tTex = canvasTex(256, 256, g => {
+  g.fillStyle = '#d4ae76'; g.fillRect(0,0,256,256);
+  g.fillStyle = '#cba36b'; g.fillRect(0,0,256,128);
+  for (let i = 0; i < 300; i++){ g.fillStyle = `rgba(${Math.random()<.5?'110,80,40':'250,228,185'},.25)`; g.fillRect(Math.random()*256, Math.random()*256, 3, 3); }
+  g.fillStyle = 'rgba(255,255,250,.85)';
+  for (const x of [256/3, 512/3]) g.fillRect(x - 3, 30, 6, 70), g.fillRect(x - 3, 158, 6, 70);
+  g.fillStyle = '#5fa83f'; g.fillRect(0,0,7,256); g.fillRect(249,0,7,256);
+}, true);
+const chevrons = (bg, fg) => g => {
+  g.fillStyle = bg; g.fillRect(0, 0, 128, 128);
+  g.strokeStyle = fg; g.lineWidth = 16; g.lineCap = 'round'; g.lineJoin = 'round';
+  for (const y of [40, 104]){ g.beginPath(); g.moveTo(22, y + 18); g.lineTo(64, y - 18); g.lineTo(106, y + 18); g.stroke(); }
+};
+const padTex = canvasTex(128, 128, chevrons('#ff8a1f', '#fff3b0'), true); padTex.repeat.set(1, 2);
+const zoneTex = canvasTex(128, 128, chevrons('rgba(40,200,255,.55)', 'rgba(255,255,255,.9)'), true);
+const checkTex = canvasTex(128, 32, g => { for (let x = 0; x < 16; x++) for (let y = 0; y < 4; y++){ g.fillStyle = (x + y) % 2 ? '#111' : '#fff'; g.fillRect(x*8, y*8, 8, 8); } });
+checkTex.magFilter = THREE.NearestFilter;
+const bannerTex = (text, bg) => canvasTex(512, 80, g => {
+  g.fillStyle = bg; g.fillRect(0, 0, 512, 80);
+  for (let x = 0; x < 64; x++) for (let y = 0; y < 2; y++){ g.fillStyle = (x + y) % 2 ? '#111' : '#fff'; g.fillRect(x * 8, y * 8, 8, 8); g.fillRect(x * 8, 64 + y * 8, 8, 8); }
+  g.fillStyle = '#fff'; g.font = '900 44px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 256, 41);
+});
+const W_MAT = {
+  track: new THREE.MeshLambertMaterial({ map:tTex }),
+  ground: new THREE.MeshLambertMaterial({ vertexColors:true }),
+  zone: new THREE.MeshBasicMaterial({ map:zoneTex, transparent:true, depthWrite:false }),
+  check: new THREE.MeshLambertMaterial({ map:checkTex }),
+  post: new THREE.MeshLambertMaterial({ color:0xffffff }),
+  zonePost: new THREE.MeshBasicMaterial({ color:0x4fd8ff }),
+  start: new THREE.MeshLambertMaterial({ map:bannerTex('START', '#2b9e5a') }),
+  finish: new THREE.MeshLambertMaterial({ map:bannerTex('FINISH', '#e2453c') }),
+  wood: new THREE.MeshLambertMaterial({ color:0xa8794a }),
+  trunk: new THREE.MeshLambertMaterial({ color:0xffffff }),
+  leaf: new THREE.MeshLambertMaterial({ color:0xffffff, flatShading:true }),
+  stone: new THREE.MeshLambertMaterial({ color:0xffffff, flatShading:true }),
+  plain: new THREE.MeshLambertMaterial({ color:0xffffff }),
+};
+const padMat = new THREE.MeshBasicMaterial({ map:padTex });
+
+// a strip that follows the path, e.g. the track itself
+function ribbon(d0, d1, width, up, uScale, vScale, step = 1){
+  const n = Math.max(1, Math.ceil((d1 - d0) / step)), pos = [], uv = [], idx = [];
+  for (let i = 0; i <= n; i++){
+    const d = d0 + (d1 - d0) * i / n;
+    for (const s of [0, 1]){
+      const p = wpos(d, (s - .5) * width, up);
+      pos.push(p.x, p.y, p.z); uv.push(s * uScale, (d - d0) * vScale);
+    }
+    if (i < n){ const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+
+const world = new THREE.Group();   // everything that depends on the track seed
+scene.add(world);
+const dummy = new THREE.Object3D(), tmpC = new THREE.Color();
+function inst(geo, mat, list, shadow = true){
+  if (!list.length) return;
+  const m = new THREE.InstancedMesh(geo, mat, list.length);
+  list.forEach((it, i) => {
+    dummy.position.set(it.p[0], it.p[1], it.p[2]);
+    dummy.rotation.set(...(it.r || [0, 0, 0]));
+    if (it.look) dummy.lookAt(it.look);
+    dummy.scale.set(...(it.s || [1, 1, 1]));
+    dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix);
+    if (it.c != null) m.setColorAt(i, tmpC.set(it.c));
+  });
+  m.castShadow = shadow; m.receiveShadow = !shadow; m.frustumCulled = false;
+  world.add(m);
+}
+const GEO = {
+  trunk: new THREE.CylinderGeometry(.16, .26, 2.4, 7).translate(0, 1.2, 0),
+  blob: new THREE.IcosahedronGeometry(1, 1),
+  cone: new THREE.ConeGeometry(1, 1.7, 8),
+  tuft: new THREE.ConeGeometry(.12, .7, 4).translate(0, .3, 0),
+  flower: new THREE.IcosahedronGeometry(.16, 0),
+  stem: new THREE.CylinderGeometry(.025, .025, .5, 4).translate(0, .25, 0),
+  rock: new THREE.DodecahedronGeometry(1, 0),
+  post: new THREE.BoxGeometry(.16, .9, .16).translate(0, .45, 0),
+  rail: new THREE.BoxGeometry(.07, .09, 1),
+  cap: new THREE.SphereGeometry(.5, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+  mstem: new THREE.CylinderGeometry(.14, .18, .6, 8).translate(0, .3, 0),
+};
+const pick = a => a[Math.random() * a.length | 0];
+const rr = (a, b) => a + Math.random() * (b - a);
+
+function buildWorld(){
+  for (const c of [...world.children]){ world.remove(c); if (c.geometry && !Object.values(GEO).includes(c.geometry)) c.geometry.dispose(); if (c.isInstancedMesh) c.dispose(); }
+  const D0 = -60, D1 = RACE + 160;
+  // track + meadow
+  const tr = new THREE.Mesh(ribbon(D0, D1, LW * 3 + .6, 0, 1, 1 / 7), W_MAT.track);
+  tr.receiveShadow = true; world.add(tr);
+  {
+    const L = D1 - D0 + 160, gg = new THREE.PlaneGeometry(380, L, 76, Math.round(L / 3.5));
+    gg.rotateX(-Math.PI / 2); gg.translate(0, 0, -(D0 + D1) / 2);
+    const p = gg.attributes.position, cols = [];
+    for (let i = 0; i < p.count; i++){
+      const d = -p.getZ(i), x = p.getX(i) + cx(d);
+      p.setX(i, x); p.setY(i, groundY(x, d));
+      const n = Math.sin(x * .21 - d * .13) * Math.sin(x * .07 + d * .11), dry = Math.max(0, Math.sin(x * .03 + d * .02)) * .15;
+      cols.push(.42 + n * .05 + dry, .7 + n * .08 + dry * .4, .3 + n * .04);
+    }
+    gg.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+    gg.computeVertexNormals();
+    const gm = new THREE.Mesh(gg, W_MAT.ground); gm.receiveShadow = true; world.add(gm);
+  }
+  // start / finish gates
+  for (const [d, mat] of [[0, W_MAT.start], [RACE, W_MAT.finish]]){
+    world.add(new THREE.Mesh(ribbon(d - .7, d + .7, LW * 3 + .6, .012, 16, 1 / 1.4 * 4, .7), W_MAT.check));
+    for (const sx of [-1, 1]){
+      const pp = new THREE.Mesh(new THREE.CylinderGeometry(.15, .15, 5, 10), W_MAT.post);
+      pp.position.copy(wpos(d, sx * (LW * 1.5 + .8), 2.5)); pp.castShadow = true; world.add(pp);
+    }
+    const b = new THREE.Mesh(new THREE.BoxGeometry(LW * 3 + 2, 1, .2), mat);
+    b.position.copy(wpos(d, 0, 5)); b.rotation.y = yaw(d); b.castShadow = true; world.add(b);
+  }
+  // speed zones
+  for (const z of zones){
+    world.add(new THREE.Mesh(ribbon(z.a, z.b, LW * 3 + .4, .02, 3, 1 / 3), W_MAT.zone));
+    const posts = [];
+    for (let d = z.a; d <= z.b; d += 7.5) for (const sx of [-1, 1]){ const p = wpos(d, sx * (LW * 1.5 + .45), .8); posts.push({ p:[p.x, p.y, p.z], s:[1, 1, 1] }); }
+    inst(new THREE.CylinderGeometry(.1, .1, 1.6, 8), W_MAT.zonePost, posts, false);
+  }
+  // wooden fence along both edges
+  const posts = [], rails = [], FX = LW * 1.5 + 1.05;
+  for (const sx of [-1, 1]){
+    let prev = null;
+    for (let d = D0 + 30; d < D1 - 20; d += 3){
+      const p = wpos(d, sx * FX, 0);
+      posts.push({ p:[p.x, p.y, p.z] });
+      if (prev) for (const h of [.38, .72]){
+        const a = prev.clone().setY(prev.y + h), b = p.clone().setY(p.y + h);
+        const m = a.clone().add(b).multiplyScalar(.5);
+        rails.push({ p:[m.x, m.y, m.z], look:b, s:[1, 1, a.distanceTo(b)] });
+      }
+      prev = p;
+    }
+  }
+  inst(GEO.post, W_MAT.wood, posts); inst(GEO.rail, W_MAT.wood, rails);
+  // trees, bushes, flowers, rocks
+  const trunks = [], leaves = [], pines = [], tufts = [], flowers = [], stems = [], rocks = [], bushes = [], caps = [], mstems = [];
+  const GREENS = [0x3f8f3a, 0x4fa043, 0x5aae4a, 0x357f35, 0x6fb94a, 0x2f7330];
+  const PINES = [0x2e6b3a, 0x2a6234, 0x37774a, 0x2f7041];
+  const BLOOM = [0xffffff, 0xffd84a, 0xff7aa8, 0x9fc2ff, 0xff9a3d, 0xe27bff];
+  const at = (d, lat) => { const x = cx(d) + lat; return [x, groundY(x, d), -d]; };
+  for (let d = D0; d < D1; d += 2){
+    for (const sx of [-1, 1]){
+      for (let k = 0; k < 2; k++){ const p = at(d + rr(0, 2), sx * rr(LW * 1.5 + 1.3, LW * 1.5 + 7)); tufts.push({ p, r:[rr(-.3, .3), rr(0, 3), rr(-.3, .3)], s:[1, rr(.7, 1.5), 1], c:pick([0x4fa83a, 0x5fb846, 0x3e9135, 0x78c552]) }); }
+      if (Math.random() < .4){ const p = at(d + rr(0, 2), sx * rr(LW * 1.5 + 1.4, 14)); const h = rr(.7, 1.3); stems.push({ p, s:[1, h, 1] }); flowers.push({ p:[p[0], p[1] + .5 * h, p[2]], c:pick(BLOOM), s:[1, .7, 1] }); }
+      if (Math.random() < .12){ const p = at(d, sx * rr(6, 16)); const s = rr(.8, 1.8); bushes.push({ p:[p[0], p[1] + s * .35, p[2]], s:[s * 1.3, s * .85, s * 1.1], r:[0, rr(0, 3), 0], c:pick(GREENS) }); }
+      if (Math.random() < .05){ const p = at(d, sx * rr(5.5, 22)); const s = rr(.4, 1.4); rocks.push({ p:[p[0], p[1] + s * .25, p[2]], s:[s * 1.2, s * .7, s], r:[rr(0, 3), rr(0, 3), 0], c:pick([0x9aa0a8, 0x8a8f96, 0xa7a39a]) }); }
+      if (Math.random() < .03){ const p = at(d, sx * rr(5.3, 8)); const s = rr(.7, 1.6); mstems.push({ p, s:[s, s, s] }); caps.push({ p:[p[0], p[1] + .55 * s, p[2]], s:[s, s, s], c:pick([0xe84545, 0xf0a531, 0xc177e6]) }); }
+      if (Math.random() < .24){
+        const p = at(d + rr(0, 2), sx * rr(9, 55)), s = rr(.8, 1.6);
+        if (Math.random() < .6){
+          trunks.push({ p, s:[s, s * rr(.9, 1.2), s], c:pick([0x7a5232, 0x6b4729, 0x8a5d38]) });
+          const g = pick(GREENS);
+          for (let k = 0; k < 4; k++){
+            const o = [rr(-.7, .7) * s, (2.5 + rr(0, 1.1)) * s, rr(-.7, .7) * s];
+            leaves.push({ p:[p[0] + o[0], p[1] + o[1], p[2] + o[2]], s:[s * rr(1, 1.5), s * rr(.85, 1.2), s * rr(1, 1.5)], r:[rr(0, 3), rr(0, 3), 0], c:tmpC.set(g).offsetHSL(rr(-.02, .02), 0, rr(-.05, .05)).getHex() });
+          }
+        } else {
+          trunks.push({ p, s:[s * .6, s * .8, s * .6], c:0x6b4729 });
+          const g = pick(PINES);
+          [[1.6, 1.45], [2.5, 1.1], [3.3, .75]].forEach(([y, w]) => pines.push({ p:[p[0], p[1] + y * s, p[2]], s:[w * s, s, w * s], r:[0, rr(0, 3), 0], c:g }));
+        }
+      }
+    }
+  }
+  inst(GEO.trunk, W_MAT.trunk, trunks); inst(GEO.blob, W_MAT.leaf, leaves); inst(GEO.cone, W_MAT.leaf, pines);
+  inst(GEO.blob, W_MAT.leaf, bushes); inst(GEO.rock, W_MAT.stone, rocks);
+  inst(GEO.tuft, W_MAT.plain, tufts, false); inst(GEO.stem, W_MAT.wood, stems, false); inst(GEO.flower, W_MAT.plain, flowers, false);
+  inst(GEO.mstem, W_MAT.post, mstems); inst(GEO.cap, W_MAT.plain, caps);
+}
+
+// ---------- track objects ----------
+const MAT = {
+  rock: new THREE.MeshStandardMaterial({ color:0x8a8f99, roughness:.95, flatShading:true }),
+  salt: new THREE.MeshStandardMaterial({ color:0xfbfbf6, roughness:.7, flatShading:true }),
+  puddle: new THREE.MeshStandardMaterial({ color:0x4a9ee8, roughness:.1, metalness:.2, transparent:true, opacity:.78 }),
+  leaf: new THREE.MeshStandardMaterial({ color:0x5fcf4a, roughness:.6 }),
+  leaf2: new THREE.MeshStandardMaterial({ color:0x9be36e, roughness:.6 }),
+  dew: new THREE.MeshStandardMaterial({ color:0x7cd0ff, roughness:.05, metalness:.1, transparent:true, opacity:.85, emissive:0x1a6aa0, emissiveIntensity:.5 }),
+  crystal: new THREE.MeshStandardMaterial({ color:0xff66cc, roughness:.15, metalness:.3, emissive:0xff66cc, emissiveIntensity:.45, flatShading:true }),
+};
+const crystalGlowMat = new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:.25, depthWrite:false });
+function shadowy(o){ o.traverse(m => { if (m.isMesh) m.castShadow = true; }); return o; }
+function makeObj(kind){
+  const g = new THREE.Group(), spin = new THREE.Group();
+  g.add(spin);
+  if (kind === 'rock'){
+    const m = new THREE.Mesh(new THREE.DodecahedronGeometry(.75, 0), MAT.rock);
+    m.scale.set(1, .75, 1); m.position.y = .45; m.rotation.set(Math.random()*3, Math.random()*3, 0);
+    spin.add(m);
+  } else if (kind === 'salt'){
+    const m = new THREE.Mesh(new THREE.ConeGeometry(.8, 1.0, 9), MAT.salt);
+    m.position.y = .5; spin.add(m);
+    for (let i = 0; i < 6; i++){
+      const c = new THREE.Mesh(new THREE.BoxGeometry(.12, .12, .12), MAT.salt);
+      const a = Math.random() * 6.28, r = .85 + Math.random() * .3;
+      c.position.set(Math.cos(a) * r, .06, Math.sin(a) * r); c.rotation.y = a; spin.add(c);
+    }
+  } else if (kind === 'puddle'){
+    const m = new THREE.Mesh(new THREE.CircleGeometry(1.05, 24), MAT.puddle);
+    m.rotation.x = -Math.PI / 2; m.position.y = .03; m.scale.set(1, .75, 1); g.add(m);
+    return { g, spin };
+  } else if (kind === 'lettuce'){
+    for (let i = 0; i < 5; i++){
+      const m = new THREE.Mesh(new THREE.SphereGeometry(.28, 10, 8), i % 2 ? MAT.leaf2 : MAT.leaf);
+      const a = i / 5 * 6.28;
+      m.position.set(i ? Math.cos(a) * .22 : 0, i ? .45 : .62, i ? Math.sin(a) * .22 : 0); m.scale.set(1, .8, 1);
+      spin.add(m);
+    }
+  } else if (kind === 'dew'){
+    const s = new THREE.Mesh(new THREE.SphereGeometry(.34, 16, 12), MAT.dew); s.position.y = .65;
+    const c = new THREE.Mesh(new THREE.ConeGeometry(.29, .45, 16), MAT.dew); c.position.y = 1.0;
+    spin.add(s, c);
+  } else if (kind === 'crystal'){
+    const m = new THREE.Mesh(new THREE.OctahedronGeometry(.48, 0), MAT.crystal);
+    m.scale.set(1, 1.35, 1); m.position.y = .95;
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(.75, 16, 12), crystalGlowMat); halo.position.y = .95;
+    spin.add(m, halo);
+  } else if (kind === 'pad'){
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(LW * .82, 4), padMat);
+    m.rotation.x = -Math.PI / 2; m.position.y = .03; g.add(m);
+    return { g, spin };
+  }
+  shadowy(spin);
+  return { g, spin };
+}
+function placeAt(obj, d, lat, up = 0){
+  obj.position.copy(wpos(d, lat, up));
+  obj.rotation.order = 'YXZ';
+  obj.rotation.set(Math.atan(hyd(d)), yaw(d), 0);
+}
+
+// The track layout comes from a seed so every player in an online room gets the same one.
+let objs = [], objByKey = new Map(), zones = [];
+const inZone = d => zones.some(z => d >= z.a && d <= z.b);
+function addObj(kind, lane, d, key){
+  const { g, spin } = makeObj(kind);
+  placeAt(g, d, laneX(lane)); scene.add(g);
+  const o = { key, kind, lane, d, mesh:g, spin, phase:Math.random() * 6 };
+  objs.push(o); objByKey.set(key, o);
+  return o;
+}
+function buildTrack(seed){
+  const R = mulberry32(seed);
+  setPath(seed);
+  for (const o of objs) scene.remove(o.mesh);
+  objs = []; objByKey = new Map(); zones = [];
+  let n = 0;
+  const add = (kind, lane, d) => addObj(kind, lane, d, 't' + n++);
+  for (const f of [.18, .46, .74]){ const a = RACE * f + (R() - .5) * 80; zones.push({ a, b:a + 80 }); }
+  const hazard = () => { const r = R(); return r < .25 ? 'puddle' : r < .65 ? 'rock' : 'salt'; };
+  let d = 70;
+  while (d < RACE - 40){
+    const lanes = [0, 1, 2];
+    for (let i = 2; i > 0; i--){ const j = R() * (i + 1) | 0; [lanes[i], lanes[j]] = [lanes[j], lanes[i]]; }
+    if (zones.some(z => d > z.a - 6 && d < z.b + 6)){
+      if (R() < .6) add('lettuce', lanes[0], d);   // speed zones are a free run: just a line of snacks
+      d += 15; continue;
+    }
+    const r = R(), diff = d / RACE;
+    if (r < .27){
+      const k = R() < .5 ? 3 : 2;
+      for (let i = 0; i < k; i++) add('crystal', lanes[i], d);
+    } else if (r < .45){
+      add('pad', lanes[0], d);
+      if (R() < .45) add(hazard(), lanes[1], d + 4);
+    } else {
+      const nh = diff > .45 && R() < .22 ? 2 : 1;
+      for (let i = 0; i < nh; i++) add(hazard(), lanes[i], d);
+      if (R() < .5) add(R() < .65 ? 'lettuce' : 'dew', lanes[nh], d + (R() < .5 ? 0 : 7));
+    }
+    d += 32 + R() * 16;
+  }
+  buildWorld();
+}
+
+// ---------- snails ----------
+function label(text, css){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 64;
+  const g = c.getContext('2d');
+  g.font = 'bold 32px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const w = Math.min(250, g.measureText(text).width + 44);
+  g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.roundRect(128 - w/2, 8, w, 48, 24); g.fill();
+  g.fillStyle = css; g.beginPath(); g.arc(128 - w/2 + 20, 32, 8, 0, 7); g.fill();
+  g.fillStyle = '#fff'; g.fillText(text, 128 + 10, 33, 200);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:t, transparent:true, depthWrite:false }));
+  s.scale.set(2.2, .55, 1); s.position.y = 2.45;
+  return s;
+}
+const emoCache = new Map();
+function emoTex(e){
+  if (!emoCache.has(e)) emoCache.set(e, canvasTex(128, 128, g => { g.font = '96px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(e, 64, 70); }));
+  return emoCache.get(e);
+}
+
+// A logarithmic-spiral shell: a tube that coils inward and shrinks, with darker growth bands.
+// Shared by all snails; the vertex colours are a shade that multiplies the player's colour.
+const SHELL_GEO = (() => {
+  const b = .13, R0 = .42, turns = 3.3 * Math.PI, segs = 150, rs = 20;
+  const k = Math.exp(-2 * Math.PI * b), c = (1 - k) / (1 + k) * 1.04;
+  const pos = [], col = [], idx = [];
+  for (let i = 0; i <= segs; i++){
+    const t = i / segs * turns, R = R0 * Math.exp(-b * t), r = c * R, a = -Math.PI / 2 - t;
+    const ry = Math.sin(a), rz = Math.cos(a);
+    const band = .74 + .26 * (.5 + .5 * Math.sin(t * 3.4)), tip = 1 + .25 * (i / segs);
+    for (let j = 0; j <= rs; j++){
+      const ph = j / rs * Math.PI * 2, rad = Math.cos(ph) * r;
+      // inner whorls bulge sideways so the coil reads as a solid, rounded shell
+      const xw = r * 1.55 + (R0 - R) * .62;
+      pos.push(Math.sin(ph) * xw, ry * (R + rad), rz * (R + rad));
+      const sh = Math.min(1.15, band * tip * (.9 + .1 * Math.cos(ph)));
+      col.push(sh, sh, sh);
+    }
+    if (i < segs) for (let j = 0; j < rs; j++){ const a0 = i * (rs + 1) + j, b0 = a0 + rs + 1; idx.push(a0, b0, a0 + 1, b0, b0 + 1, a0 + 1); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+})();
+const SNAIL_GEO = {
+  foot: new THREE.CapsuleGeometry(.3, 1.45, 8, 18),
+  neck: new THREE.CapsuleGeometry(.23, .45, 6, 14),
+  head: new THREE.SphereGeometry(.3, 20, 16),
+  eye: new THREE.SphereGeometry(.13, 16, 12),
+  pupil: new THREE.SphereGeometry(.07, 12, 10),
+  glint: new THREE.SphereGeometry(.028, 8, 6),
+  smile: new THREE.TorusGeometry(.09, .018, 6, 16, Math.PI),
+  cheek: new THREE.SphereGeometry(.055, 10, 8),
+  jet: new THREE.CylinderGeometry(.09, .12, .36, 12),
+  flame: new THREE.ConeGeometry(.11, .6, 10),
+  bubble: new THREE.SphereGeometry(1.45, 20, 14),
+  stalk: [-1, 1].map(sx => new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(
+    new THREE.Vector3(sx * .1, .98, -1.02), new THREE.Vector3(sx * .12, 1.32, -1.08), new THREE.Vector3(sx * .2, 1.52, -1.0)), 12, .038, 8)),
+};
+const BASE_MATS = {
+  body: new THREE.MeshStandardMaterial({ color:0xf3d6a2, roughness:.45 }),
+  foot: new THREE.MeshStandardMaterial({ color:0xe0b47c, roughness:.55 }),
+  white: new THREE.MeshStandardMaterial({ color:0xffffff, roughness:.2 }),
+  black: new THREE.MeshBasicMaterial({ color:0x15110e }),
+  glint: new THREE.MeshBasicMaterial({ color:0xffffff }),
+  cheek: new THREE.MeshBasicMaterial({ color:0xff8fa3 }),
+  metal: new THREE.MeshStandardMaterial({ color:0xb9c1d0, roughness:.3, metalness:.8 }),
+};
+const flameMat = new THREE.MeshBasicMaterial({ color:0xffa53d, transparent:true, opacity:.9 });
+const bubbleMat = new THREE.MeshBasicMaterial({ color:0xffcf5c, transparent:true, opacity:.22, depthWrite:false });
+
+function makeSnail(color, css, name){
+  const M = {};
+  for (const k in BASE_MATS) M[k] = BASE_MATS[k].clone();
+  M.shell = new THREE.MeshPhysicalMaterial({ color, roughness:.32, clearcoat:.8, clearcoatRoughness:.25, vertexColors:true });
+  const g = new THREE.Group(), inner = new THREE.Group();
+  g.rotation.order = 'YXZ';
+  g.add(inner);
+  const add = (geo, mat, p, r, s) => { const m = new THREE.Mesh(geo, mat); if (p) m.position.set(...p); if (r) m.rotation.set(...r); if (s) m.scale.set(...s); m.castShadow = true; inner.add(m); return m; };
+  add(SNAIL_GEO.foot, M.foot, [0, .15, .08], [Math.PI / 2, 0, 0], [1.4, 1, .5]);
+  add(SNAIL_GEO.foot, M.body, [0, .24, .02], [Math.PI / 2, 0, 0], [1.1, .92, .55]);
+  add(SNAIL_GEO.neck, M.body, [0, .52, -.8], [-.45, 0, 0]);
+  add(SNAIL_GEO.head, M.body, [0, .85, -1.0], null, [1, .93, 1.05]);
+  const eyes = new THREE.Group(); inner.add(eyes);
+  for (const [i, sx] of [[0, -1], [1, 1]]){
+    const e = (geo, mat, p) => { const m = new THREE.Mesh(geo, mat); m.position.set(...p); eyes.add(m); return m; };
+    e(SNAIL_GEO.stalk[i], M.body, [0, 0, 0]);
+    e(SNAIL_GEO.eye, M.white, [sx * .2, 1.6, -1.0]);
+    e(SNAIL_GEO.pupil, M.black, [sx * .21, 1.61, -1.1]);
+    e(SNAIL_GEO.glint, M.glint, [sx * .18, 1.66, -1.16]);
+  }
+  add(SNAIL_GEO.smile, M.black, [0, .79, -1.3], [.15, 0, Math.PI]);
+  for (const sx of [-1, 1]) add(SNAIL_GEO.cheek, M.cheek, [sx * .19, .82, -1.24], null, [1, .6, .4]).castShadow = false;
+  const shell = add(SHELL_GEO, M.shell, [0, .98, .22]);
+  add(SNAIL_GEO.jet, M.metal, [0, .55, 1.02], [Math.PI / 2, 0, 0]);
+  const fm = flameMat.clone();
+  const flame = new THREE.Mesh(SNAIL_GEO.flame, fm);
+  flame.rotation.x = Math.PI / 2; flame.position.set(0, .55, 1.48); flame.visible = false; inner.add(flame);
+  const bubble = new THREE.Mesh(SNAIL_GEO.bubble, bubbleMat);
+  bubble.position.y = .8; bubble.visible = false; inner.add(bubble);
+  const tag = label(name, css);
+  const emo = new THREE.Sprite(new THREE.SpriteMaterial({ transparent:true, depthWrite:false }));
+  emo.scale.set(1, 1, 1); emo.position.y = 3.2; emo.visible = false;
+  g.add(tag, emo);
+  scene.add(g);
+  return { g, inner, shell, flame, fm, bubble, eyes, tag, emo, mats:[M.body, M.foot, M.white, M.black, M.metal, M.shell, M.cheek, M.glint], ghost:false };
+}
+function setGhost(m, on){
+  if (m.ghost === on) return;
+  m.ghost = on;
+  for (const mt of m.mats){ mt.transparent = on; mt.opacity = on ? .35 : 1; mt.depthWrite = !on; mt.needsUpdate = true; }
+}
+function emote(s, e){
+  if (!s || s === player) return;
+  const m = s.m.emo;
+  m.material.map = emoTex(e); m.material.needsUpdate = true; m.visible = true; s.emoT = 1.4;
+}
+
+// racer kinds: 'me' (keyboard/touch), 'ai' (simulated here), 'remote' (driven by network updates)
+let snails = [], player = null, byId = new Map(), myId = 'me';
+function makeRacers(specs){
+  for (const s of snails) scene.remove(s.m.g);
+  byId = new Map();
+  snails = specs.map((sp, i) => {
+    const col = COLORS[sp.ci % COLORS.length];
+    const s = {
+      id:sp.id, name:sp.name, kind:sp.kind, ai:sp.ai || null, bot:!!sp.bot, i, css:col.css,
+      m: makeSnail(col.hex, col.css, sp.label || sp.name),
+      lane:sp.lane, x:laneX(sp.lane), d:START_D, v:0,
+      heat:0, overheat:0, slow:0, stun:0, boost:0, pad:0, shield:false, wantTurbo:false, turbo:false,
+      pw:null, pwT:0, emoT:0, wasAhead:undefined,
+      hits:new Set(), think:Math.random() * .3, finished:false, time:0, wob:Math.random() * 6, left:false, net:null, zone:false,
+    };
+    byId.set(s.id, s);
+    return s;
+  });
+  player = snails.find(s => s.id === myId) || snails[0];
+  const prog = $('prog');
+  prog.querySelectorAll('i').forEach(e => e.remove());
+  for (const s of snails){
+    const dot = document.createElement('i');
+    dot.style.background = s.css; if (s === player) dot.className = 'me';
+    prog.appendChild(dot); s.dot = dot;
+  }
+}
+
+// ---------- particles / effects ----------
+const pGeo = new THREE.SphereGeometry(.09, 6, 4);
+let parts = [];
+const _v = new THREE.Vector3();
+function burst(d, lat, up, color, n, vy = 0, spread = 5){
+  if (parts.length > 320) return;
+  wpos(d, lat, up, _v);
+  for (let i = 0; i < n; i++){
+    const m = new THREE.Mesh(pGeo, new THREE.MeshBasicMaterial({ color, transparent:true }));
+    m.position.copy(_v); scene.add(m);
+    parts.push({ m, vx:(Math.random() - .5) * spread, vy:vy + Math.random() * 4, vz:(Math.random() - .5) * spread, life:.5 + Math.random() * .4, grav:vy ? 0 : 9 });
+  }
+}
+const boltMat = new THREE.MeshBasicMaterial({ color:0xfff36b, transparent:true });
+let fx = [];
+function zapFx(s){
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(.12, .25, 14, 6), boltMat.clone());
+  m.position.copy(wpos(s.d, s.x, 7)); scene.add(m);
+  fx.push({ m, life:.35 });
+  burst(s.d, s.x, 1, 0xfff36b, 18);
+}
+function stepParts(dt){
+  for (const p of parts){
+    p.life -= dt; p.vy -= p.grav * dt;
+    p.m.position.x += p.vx * dt; p.m.position.y += p.vy * dt; p.m.position.z += p.vz * dt;
+    p.m.material.opacity = Math.min(1, p.life * 2);
+    if (p.life <= 0){ scene.remove(p.m); p.m.material.dispose(); }
+  }
+  parts = parts.filter(p => p.life > 0);
+  for (const f of fx){
+    f.life -= dt; f.m.material.opacity = Math.max(0, f.life * 3); f.m.scale.x = f.m.scale.z = 1 + Math.random();
+    if (f.life <= 0){ scene.remove(f.m); f.m.material.dispose(); f.m.geometry.dispose(); }
+  }
+  fx = fx.filter(f => f.life > 0);
+}
+function clearParts(){
+  for (const p of parts){ scene.remove(p.m); p.m.material.dispose(); } parts = [];
+  for (const f of fx){ scene.remove(f.m); f.m.material.dispose(); } fx = [];
+}
+
+// ---------- simulation ----------
+// state: idle | count | race | finishing | over | paused      mode: ai | watch | online
+let state = 'idle', mode = 'ai', raceT = 0, countT = 0, finishT = 0, lastBeep = 0;
+const baseSpeed = () => Math.min(27, 17 + raceT * .22);
+
+function rollPower(s){
+  const st = standings().filter(x => !x.left), place = st.indexOf(s), lastPlace = place === st.length - 1, first = place === 0;
+  const w = {};
+  for (const k in POWERS) w[k] = POWERS[k].w;
+  if (lastPlace && st.length > 1){ w.rocket *= 2.2; w.zap *= 1.5; w.salt *= .4; }
+  if (first){ w.rocket *= .5; w.zap *= .6; w.salt *= 1.8; w.shield *= 1.5; }
+  let r = Math.random() * Object.values(w).reduce((a, b) => a + b, 0);
+  for (const k in w){ r -= w[k]; if (r <= 0) return k; }
+  return 'rocket';
+}
+function nearestRival(s){
+  let ahead = null, behind = null;
+  for (const o of snails){
+    if (o === s || o.left || o.finished) continue;
+    const dd = o.d - s.d;
+    if (dd > 0 && (!ahead || dd < ahead.d - s.d)) ahead = o;
+    if (dd <= 0 && (!behind || dd > behind.d - s.d)) behind = o;
+  }
+  return ahead || behind;
+}
+let dropN = 0;
+function usePower(s, p){
+  if (!p || s.finished) return;
+  const me = s === player;
+  emote(s, POWERS[p].e);
+  if (p === 'shield') s.shield = true;
+  else if (p === 'salt'){
+    const key = 'd' + s.id + '-' + (++dropN), d = s.d - 3;
+    const o = addObj('salt', s.lane, d, key);
+    s.hits.add(o);
+    netSend({ t:'drop', key, lane:s.lane, d:+d.toFixed(2), by:s.id });
+    if (!me && player && s.d > player.d && s.d - player.d < 35) toast(`🧂 ${s.name} dropped salt!`);
+  } else if (p === 'zap'){
+    const t = nearestRival(s);
+    if (t){
+      zapFx(t);
+      if (t.kind === 'remote') netSend({ t:'zap', target:t.id, by:s.id });
+      else applyZap(t, s);
+    }
+  } else {
+    s.pw = p; s.pwT = POWERS[p].dur;
+    if (p === 'ice'){ s.heat = 0; s.overheat = 0; }
+    if (p === 'rocket') burst(s.d - 1.2, s.x, 1, 0xff8a3d, 16, 1);
+  }
+  if (me){ toast(POWERS[p].e + ' ' + POWERS[p].name + '!'); sfx(p === 'zap' ? 'zap' : 'power'); buzz(30); }
+}
+function applyZap(t, by){
+  if (t.finished) return;
+  if (t.pw === 'ghost' || t.pw === 'rocket'){ if (t === player) toast('Zap missed you!'); return; }
+  if (t.shield){ t.shield = false; if (t === player) toast('🛡️ Shield blocked a zap'); return; }
+  t.stun = 1.2; t.wantTurbo = false; emote(t, '😵');
+  if (t === player){ toast(`⚡ Zapped${by && by !== player ? ' by ' + by.name : ''}!`); sfx('zap'); buzz(140); }
+}
+
+function aiThink(s, dt){
+  const A = s.ai;
+  s.think -= dt;
+  if (s.think > 0) return;
+  s.think = A.react * (.7 + Math.random() * .6);
+  const look = Math.max(9, s.v * A.look * 1.6 + 4);
+  const cost = [0, 0, 0];
+  const immune = s.pw === 'ghost' || s.pw === 'rocket';
+  const blind = Math.random() < (A.risk || 0);      // sometimes it just doesn't notice the danger
+  for (const o of objs){
+    const rel = o.d - s.d;
+    if (rel < -.6 || rel > look || o.taken || s.hits.has(o)) continue;
+    const k = KINDS[o.kind], w = 1.2 - rel / look * .6;
+    if (k.deadly) cost[o.lane] += immune || blind ? 0 : (s.shield ? 30 : 100) * w;
+    else if (o.kind === 'puddle') cost[o.lane] += immune || blind ? 0 : 25 * w;
+    else if (o.kind === 'crystal') cost[o.lane] -= 18 * w * A.greed;
+    else if (o.kind === 'pad') cost[o.lane] -= 12 * w;
+    else {
+      const val = o.kind === 'lettuce' ? 12 : (s.heat > 45 || s.overheat > 0 ? 22 : 3);
+      cost[o.lane] -= val * w * A.greed;
+    }
+  }
+  if (Math.random() >= A.mistake){
+    let bestL = s.lane, bestC = cost[s.lane];
+    for (const l of [s.lane - 1, s.lane + 1]){
+      if (l < 0 || l >= LANES) continue;
+      const far = l + (l - s.lane), farC = far >= 0 && far < LANES ? Math.min(cost[far], cost[l] + 40) : Infinity;
+      const c = Math.min(cost[l], farC + 4) + 3;
+      if (c < bestC){ bestC = c; bestL = l; }
+    }
+    // nothing around: wander between lanes now and then, like a real racer looking for a line
+    if (bestL === s.lane && cost.every(c => Math.abs(c) < 1) && Math.random() < (A.weave || 0)) bestL = Math.max(0, Math.min(2, s.lane + (Math.random() < .5 ? -1 : 1)));
+    s.lane = bestL;
+  }
+  if (s.pw === 'ice') s.wantTurbo = true;
+  else if (s.wantTurbo && s.heat > A.hi * (.85 + Math.random() * .3)) s.wantTurbo = false;
+  else if (!s.wantTurbo && s.heat < A.lo) s.wantTurbo = Math.random() < .7;
+
+}
+
+function takeObj(o){
+  if (o.taken) return;
+  o.taken = true; o.mesh.visible = false;
+  burst(o.d, laneX(o.lane), .8, o.kind === 'dew' ? 0x7cd0ff : 0x5fcf4a, 10);
+}
+
+function stepSnail(s, dt){
+  if (s.finished){
+    s.v += (5 - s.v) * Math.min(1, dt * 1.5); s.d += s.v * dt; s.turbo = false; s.pw = null;
+    s.x += (laneX(s.lane) - s.x) * Math.min(1, dt * 10);
+    s.stun = Math.max(0, s.stun - dt);
+    return;
+  }
+  const me = s === player;
+  if (s.pw){ s.pwT -= dt; if (s.pwT <= 0) s.pw = null; }
+  const rocket = s.pw === 'rocket', ghost = s.pw === 'ghost', ice = s.pw === 'ice';
+  s.turbo = s.wantTurbo && s.overheat <= 0 && s.stun <= 0 && !rocket;
+  if (ice){ s.heat = Math.max(0, s.heat - 60 * dt); s.overheat = 0; }
+  else if (s.overheat > 0){
+    s.overheat -= dt; s.heat = Math.max(0, s.heat - 60 * dt);
+    if (s.overheat <= 0) s.heat = 0;
+  } else if (s.turbo){
+    s.heat += 34 * dt;
+    if (s.heat >= 100){
+      s.heat = 100; s.overheat = 1.6; s.turbo = false;
+      burst(s.d - .8, s.x, 1.2, 0x999999, 12, 2);
+      emote(s, '🥵');
+      if (me){ toast('🔥 Overheated!'); sfx('hot'); buzz(60); }
+    }
+  } else s.heat = Math.max(0, s.heat - 24 * dt);
+  s.slow = Math.max(0, s.slow - dt); s.stun = Math.max(0, s.stun - dt); s.boost = Math.max(0, s.boost - dt); s.pad = Math.max(0, s.pad - dt);
+  const z = inZone(s.d);
+  if (z && !s.zone && me){ toast('💨 Speed zone!'); sfx('pad'); }
+  s.zone = z;
+  let mult = rocket ? 2.1 : s.turbo ? 1.7 : 1;
+  if (s.overheat > 0 && !rocket) mult *= .55;
+  if (s.slow > 0) mult *= .55;
+  if (s.boost > 0) mult *= 1.3;
+  if (s.pad > 0) mult *= 1.45;
+  if (z) mult *= 1.35;
+  if (s.stun > 0) mult *= .15;
+  mult *= 1 - Math.max(-.15, Math.min(.15, hyd(s.d) * 1.6));      // uphill is slower, downhill faster
+  if (s.ai) mult *= s.ai.speed || 1;
+  if (mode === 'ai' && s !== player && player){
+    // keep races close: AI far ahead eases off a little, AI far behind pushes harder
+    mult *= Math.max(.9, Math.min(1.1, 1 + (player.d - s.d) / 260));
+  }
+  const target = baseSpeed() * mult;
+  s.v += (target - s.v) * Math.min(1, dt * (target < s.v ? 8 : 3.5));
+  const d0 = s.d;
+  s.d += s.v * dt;
+  if (s.stun <= 0) s.x += (laneX(s.lane) - s.x) * Math.min(1, dt * 14);
+
+  for (const o of objs){
+    if (o.taken || s.hits.has(o)) continue;
+    const k = KINDS[o.kind];
+    if (o.d < d0 - k.r - .55 || o.d > s.d + k.r + .55 || Math.abs(laneX(o.lane) - s.x) > LW * .45) continue;
+    const ol = laneX(o.lane);
+    if (o.kind === 'crystal'){
+      s.hits.add(o);
+      if (me){ o.mesh.visible = false; burst(o.d, ol, 1, 0xff66cc, 14); sfx('crystal'); }
+      usePower(s, rollPower(s));
+    } else if (o.kind === 'pad'){
+      s.hits.add(o); s.pad = 1.3;
+      if (me){ toast('⏩ Boost!'); sfx('pad'); buzz(15); }
+    } else if (KINDS[o.kind].pickup){
+      takeObj(o); netTake(o.key);
+      if (o.kind === 'lettuce'){ s.boost = 1.6; if (me) toast('🥬 Snack boost!'); }
+      if (o.kind === 'dew'){ s.heat = Math.max(0, s.heat - 50); s.overheat = 0; if (me) toast('💧 Cooled down'); }
+      if (me){ sfx('pick'); buzz(15); }
+    } else {
+      s.hits.add(o);
+      if (ghost) continue;
+      if (rocket){
+        if (o.kind !== 'puddle'){ burst(o.d, ol, .8, o.kind === 'salt' ? 0xffffff : 0x8a8f99, 20); o.mesh.visible = false; if (me){ toast('💥 Smash!'); sfx('crash'); } }
+        continue;
+      }
+      if (o.kind === 'puddle'){ s.slow = 1; burst(o.d, ol, .3, 0x7cd0ff, 8); if (me) toast('💦 Splash'); }
+      else if (s.shield){
+        s.shield = false; burst(o.d, ol, .8, 0xffcf5c, 16);
+        if (me){ toast('🛡️ Shield saved you!'); sfx('pick'); }
+      } else {
+        s.stun = 1.2; s.wantTurbo = false;
+        burst(o.d, ol, .8, o.kind === 'salt' ? 0xffffff : 0x8a8f99, 16);
+        emote(s, '😵');
+        if (me){ toast(o.kind === 'salt' ? '🧂 Salted! Ouch' : '🪨 Bonk!'); sfx('crash'); buzz(120); }
+      }
+    }
+  }
+
+  if (s.d >= RACE){
+    s.finished = true; s.time = raceT; s.pw = null;
+    emote(s, '🏁');
+    if (me) onMyFinish();
+  }
+}
+
+// remote snails: follow the latest network state with a little prediction
+function stepRemote(s, dt){
+  const n = s.net;
+  if (!n) return;
+  const age = (performance.now() - n.at) / 1000;
+  const pred = n.d + n.v * Math.min(age, .5);
+  s.v = n.v; s.d += s.v * dt;
+  s.d += (pred - s.d) * Math.min(1, dt * 5);
+  if (Math.abs(pred - s.d) > 25) s.d = pred;
+  s.x += (n.x - s.x) * Math.min(1, dt * 10);
+  s.lane = n.l; s.turbo = !!n.tu; s.shield = !!n.sh;
+  const pw = PW_FROM[n.pw] || null;
+  if (pw && pw !== s.pw) emote(s, POWERS[pw].e);
+  s.pw = pw;
+  if (n.st && s.stun <= 0 && !s.stunSeen){ s.stun = 1.2; s.stunSeen = true; emote(s, '😵'); }
+  if (!n.st) s.stunSeen = false;
+  s.stun = Math.max(0, s.stun - dt);
+  if (n.f && !s.finished){ s.finished = true; s.time = n.ft; }
+}
+
+function standings(){
+  return [...snails].sort((a, b) =>
+    (a.left - b.left) || (a.finished && b.finished ? a.time - b.time : a.finished ? -1 : b.finished ? 1 : b.d - a.d));
+}
+
+// ---------- input ----------
+// Touch works like an endless-runner: swipe left/right = change lane,
+// hold your finger down anywhere = turbo. The keyboard and mouse drag work the same way.
+const keys = new Set();
+const canSteer = () => (state === 'race' || state === 'finishing') && player && player.kind === 'me' && player.stun <= 0 && !player.finished;
+function move(dl){
+  if (!canSteer()) return;
+  const l = Math.max(0, Math.min(LANES - 1, player.lane + dl));
+  if (l !== player.lane){ player.lane = l; buzz(8); }
+}
+const gameOn = () => !$('game').classList.contains('hidden');
+addEventListener('keydown', e => {
+  if (!gameOn() || e.target.tagName === 'INPUT') return;
+  const c = e.code;
+  if (!$('ov').classList.contains('hidden') && (c === 'Enter' || c === 'Space')){
+    e.preventDefault(); if (!e.repeat) $('ovBtns').querySelector('button')?.click(); return;
+  }
+  if (['ArrowLeft','KeyA'].includes(c)){ e.preventDefault(); if (!e.repeat) move(-1); }
+  else if (['ArrowRight','KeyD'].includes(c)){ e.preventDefault(); if (!e.repeat) move(1); }
+  else if (['Space','ShiftLeft','ShiftRight','ArrowUp','KeyW','ArrowDown','KeyS'].includes(c)){ e.preventDefault(); keys.add(c); }
+  else if (c === 'KeyP' || c === 'Escape'){ e.preventDefault(); pauseMenu(); }
+});
+addEventListener('keyup', e => keys.delete(e.code));
+addEventListener('blur', () => { keys.clear(); ptrs.clear(); });
+
+const ptrs = new Map();
+const gameEl = $('game');
+const SWIPE = 28;
+gameEl.addEventListener('pointerdown', e => {
+  if (e.target.closest('button, .ov')) return;
+  e.preventDefault();
+  ptrs.set(e.pointerId, { x:e.clientX, y:e.clientY, t:performance.now(), swiped:false });
+  try { gameEl.setPointerCapture(e.pointerId); } catch {}
+});
+gameEl.addEventListener('pointermove', e => {
+  const p = ptrs.get(e.pointerId);
+  if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y, ax = Math.abs(dx), ay = Math.abs(dy);
+  if (Math.max(ax, ay) < SWIPE) return;
+  if (ax > ay) move(dx > 0 ? 1 : -1);
+  p.swiped = true; p.x = e.clientX; p.y = e.clientY;   // keep swiping with the same finger
+});
+for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) gameEl.addEventListener(ev, e => ptrs.delete(e.pointerId));
+gameEl.addEventListener('contextmenu', e => e.preventDefault());
+function playerTurbo(){
+  for (const k of ['Space','ShiftLeft','ShiftRight','ArrowUp','KeyW','ArrowDown','KeyS']) if (keys.has(k)) return true;
+  const now = performance.now();
+  for (const p of ptrs.values()) if (!p.swiped && now - p.t > 90) return true;
+  return false;
+}
+
+// ---------- screens ----------
+function show(id){
+  const game = id === 'game';
+  $('game').classList.toggle('hidden', !game);
+  $('pages').classList.toggle('hidden', game);
+  $('menu').classList.toggle('hidden', id !== 'menu');
+  $('lobby').classList.toggle('hidden', id !== 'lobby');
+  if (game) resize();
+  else { state = 'idle'; $('ov').classList.add('hidden'); if (SND.ctx && SND.ctx.state === 'running') SND.ctx.suspend(); }
+  watchRooms(id === 'menu');
+  if (id === 'menu') renderRooms();
+  const inner = history.state && history.state.inner;
+  if (id !== 'menu' && !inner) history.pushState({ inner:1 }, '');
+  else if (id === 'menu' && inner) history.back();
+  scrollTo(0, 0);
+}
+addEventListener('popstate', () => {
+  if (!$('menu').classList.contains('hidden')) return;
+  quitToMenu();
+});
+function quitToMenu(note){
+  netLeave();
+  show('menu');
+  $('menuMsg').textContent = note || '';
+}
+
+let toastTimer;
+function toast(text, secs = 1.1){
+  const t = $('toast'); t.textContent = text; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), secs * 1000);
+}
+function overlay(title, text, { results = null, buttons = [] } = {}){
+  $('ovTitle').textContent = title;
+  $('ovText').textContent = text || '';
+  $('ovText').classList.toggle('hidden', !text);
+  $('results').classList.toggle('hidden', !results);
+  $('results').innerHTML = results || '';
+  const box = $('ovBtns'); box.innerHTML = '';
+  for (const [label, fn, cls] of buttons){
+    const b = document.createElement('button');
+    b.className = cls || ''; b.textContent = label; b.onclick = fn;
+    box.appendChild(b);
+  }
+  $('ov').classList.remove('hidden');
+}
+const hideOverlay = () => $('ov').classList.add('hidden');
+
+// ---------- race flow ----------
+let hintTimer;
+function beginRace(m, seed, specs){
+  mode = m;
+  clearParts();
+  buildTrack(seed);
+  makeRacers(specs);
+  raceT = 0; countT = 3.2; lastBeep = 4; state = 'count';
+  keys.clear(); ptrs.clear();
+  hideOverlay();
+  show('game');
+  actx();
+  $('watchTag').classList.toggle('hidden', mode !== 'watch');
+  $('pauseBtn').textContent = mode === 'online' ? '✕' : '⏸';
+  $('pauseBtn').setAttribute('aria-label', mode === 'online' ? 'Leave race' : 'Pause');
+  const h = $('hint');
+  h.innerHTML = touchUI
+    ? '👈 Swipe 👉 to change lanes<br>✋ Hold anywhere for turbo<br>💎 Crystals = instant superpowers'
+    : '<kbd>←</kbd> <kbd>→</kbd> lanes · hold <kbd>Space</kbd> turbo · <kbd>P</kbd> pause<br>💎 Crystals = instant superpowers';
+  h.classList.toggle('hidden', mode === 'watch'); h.classList.remove('fade');
+  clearTimeout(hintTimer); hintTimer = setTimeout(() => h.classList.add('fade'), 6000);
+  snapCamera();
+  updateHud();
+}
+function soloSpecs(watch){
+  myId = 'me';
+  return [
+    { id:'me', name:'You', label: watch ? 'You (AI)' : 'You', ci:0, lane:1, kind: watch ? 'ai' : 'me', ai: watch ? AUTOPILOT : null },
+    { id:'b0', name:BOTS[0].name, ci:1, lane:0, kind:'ai', ai:botAI(0, diff), bot:true },
+    { id:'b1', name:BOTS[1].name, ci:2, lane:2, kind:'ai', ai:botAI(1, diff), bot:true },
+  ];
+}
+const newSeed = () => Math.random() * 2 ** 32 >>> 0;
+function startSolo(watch){ beginRace(watch ? 'watch' : 'ai', newSeed(), soloSpecs(watch)); }
+$('vsAI').onclick = () => startSolo(false);
+$('watchAI').onclick = () => startSolo(true);
+function diffUI(){ for (const b of document.querySelectorAll('#diffRow button')) b.classList.toggle('on', b.dataset.d === diff); }
+for (const b of document.querySelectorAll('#diffRow button')) b.onclick = () => { diff = b.dataset.d; store.set('snail-diff', diff); diffUI(); };
+diffUI();
+
+function onMyFinish(){
+  state = 'finishing';
+  finishT = mode === 'online' ? 12 : 4;
+  const place = standings().indexOf(player) + 1;
+  toast(`🏁 ${ord(place)} place!`, 2.5);
+  sfx(place === 1 ? 'win' : 'done'); buzz([40, 60, 40]);
+}
+function resultRows(){
+  return standings().map((s, i) => {
+    const t = s.left ? 'left' : s.finished ? fmt(s.time) : `+${Math.max(0, Math.round(RACE - s.d))}m`;
+    const nm = (s === player ? (mode === 'watch' ? 'You (AI)' : mode === 'online' ? s.name + ' (you)' : 'You') : s.name) + (s.bot ? ' 🤖' : '');
+    return `<div class="${s === player ? 'me' : ''}"><b>${s.left ? '–' : ord(i + 1)}</b><i style="background:${s.css}"></i><span class="n">${esc(nm)}</span><span class="t">${t}</span></div>`;
+  }).join('');
+}
+function showResults(){
+  state = 'over';
+  const st = standings(), place = st.indexOf(player) + 1;
+  const rows = resultRows();
+  const menu = ['Main menu', () => quitToMenu(), 'ghost'];
+  if (mode === 'watch'){
+    overlay('Race over', `${st[0] === player ? 'Your autopilot' : st[0].name} won.`, { results:rows, buttons:[
+      ['🏁 Race them yourself', () => startSolo(false), 'primary'], ['🤖 Watch again', () => startSolo(true)], menu ] });
+  } else if (mode === 'ai'){
+    const newBest = player.finished && (!best || player.time < best);
+    if (newBest){ best = player.time; store.set('snail3d-best', best.toFixed(2)); showBest(); }
+    const lvl = diff[0].toUpperCase() + diff.slice(1);
+    overlay(place === 1 ? '🏆 You won!' : `${ord(place)} place`, (newBest ? `New best time: ${fmt(player.time)}` : best ? `Your best: ${fmt(best)}` : '') + ` · AI: ${lvl}`,
+      { results:rows, buttons:[ ['Race again', () => startSolo(false), 'primary'], menu ] });
+  } else {
+    const title = place === 1 ? '🏆 You won!' : `${ord(place)} place`;
+    if (NET.host) overlay(title, '', { results:rows, buttons:[
+      ['Race again', () => hostStart(), 'primary'], ['Back to lobby', () => hostToLobby()], ['Close room', () => quitToMenu(), 'ghost'] ] });
+    else overlay(title, 'Waiting for the host to start the next race…', { results:rows, buttons:[ ['Leave room', () => quitToMenu(), 'ghost'] ] });
+  }
+}
+
+let pausedFrom = null;
+function pauseMenu(){
+  if (mode === 'online'){
+    if (state === 'over') return;
+    overlay('Leave the race?', NET.host ? 'You are the host: leaving closes the room for everyone.' : 'The others will keep racing without you.',
+      { buttons:[ ['Keep racing', hideOverlay, 'primary'], ['Leave', () => quitToMenu(), 'ghost'] ] });
+    return;
+  }
+  if (state === 'paused'){ resume(); return; }
+  if (!['race', 'count', 'finishing'].includes(state)) return;
+  pausedFrom = state; state = 'paused'; keys.clear(); ptrs.clear();
+  overlay('Paused', '', { buttons:[
+    ['Resume', resume, 'primary'], ['Restart', () => startSolo(mode === 'watch')], ['Main menu', () => quitToMenu(), 'ghost'] ] });
+}
+function resume(){ if (state !== 'paused') return; state = pausedFrom; hideOverlay(); }
+$('pauseBtn').onclick = pauseMenu;
+document.addEventListener('visibilitychange', () => { if (document.hidden && mode !== 'online' && ['race','count','finishing'].includes(state)) pauseMenu(); });
+
+// ---------- camera / sizing ----------
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3(), _c1 = new THREE.Vector3(), _c2 = new THREE.Vector3();
+let baseFov = 60;
+function camTargets(){
+  const x = player ? player.x : 0, d = player ? player.d : 0;
+  const portrait = camera.aspect < .8;
+  wpos(d - (portrait ? 9.5 : 8.5), x * .55, portrait ? 5.2 : 4.4, _c1);
+  wpos(d + (portrait ? 12 : 10), x * .35, .7, _c2);
+  return [_c1, _c2];
+}
+function snapCamera(){ const [p, l] = camTargets(); camPos.copy(p); camLook.copy(l); }
+function resize(){
+  const W = innerWidth, H = innerHeight;
+  renderer.setSize(W, H, false);
+  camera.aspect = W / H;
+  baseFov = W / H < .8 ? 68 : 55;
+  camera.fov = baseFov;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', () => { if (gameOn()) resize(); });
+
+// ---------- visuals / hud ----------
+function syncVisuals(dt, t){
+  for (const s of snails){
+    const m = s.m;
+    s.wob += dt * (2 + s.v * .5);
+    placeAt(m.g, s.d, s.x + (s.i - 1) * .06);
+    const rel = s.d - player.d;
+    m.g.visible = !s.left && (s === player || rel > -2.5);
+    m.tag.visible = s === player || rel > -.3;
+    m.inner.rotation.y = s.stun > 0 ? s.stun * (Math.PI * 4 / 1.2) : (laneX(s.lane) - s.x) * .18;
+    m.inner.scale.set(1, 1 + Math.sin(s.wob) * .03, 1 + Math.sin(s.wob) * .05);
+    m.eyes.rotation.x = Math.sin(s.wob * .6) * .06;
+    m.eyes.rotation.z = Math.sin(s.wob * .37) * .05;
+    const rocket = s.pw === 'rocket', ice = s.pw === 'ice';
+    m.flame.visible = s.turbo || rocket;
+    if (m.flame.visible){
+      const big = rocket ? 2.4 : 1;
+      m.flame.scale.set(big * .9, big * (.8 + Math.random() * .6), big * .9);
+      m.fm.color.set(ice ? 0x6fdcff : rocket ? 0xff5a1f : 0xffa53d);
+    }
+    setGhost(m, s.pw === 'ghost');
+    m.bubble.visible = s.shield;
+    if (s.emoT > 0){ s.emoT -= dt; const k = Math.min(1, (1.4 - s.emoT) * 6); m.emo.scale.setScalar(k); m.emo.position.y = 3.1 + (1.4 - s.emoT) * .3; if (s.emoT <= 0) m.emo.visible = false; }
+    if (s.overheat > 0 && Math.random() < dt * 14) burst(s.d - .9, s.x, 1.4, 0x9a9a9a, 1, 2);
+    if ((s.turbo || rocket) && Math.random() < dt * (rocket ? 70 : 30)) burst(s.d - 1.5, s.x, .55, ice ? 0x9be7ff : Math.random() < .5 ? 0xffcf5c : 0xff8a3d, 1, .5);
+    if (s.zone && Math.random() < dt * 30) burst(s.d + 5, s.x + (Math.random() - .5) * 3, .2 + Math.random(), 0xbff3ff, 1, 0, 1);
+    // little reactions when an AI overtakes you or you pass it
+    if (s !== player && !s.left && !player.finished && !s.finished && dt > 0){
+      const ahead = s.d > player.d;
+      if (s.wasAhead !== undefined && ahead !== s.wasAhead && Math.abs(s.d - player.d) < 5 && raceT > 3) emote(s, ahead ? pick(['😜', '😎', '👋']) : pick(['😤', '😱', '😬']));
+      s.wasAhead = ahead;
+    }
+  }
+  const hue = (t * .15) % 1;
+  MAT.crystal.color.setHSL(hue, .85, .6); MAT.crystal.emissive.setHSL(hue, .85, .45);
+  for (const o of objs){
+    if (o.kind === 'crystal' || (KINDS[o.kind].pickup && !o.taken)){
+      o.spin.rotation.y = t * (o.kind === 'crystal' ? 2.4 : 1.6) + o.phase;
+      o.spin.position.y = Math.sin(t * 3 + o.phase) * .12;
+    }
+  }
+  padTex.offset.y = -(t * 1.6 % 1);
+  zoneTex.offset.y = -(t * 1.2 % 1);
+}
+function updateHud(){
+  if (!player) return;
+  const active = snails.filter(s => !s.left);
+  const place = standings().indexOf(player) + 1;
+  $('pos').textContent = ord(place); $('of').textContent = `/${active.length}`;
+  $('time').textContent = fmt(player.finished ? player.time : raceT);
+  const ice = player.pw === 'ice';
+  const heat = player.overheat > 0 ? 100 : player.heat;
+  $('heatFill').style.width = (ice ? 100 : heat) + '%';
+  $('bar').classList.toggle('hot', player.overheat > 0);
+  $('bar').classList.toggle('ice', ice);
+  $('heatTxt').textContent = ice ? 'NO HEAT ❄️' : player.overheat > 0 ? 'OVERHEATED' : player.turbo ? 'TURBO!' : 'TURBO HEAT';
+  $('shield').classList.toggle('on', player.shield);
+  const pw = player.pw;
+  $('active').classList.toggle('hidden', !pw);
+  if (pw){ $('activeTxt').textContent = POWERS[pw].e + ' ' + POWERS[pw].name.toUpperCase(); $('activeBar').style.width = Math.max(0, player.pwT / POWERS[pw].dur * 100) + '%'; }
+  for (const s of snails){
+    s.dot.style.display = s.left ? 'none' : '';
+    s.dot.style.left = `calc(14px + (100% - 42px) * ${Math.max(0, Math.min(1, s.d / RACE)).toFixed(4)})`;
+  }
+}
+
+// ---------- main loop ----------
+let last = performance.now(), clock = 0;
+const _sp = new THREE.Vector3();
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (!gameOn()) return;
+  if (state !== 'paused') clock += dt;
+
+  if (state === 'count'){
+    countT -= dt;
+    const c = $('count');
+    c.classList.remove('hidden');
+    const n = countT > .2 ? Math.ceil(countT - .2) : 0;
+    if (n !== lastBeep){
+      lastBeep = n;
+      c.classList.toggle('go', n === 0);
+      c.innerHTML = `<span>${n || 'GO!'}</span>`;
+      sfx(n ? 'beep' : 'go');
+    }
+    if (countT <= 0){ state = 'race'; setTimeout(() => c.classList.add('hidden'), 500); }
+  }
+  if (state === 'race' || state === 'finishing' || (state === 'over' && mode === 'online')){
+    raceT += dt;
+    for (const s of snails){
+      if (s.left) continue;
+      if (s.kind === 'remote') stepRemote(s, dt);
+      else {
+        if (s.kind === 'ai') aiThink(s, dt); else s.wantTurbo = playerTurbo();
+        stepSnail(s, dt);
+      }
+    }
+    if (state === 'finishing'){
+      finishT -= dt;
+      if (finishT <= 0 || snails.every(s => s.finished || s.left)) showResults();
+    }
+    if (state !== 'over' || mode === 'online') updateHud();
+  }
+  if (state !== 'paused'){
+    stepParts(dt);
+    syncVisuals(['race', 'finishing', 'over'].includes(state) ? dt : 0, clock);
+  }
+  const [p, l] = camTargets();
+  const k = Math.min(1, dt * 9);
+  camPos.lerp(p, k); camLook.lerp(l, k);
+  camera.position.copy(camPos);
+  camera.lookAt(camLook);
+  // widen the view a little with speed for a sense of rush
+  const wantFov = baseFov + (player ? Math.min(18, Math.max(0, player.v - 17) * .55) : 0);
+  if (Math.abs(camera.fov - wantFov) > .05){ camera.fov += (wantFov - camera.fov) * Math.min(1, dt * 4); camera.updateProjectionMatrix(); }
+  sky.position.copy(camera.position);
+  // the sun's shadow box travels with you
+  if (player){ wpos(player.d + 6, 0, 0, _sp); sun.target.position.copy(_sp); sun.position.copy(_sp).add(SUN_OFF); }
+  renderer.render(scene, camera);
+}
+
+// =====================================================================
+// ONLINE MULTIPLAYER (PeerJS / WebRTC, no game server of our own)
+// - The host's browser owns the room: guests connect to it (peer id = PREFIX+code).
+// - Everyone simulates their own snail and sends its state ~15x/s; the host
+//   relays all states (plus the AI bots it simulates) to everyone.
+// - The track comes from a shared seed; eaten snacks, dropped salt and zaps
+//   are sent as events so everyone sees them.
+// =====================================================================
+const PREFIX = 'snailsprint-v1-';
+const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const ICE = { iceServers:[
+  { urls:['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+  { urls:'stun:stun.cloudflare.com:3478' },
+  { urls:['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username:'peerjs', credential:'peerjsp' }
+]};
+const MAX_PLAYERS = 3;
+const rnd = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => b.toString(16).padStart(2, '0')).join('');
+const newCode = () => Array.from(crypto.getRandomValues(new Uint8Array(5)), b => CODE_CHARS[b % CODE_CHARS.length]).join('');
+const hasPeer = () => typeof Peer !== 'undefined' && !!window.RTCPeerConnection;
+
+const NET = { peer:null, ready:false, host:false, code:null, guests:new Map(), hostConn:null, hostLast:0, players:[], fill:true, phase:'lobby', public:false, welcomed:false, gen:0 };
+let netTimer = null;
+
+function netReset(){
+  NET.gen++;
+  clearInterval(netTimer); netTimer = null;
+  setPublic(false);
+  try { NET.peer && NET.peer.destroy(); } catch {}
+  Object.assign(NET, { peer:null, ready:false, host:false, code:null, guests:new Map(), hostConn:null, hostLast:0, players:[], phase:'lobby', public:false, welcomed:false });
+}
+function netLeave(){
+  if (!NET.peer) return;
+  if (NET.host) hostBroadcast({ t:'bye' });
+  else hostSend({ t:'bye' });
+  const p = NET.peer;
+  NET.peer = null;
+  setTimeout(() => { try { p.destroy(); } catch {} }, 150);
+  netReset();
+}
+addEventListener('pagehide', () => { if (NET.peer){ if (NET.public) announce('close', NET.code, true); netLeave(); } });
+
+function connSend(c, m){ try { if (c && c.open) c.send(m); } catch {} }
+function hostSend(m){ connSend(NET.hostConn, m); }
+function hostBroadcast(m, except){ for (const g of NET.guests.values()) if (g.c !== except) connSend(g.c, m); }
+function netSend(m){ if (mode !== 'online') return; if (NET.host) hostBroadcast(m); else hostSend(m); }
+
+function packState(s){
+  return { id:s.id, d:+s.d.toFixed(2), x:+s.x.toFixed(2), v:+s.v.toFixed(2), l:s.lane, tu:s.turbo ? 1 : 0, st:s.stun > 0 ? 1 : 0, sh:s.shield ? 1 : 0, pw:PW_CODE[s.pw] || '', f:s.finished ? 1 : 0, ft:+s.time.toFixed(2) };
+}
+function applyNet(m){
+  const s = byId.get(m.id);
+  if (!s || s.kind !== 'remote' || typeof m.d !== 'number') return;
+  s.net = { d:m.d, x:m.x, v:m.v, l:m.l | 0, tu:m.tu, st:m.st, sh:m.sh, pw:String(m.pw || ''), f:m.f, ft:m.ft, at:performance.now() };
+}
+function netTake(key){ netSend({ t:'take', key }); }
+function remoteTake(key){ const o = objByKey.get(String(key)); if (o && !o.taken) takeObj(o); }
+function remoteDrop(m){
+  const key = String(m.key || ''), lane = m.lane | 0, d = +m.d;
+  if (!key || objByKey.has(key) || lane < 0 || lane >= LANES || !isFinite(d)) return;
+  addObj('salt', lane, d, key);
+  burst(d, laneX(lane), .8, 0xffffff, 10);
+  const by = byId.get(m.by);
+  if (by && player && by.d > player.d && by.d - player.d < 35) toast(`🧂 ${by.name} dropped salt!`);
+  emote(by, '🧂');
+}
+function remoteZap(m){
+  const t = byId.get(m.target), by = byId.get(m.by);
+  if (!t || t.left) return;
+  zapFx(t);
+  if (t.kind !== 'remote') applyZap(t, by);
+}
+function markLeft(id){
+  const s = byId.get(id);
+  if (s && !s.left){ s.left = true; toast(`${s.name} left`); }
+}
+
+// ----- host -----
+function hostRoom(pub){
+  if (!hasPeer()){ $('menuMsg').textContent = 'Online play is not available in this browser.'; return; }
+  netReset();
+  NET.host = true; NET.public = pub; NET.fill = $('fill').checked;
+  myId = 'h';
+  show('lobby');
+  openHostPeer(newCode());
+  netTimer = setInterval(hostTick, 1000);
+}
+function openHostPeer(code){
+  const gen = NET.gen;
+  NET.code = code; lobbyUI();
+  const peer = new Peer(PREFIX + code, { debug:0, config:ICE });
+  NET.peer = peer;
+  peer.on('open', () => { if (gen !== NET.gen) return; NET.ready = true; lobbyUI(); if (NET.public) setPublic(true); });
+  peer.on('connection', c => { if (gen !== NET.gen) { try { c.close(); } catch {} return; } onGuestConn(c); });
+  peer.on('disconnected', () => setTimeout(() => { if (gen === NET.gen && !peer.destroyed && peer.disconnected) try { peer.reconnect(); } catch {} }, 1000));
+  peer.on('error', e => {
+    if (gen !== NET.gen) return;
+    if (e.type === 'unavailable-id'){ try { peer.destroy(); } catch {} openHostPeer(newCode()); }
+    else if (['network', 'server-error', 'socket-error', 'socket-closed'].includes(e.type)){ NET.ready = false; lobbyUI('Connection problem, retrying…'); }
+  });
+}
+function onGuestConn(c){
+  c.on('data', d => hostHandle(c, d));
+  const gone = () => dropGuest(c.pid);
+  c.on('close', gone); c.on('error', gone);
+}
+function humans(){ return 1 + NET.guests.size; }
+function hostHandle(c, d){
+  if (!d || typeof d !== 'object') return;
+  if (d.t === 'hello'){
+    if (NET.phase !== 'lobby') { connSend(c, { t:'nope', why:'A race is already running in that room. Try again in a minute.' }); setTimeout(() => c.close(), 600); return; }
+    if (humans() >= MAX_PLAYERS) { connSend(c, { t:'nope', why:'That room is full.' }); setTimeout(() => c.close(), 600); return; }
+    const id = 'g' + rnd(4);
+    c.pid = id;
+    NET.guests.set(id, { c, name:cleanName(d.name) || 'Snail', last:performance.now() });
+    connSend(c, { t:'welcome', id });
+    lobbyChanged();
+    return;
+  }
+  const g = NET.guests.get(c.pid);
+  if (!g) return;
+  g.last = performance.now();
+  if (d.t === 'bye'){ dropGuest(c.pid); return; }
+  if (mode !== 'online') return;
+  if (d.t === 's'){ d.id = c.pid; applyNet(d); }
+  else if (d.t === 'take'){ remoteTake(d.key); hostBroadcast({ t:'take', key:String(d.key) }, c); }
+  else if (d.t === 'drop'){ const m = { t:'drop', key:String(d.key), lane:d.lane | 0, d:+d.d, by:c.pid }; remoteDrop(m); hostBroadcast(m, c); }
+  else if (d.t === 'zap'){ const m = { t:'zap', target:String(d.target), by:c.pid }; remoteZap(m); hostBroadcast(m, c); }
+}
+function dropGuest(id){
+  if (!id || !NET.guests.has(id)) return;
+  const g = NET.guests.get(id);
+  NET.guests.delete(id);
+  try { g.c.close(); } catch {}
+  if (NET.phase === 'race'){ hostBroadcast({ t:'left', id }); if (mode === 'online') markLeft(id); }
+  else lobbyChanged();
+}
+function lobbyPlayers(){
+  return [{ id:'h', name:myName() }, ...[...NET.guests].map(([id, g]) => ({ id, name:g.name }))];
+}
+function lobbyChanged(){
+  NET.players = lobbyPlayers();
+  hostBroadcast({ t:'lobby', players:NET.players, fill:NET.fill, code:NET.code });
+  if (NET.public && NET.ready) announce(humans() < MAX_PLAYERS ? 'open' : 'close');
+  lobbyUI();
+}
+function hostTick(){
+  const now = performance.now();
+  for (const [id, g] of NET.guests) if (now - g.last > 20000) dropGuest(id);
+  if (NET.phase === 'lobby') hostBroadcast({ t:'lobby', players:lobbyPlayers(), fill:NET.fill, code:NET.code });
+}
+function hostStart(){
+  if (!NET.host) return;
+  const list = lobbyPlayers();
+  const specs = list.map((p, i) => ({ id:p.id, name:p.name, ci:i, lane:START_LANES[i] }));
+  if (NET.fill) for (let b = 0; specs.length < MAX_PLAYERS; b++){
+    const i = specs.length;
+    specs.push({ id:'b' + b, name:BOTS[b].name, ci:i, lane:START_LANES[i], bot:true });
+  }
+  if (specs.length < 2) return;
+  const seed = newSeed();
+  NET.phase = 'race';
+  if (NET.public) announce('close');
+  hostBroadcast({ t:'start', seed, specs });
+  startOnline(seed, specs);
+}
+function hostToLobby(){
+  NET.phase = 'lobby';
+  show('lobby');
+  lobbyChanged();
+}
+$('fill').onchange = () => { NET.fill = $('fill').checked; if (NET.host) lobbyChanged(); };
+
+// ----- guest -----
+function joinRoom(code){
+  code = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!/^[A-Z0-9]{5}$/.test(code)){ $('menuMsg').textContent = 'Room codes have 5 letters/numbers.'; return; }
+  if (!hasPeer()){ $('menuMsg').textContent = 'Online play is not available in this browser.'; return; }
+  netReset();
+  NET.code = code; myId = null;
+  const gen = NET.gen;
+  show('lobby'); lobbyUI();
+  const peer = new Peer({ debug:0, config:ICE });
+  NET.peer = peer;
+  const fail = why => { if (gen === NET.gen) quitToMenu(why); };
+  peer.on('open', () => {
+    if (gen !== NET.gen) return;
+    const c = peer.connect(PREFIX + code, { reliable:true });
+    NET.hostConn = c;
+    c.on('open', () => { if (gen === NET.gen){ NET.hostLast = performance.now(); connSend(c, { t:'hello', name:myName() }); } });
+    c.on('data', d => { if (gen === NET.gen) guestHandle(d); });
+    c.on('close', () => fail(NET.welcomed ? 'Lost connection to the room.' : `Couldn't join room ${code}.`));
+  });
+  peer.on('error', e => {
+    if (gen !== NET.gen) return;
+    if (e.type === 'peer-unavailable') fail(`No room “${code}” found. Check the code, or the host may have left.`);
+    else if (['network', 'server-error', 'socket-error', 'browser-incompatible'].includes(e.type)) fail('Could not reach the game server. Check your connection and try again.');
+  });
+  setTimeout(() => { if (gen === NET.gen && !NET.welcomed) fail(`Couldn't reach room ${code}. Check the code and try again.`); }, 15000);
+  netTimer = setInterval(() => {
+    if (gen !== NET.gen) return;
+    if (NET.welcomed && performance.now() - NET.hostLast > 20000) fail('Lost connection to the host.');
+    else if (NET.welcomed && NET.phase === 'lobby') hostSend({ t:'ping' });
+  }, 2000);
+}
+function guestHandle(d){
+  if (!d || typeof d !== 'object') return;
+  NET.hostLast = performance.now();
+  if (d.t === 'welcome'){ NET.welcomed = true; myId = d.id; lobbyUI(); }
+  else if (d.t === 'nope') quitToMenu(d.why);
+  else if (d.t === 'lobby'){
+    NET.players = Array.isArray(d.players) ? d.players.slice(0, MAX_PLAYERS).map(p => ({ id:String(p.id), name:cleanName(p.name) || 'Snail' })) : [];
+    NET.fill = !!d.fill;
+    if (NET.phase !== 'lobby'){ NET.phase = 'lobby'; show('lobby'); }
+    lobbyUI();
+  }
+  else if (d.t === 'start' && Array.isArray(d.specs)){
+    NET.phase = 'race';
+    const specs = d.specs.slice(0, MAX_PLAYERS).map((p, i) => ({ id:String(p.id), name:cleanName(p.name) || 'Snail', ci:i, lane:START_LANES[i], bot:!!p.bot }));
+    startOnline(d.seed >>> 0, specs);
+  }
+  else if (d.t === 'bye') quitToMenu('The host closed the room.');
+  else if (mode !== 'online') return;
+  else if (d.t === 'S' && Array.isArray(d.l)){ for (const m of d.l) if (m && m.id !== myId) applyNet(m); }
+  else if (d.t === 'take') remoteTake(d.key);
+  else if (d.t === 'drop') remoteDrop(d);
+  else if (d.t === 'zap') remoteZap(d);
+  else if (d.t === 'left') markLeft(d.id);
+}
+
+// ----- shared race -----
+let sendTimer = null;
+function startOnline(seed, specs){
+  const mine = specs.map(sp => ({
+    ...sp,
+    kind: sp.id === myId ? 'me' : (NET.host && sp.bot) ? 'ai' : 'remote',
+    ai: sp.bot ? botAI(+sp.id.slice(1) % BOTS.length, 'normal') : null,
+    label: sp.id === myId ? 'You' : sp.name,
+  }));
+  beginRace('online', seed, mine);
+  clearInterval(sendTimer);
+  const gen = NET.gen;
+  sendTimer = setInterval(() => {
+    if (gen !== NET.gen || mode !== 'online' || !player){ clearInterval(sendTimer); return; }
+    if (state === 'count' || state === 'idle') return;
+    if (NET.host){
+      const l = snails.filter(s => !s.left).map(s => { if (s.kind !== 'remote') return packState(s); if (!s.net) return null; const { at, ...n } = s.net; return { id:s.id, ...n }; }).filter(Boolean);
+      hostBroadcast({ t:'S', l });
+    } else hostSend({ t:'s', ...packState(player) });
+  }, 66);
+}
+
+// ----- lobby UI -----
+function lobbyUI(note){
+  const code = NET.code || '·····';
+  $('codeBig').textContent = NET.host && !NET.ready ? '·····' : code;
+  $('lobbyTop').textContent = NET.host ? (NET.public ? 'Public room' : 'Private room') + ' · code' : 'Room code';
+  $('shareBits').classList.toggle('hidden', !NET.host);
+  $('pubNote').classList.toggle('hidden', !(NET.host && NET.public));
+  $('pubNote').textContent = `📣 Listed in public rooms as “${myName()}”. Anyone can join.`;
+  const players = NET.host ? lobbyPlayers() : NET.players;
+  const box = $('slots'); box.innerHTML = '';
+  for (let i = 0; i < MAX_PLAYERS; i++){
+    const p = players[i], row = document.createElement('div');
+    const col = COLORS[i].css;
+    if (p){
+      const me = p.id === myId;
+      row.className = 'slot';
+      row.innerHTML = `<span class="sn" style="background:${col}">🐌</span><span class="nm">${esc(p.name)}<small>${p.id === 'h' ? 'Host' : 'Ready'}</small></span>${me ? '<span class="tag">You</span>' : ''}`;
+    } else if (NET.fill){
+      const b = BOTS[i - players.length] || BOTS[0];
+      row.className = 'slot';
+      row.innerHTML = `<span class="sn" style="background:${col}">🤖</span><span class="nm">${b.name}<small>AI, unless someone joins</small></span>`;
+    } else {
+      row.className = 'slot empty';
+      row.innerHTML = `<span class="sn"></span><span class="nm">Open spot<small>Waiting for a player…</small></span>`;
+    }
+    box.appendChild(row);
+  }
+  $('fillRow').classList.toggle('hidden', !NET.host);
+  $('fill').checked = NET.fill;
+  const racers = players.length + (NET.fill ? MAX_PLAYERS - players.length : 0);
+  $('startRace').classList.toggle('hidden', !NET.host);
+  $('startRace').disabled = !NET.ready || racers < 2;
+  let text;
+  if (note) text = note;
+  else if (NET.host) text = !NET.ready ? 'Setting up your room…' : players.length < MAX_PLAYERS ? 'Waiting for friends to join…' : 'Room full. Ready when you are!';
+  else text = NET.welcomed ? 'Waiting for the host to start the race…' : `Joining room ${code}…`;
+  $('lobbyText').textContent = text;
+  $('waitRow').classList.toggle('hidden', NET.host && NET.ready && players.length >= MAX_PLAYERS);
+}
+const inviteLink = () => location.origin + location.pathname + '#' + NET.code;
+async function copyText(t){
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); let ok = false; try { ok = document.execCommand('copy'); } catch {} a.remove(); return ok; }
+}
+function flash(btn, text){ const o = btn.textContent; btn.textContent = text; setTimeout(() => btn.textContent = o, 1400); }
+function toastLobby(t){ lobbyUI(t); setTimeout(() => lobbyUI(), 1400); }
+$('codeBig').onclick = async () => { if (NET.code && await copyText(NET.code)) toastLobby('Code copied'); };
+$('copyCode').onclick = async () => { if (await copyText(NET.code)) flash($('copyCode'), '✓ Copied'); };
+$('copyLink').onclick = async () => { if (await copyText(inviteLink())) flash($('copyLink'), '✓ Link copied'); };
+$('shareLink').onclick = async () => {
+  if (navigator.share) try { await navigator.share({ title:'Snail Sprint', text:`Race me in Snail Sprint! Room ${NET.code}`, url:inviteLink() }); } catch {}
+  else if (await copyText(inviteLink())) flash($('shareLink'), '✓ Copied');
+};
+$('startRace').onclick = () => hostStart();
+$('leave').onclick = () => quitToMenu();
+$('create').onclick = () => { $('menuMsg').textContent = ''; hostRoom(false); };
+$('hostPublic').onclick = () => { $('menuMsg').textContent = ''; hostRoom(true); };
+$('join').onclick = () => { $('menuMsg').textContent = ''; joinRoom($('joinCode').value); };
+$('joinCode').addEventListener('keydown', e => { if (e.key === 'Enter') $('join').click(); });
+$('joinCode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
+
+// ---------- public rooms ----------
+// No server of our own: hosts announce their open room on a public ntfy.sh topic every 15s
+// (and "close" when it fills up, starts racing or is closed); the menu listens live (SSE)
+// and lists rooms heard from in the last 45s. Only the room code, host name and player count are sent.
+const ROOMS_TOPIC = (() => { const t = new URLSearchParams(location.search).get('rooms'); return t && /^[\w-]{8,64}$/.test(t) ? t : 'snailsprint-rooms-v1-q4w8z2'; })();
+const ROOMS_URL = 'https://ntfy.sh/' + ROOMS_TOPIC;
+const ROOMS = new Map(), seenMsg = new Set();
+let roomsES = null, roomsState = 'connecting', roomsSkew = 0, announceT = null;
+function announce(kind, code, beacon){
+  const body = JSON.stringify({ t:kind, code:code || NET.code, name:myName(), n:humans() });
+  try {
+    if (beacon && navigator.sendBeacon) navigator.sendBeacon(ROOMS_URL, body);
+    else fetch(ROOMS_URL, { method:'POST', body, keepalive:true }).catch(() => {});
+  } catch {}
+}
+function setPublic(on){
+  clearInterval(announceT); announceT = null;
+  if (on){
+    announce('open');
+    announceT = setInterval(() => { if (NET.public && NET.ready && NET.phase === 'lobby' && humans() < MAX_PLAYERS && !document.hidden) announce('open'); }, 15000);
+  } else if (NET.public && NET.code && NET.ready) announce('close');
+}
+function watchRooms(on){
+  if (on && !roomsES && window.EventSource){
+    roomsState = 'connecting'; renderRooms();
+    const es = roomsES = new EventSource(ROOMS_URL + '/sse?since=60s');
+    es.onopen = e => { if (e.data) try { roomsSkew = Date.now() - JSON.parse(e.data).time * 1000; } catch {} roomsState = 'ok'; renderRooms(); };
+    es.onerror = () => { roomsState = es.readyState === 2 ? 'err' : 'connecting'; renderRooms(); };
+    es.onmessage = e => {
+      try {
+        const m = JSON.parse(e.data); if (m.event !== 'message' || seenMsg.has(m.id)) return;
+        seenMsg.add(m.id); onRoomMsg(JSON.parse(m.message), m.time * 1000 + roomsSkew);
+      } catch {}
+    };
+  } else if (!on && roomsES){ roomsES.close(); roomsES = null; }
+}
+function onRoomMsg(d, t){
+  if (!d || typeof d.code !== 'string' || !/^[A-Z0-9]{5}$/.test(d.code)) return;
+  const cur = ROOMS.get(d.code);
+  if (cur && t < cur.seen) return;
+  if (d.t === 'open') ROOMS.set(d.code, { name:cleanName(d.name) || 'Snail', n:Math.max(1, Math.min(MAX_PLAYERS, d.n | 0 || 1)), seen:t, since:cur ? cur.since : t });
+  else if (d.t === 'close') ROOMS.delete(d.code);
+  renderRooms();
+}
+function ago(ms){ const s = Math.max(0, ms / 1000 | 0); return s < 60 ? 'just now' : `${s / 60 | 0} min`; }
+function renderRooms(){
+  const now = Date.now();
+  for (const [k, r] of ROOMS) if (now - r.seen > 45000) ROOMS.delete(k);
+  $('roomsDot').className = 'dot' + (roomsState === 'ok' ? ' on' : roomsState === 'connecting' ? ' warn' : '');
+  $('roomsState').textContent = roomsState === 'ok' ? 'Live' : roomsState === 'connecting' ? 'Connecting…' : 'Offline';
+  const list = [...ROOMS.entries()].filter(([k]) => k !== NET.code).sort((a, b) => a[1].since - b[1].since);
+  const box = $('roomList'); box.innerHTML = '';
+  if (!list.length){
+    const e = document.createElement('div'); e.className = 'empty';
+    e.textContent = roomsState === 'err' ? 'Can’t load the room list right now. You can still create a room and share the code.' : 'No open rooms right now. Host one and wait for challengers!';
+    box.appendChild(e); return;
+  }
+  for (const [code, r] of list){
+    const row = document.createElement('div'); row.className = 'room';
+    const av = document.createElement('div'); av.className = 'ravatar'; av.textContent = (r.name[0] || '🐌').toUpperCase();
+    const info = document.createElement('div'); info.className = 'rinfo';
+    const b = document.createElement('b'); b.textContent = r.name + '’s room';
+    const sm = document.createElement('small'); sm.textContent = `${r.n}/${MAX_PLAYERS} snails · ${code} · ${ago(now - r.since)}`;
+    info.append(b, sm);
+    const btn = document.createElement('button'); btn.className = 'accent'; btn.textContent = 'Join';
+    btn.onclick = () => { $('joinCode').value = code; joinRoom(code); };
+    row.append(av, info, btn); box.appendChild(row);
+  }
+}
+setInterval(() => { if (!$('menu').classList.contains('hidden')) renderRooms(); }, 5000);
+
+// ---------- start ----------
+function takeInvite(){
+  const h = location.hash.slice(1).toUpperCase();
+  if (location.hash) history.replaceState(history.state, '', location.pathname + location.search);
+  return /^[A-Z0-9]{5}$/.test(h) ? h : null;
+}
+addEventListener('hashchange', () => {
+  const invite = takeInvite(); if (!invite) return;
+  if (NET.peer && NET.code === invite) return;
+  quitToMenu(); $('joinCode').value = invite; joinRoom(invite);
+});
+history.replaceState(null, '', location.pathname + location.search + location.hash);
+show('menu');
+const invite = takeInvite();
+if (invite){ $('joinCode').value = invite; joinRoom(invite); }
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
