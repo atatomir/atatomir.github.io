@@ -179,6 +179,9 @@
   .cell.plane{background-color:var(--c)!important}
   .cell.nose{box-shadow:inset 0 0 0 3px var(--ring)}
   .board.small .cell.nose{box-shadow:inset 0 0 0 2px var(--ring)}
+  .cell.nose[data-arrow]:not(.nosehit)::after{content:attr(data-arrow);font-size:1.15em;color:rgba(6,12,28,.78)}
+  .cell.sunk.nose[data-arrow]:not(.nosehit)::after,.cell.ghost-ok.nose[data-arrow]::after,.cell.ghost-bad.nose[data-arrow]::after,
+  .board.heatmode .cell.nose[data-arrow]:not(.nosehit)::after{color:var(--text)}
   .cell.sunk{background-color:color-mix(in srgb,var(--c) 50%,var(--grid))!important}
   .cell.ghost-ok{background:color-mix(in srgb,var(--ok) 55%,var(--grid))}
   .cell.ghost-bad{background:color-mix(in srgb,var(--bad) 55%,var(--grid))}
@@ -233,6 +236,24 @@
   .reacts{display:flex;gap:6px;margin-top:10px}
   .reacts button{flex:1;font-size:22px;padding:7px 0}
   .reacts button:active{transform:scale(1.2)}
+
+  /* marathon */
+  .mrsetup h3{margin:0 0 6px;font-size:21px}
+  .mrsetup p{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.45}
+  .stepper{display:flex;align-items:center;justify-content:center;gap:18px;margin:4px 0 18px}
+  .stepper button{width:56px;height:56px;border-radius:50%;font-size:28px;font-weight:700;padding:0;line-height:1;background:var(--panel-2)}
+  .stepper div{min-width:84px;text-align:center}
+  .stepper b{display:block;font-size:44px;line-height:1.05;font-variant-numeric:tabular-nums}
+  .stepper small{color:var(--muted);font-size:13px}
+  .scorecard{width:100%;border-collapse:separate;border-spacing:0;margin-top:14px;font-size:14px;font-variant-numeric:tabular-nums;
+             background:var(--panel);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .scorecard th,.scorecard td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--border)}
+  .scorecard th:first-child,.scorecard td:first-child{text-align:left}
+  .scorecard th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+  .scorecard tr.cur td{background:var(--accent-soft)}
+  .scorecard tr.tot td{border-bottom:0;font-weight:800}
+  .scorecard td.good{color:var(--ok);font-weight:700} .scorecard td.bad{color:var(--bad);font-weight:700}
+  .scorecard td.wait{color:var(--faint)}
 
   .overlay{position:fixed;inset:0;background:var(--overlay);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
            display:flex;align-items:center;justify-content:center;padding:24px;z-index:10;animation:fadein .2s}
@@ -329,6 +350,7 @@
 
     <h2>More ways to play</h2>
     <button class="opt" id="vsPC"><span class="ic">🤖</span><span class="tx">Play vs computer<small>Choose easy, normal or hard</small></span><span class="chev">›</span></button>
+    <button class="opt" id="vsMarathon"><span class="ic">🏃</span><span class="tx">Marathon<small>Solo: down hidden fleets in as few shots as you can and beat par.</small></span><span class="chev">›</span></button>
     <button class="opt" id="vsWatch"><span class="ic">👀</span><span class="tx">Watch the AI play<small>Hide your planes and see how each AI hunts them, step by step</small></span><span class="chev">›</span></button>
     <button class="opt" id="vsPVP"><span class="ic">👥</span><span class="tx">Two players, one phone<small>Pass the phone between turns</small></span><span class="chev">›</span></button>
     <details class="rules"><summary>How to play</summary>
@@ -431,6 +453,26 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- MARATHON -->
+  <section id="marathonSetup" class="hidden">
+    <div class="panel mrsetup">
+      <h3>🏃 Marathon</h3>
+      <p>Down one hidden fleet after another – nobody shoots back. Every fleet has a par, revealed once you've downed it. Each game scores par + 3 − your shots: matching par is worth 3 points, every shot under par adds one, every shot over costs one. Average more than 3 points per game to win.</p>
+      <div class="stepper">
+        <button id="mrMinus" aria-label="Fewer games">−</button>
+        <div><b id="mrN">3</b><small>games</small></div>
+        <button id="mrPlus" aria-label="More games">+</button>
+      </div>
+      <button class="primary big" id="mrStart">Start marathon</button>
+    </div>
+  </section>
+  <section id="marathon" class="hidden">
+    <div class="turn mine" id="mrTop"><div class="big" id="mrTitle"></div><div class="res" id="mrSub"></div></div>
+    <div class="bhead"><h2>Hidden fleet</h2><div id="mrPlanes"></div></div>
+    <div class="board" id="mrBoard"></div>
+    <table class="scorecard" id="mrCard"></table>
   </section>
 </div>
 
@@ -538,7 +580,7 @@ function makeGrid(el, onClick, onHover){
   }
   return cells;
 }
-const SECTIONS=['menu','pcSetup','lobby','setup','battle','watch'];
+const SECTIONS=['menu','pcSetup','lobby','setup','battle','watch','marathonSetup','marathon'];
 function show(id){
   SECTIONS.forEach(s=>$(s).classList.toggle('hidden',s!==id)); window.scrollTo(0,0);
   $('back').classList.toggle('hidden',id==='menu');
@@ -553,6 +595,8 @@ function show(id){
 function goBack(){
   if(visible('lobby')) return $('lobbyCancel').click();
   if(visible('pcSetup')) return PICK_FOR==='watch'?editWatchFleet():show('menu');
+  if(visible('marathonSetup')) return show('menu');
+  if(visible('marathon')) return overlay('Leave the marathon?','Your scores so far will be lost.','Stay',null,'Leave marathon',mrQuit);
   if(G&&G.mode==='watch') return quitLocal();
   if(G&&G.mode==='online') return confirmLeave();
   if(G&&(visible('setup')||visible('battle'))) return overlay('Leave this game?','Your progress in this game will be lost.','Stay',null,'Leave game',quitLocal);
@@ -642,7 +686,7 @@ $('ready').onclick=()=>{
   if(G.mode==='online') return onlineReady();
   if(G.mode==='watch'){ W.fleet=S.planes.map(p=>({...p})); return openDiff('watch'); }
   G.fleets[S.who]=S.planes;
-  if(G.mode==='pc'){ G.fleets[1]=randomFleet(); startBattle(); }
+  if(G.mode==='pc'){ G.fleets[1]=DIFF==='entropy'?impossibleFleet():randomFleet(); startBattle(); }
   else if(S.who===0){ show(null); overlay('Pass to Player 2','Player 1’s fleet is hidden. Hand the phone to Player 2 to place their planes.','I’m Player 2 – continue',()=>startSetup(1),'Quit game',quitLocal); }
   else { show(null); overlay('Pass to Player 1','Both fleets are placed. Player 1 fires first.','I’m Player 1 – start',startBattle,'Quit game',quitLocal); }
 };
@@ -655,9 +699,9 @@ function renderSetup(){
   }
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const el=setupCells[r][c], key=r+','+c, o=occ[key];
-    el.className='cell'; el.style.removeProperty('--c');
-    if(o){ el.classList.add('plane'); el.style.setProperty('--c',COLORS[o.i]); if(o.nose) el.classList.add('nose'); }
-    if(key in ghost){ el.classList.add(ok&&!o?'ghost-ok':'ghost-bad'); if(ghost[key]&&!o) el.classList.add('nose'); }
+    el.className='cell'; el.style.removeProperty('--c'); delete el.dataset.arrow;
+    if(o){ el.classList.add('plane'); el.style.setProperty('--c',COLORS[o.i]); if(o.nose) markNose(el,S.planes[o.i].dir); }
+    if(key in ghost){ el.classList.add(ok&&!o?'ghost-ok':'ghost-bad'); if(ghost[key]&&!o) markNose(el,S.dir); }
   }
   $('setupBoard').classList.toggle('locked',S.locked);
   $('status').innerHTML=[0,1,2].map(i=>{ const p=S.planes[i];
@@ -730,7 +774,9 @@ function paintShots(cells, shots, last){
     el.classList.add(shots[key]==='miss'?'miss':shots[key]==='hit'?'hit':'nosehit'); }
   if(last){ const [r,c]=last.split(',').map(Number); cells[r][c].classList.add('last'); }
 }
-function clearCells(cells){ for(const row of cells) for(const el of row){ el.className='cell'; el.style.removeProperty('--c'); } }
+function clearCells(cells){ for(const row of cells) for(const el of row){ el.className='cell'; el.style.removeProperty('--c'); delete el.dataset.arrow; } }
+// a nose cell shows which way its plane faces (a shot nose shows ✸ instead, via CSS order)
+function markNose(el,dir){ el.classList.add('nose'); el.dataset.arrow=DIR_ARROW[dir]; }
 
 function renderBattle(){
   const online=G.mode==='online';
@@ -739,12 +785,12 @@ function renderBattle(){
   clearCells(enemyCells);
   const shownFoe = (online&&G.revealed) ? [0,1,2] : G.sunk[v];
   shownFoe.forEach(i=>G.fleets[foe][i]&&cellsOf(G.fleets[foe][i]).forEach(([r,c],k)=>{ const el=enemyCells[r][c];
-    el.classList.add('sunk'); el.style.setProperty('--c',COLORS[i]); if(k===0) el.classList.add('nose'); }));
+    el.classList.add('sunk'); el.style.setProperty('--c',COLORS[i]); if(k===0) markNose(el,G.fleets[foe][i].dir); }));
   paintShots(enemyCells,G.shots[v],G.last[v]);
   if(online&&G.pending){ const [r,c]=G.pending.split(',').map(Number); enemyCells[r][c].classList.add('pending'); }
   clearCells(ownCells);
   G.fleets[v].forEach((p,i)=>cellsOf(p).forEach(([r,c],k)=>{ const el=ownCells[r][c];
-    el.classList.add('plane'); el.style.setProperty('--c',COLORS[i]); if(k===0) el.classList.add('nose'); }));
+    el.classList.add('plane'); el.style.setProperty('--c',COLORS[i]); if(k===0) markNose(el,p.dir); }));
   paintShots(ownCells,G.shots[foe],G.last[foe]);
 
   const canFire = G.turn===v && !G.busy;
@@ -908,6 +954,27 @@ function entropyThink(dead){
 }
 function entropyPick(dead){ const t=entropyThink(dead); return [t.r,t.c]; }
 
+// ---------- Impossible AI's own fleet ----------
+// impossible-weights.bin holds, for every layout in entropyInit()'s order, the average number of
+// shots the Impossible AI needs to down it (×10, one byte each; 16 simulated games per layout).
+// When you play the Impossible AI it hides its fleet with probability proportional to that number,
+// so layouts that are hard for an entropy hunter come up more often.
+const IMPW={data:null, loading:false};
+function loadImpossibleWeights(){
+  if(IMPW.data||IMPW.loading) return; IMPW.loading=true;
+  fetch('impossible-weights.bin').then(r=>r.ok?r.arrayBuffer():Promise.reject(r.status))
+    .then(b=>{ const d=new Uint8Array(b); if(d.length*3===entropyInit().tri.length) IMPW.data=d; })
+    .catch(()=>{}).finally(()=>{ IMPW.loading=false; });
+}
+function impossibleFleet(){
+  const d=IMPW.data; if(!d) return randomFleet();       // weights not loaded (offline / still loading)
+  const {pl,tri}=entropyInit(); let total=0; for(let i=0;i<d.length;i++) total+=d[i];
+  let x=Math.random()*total, i=0; while(i<d.length-1&&(x-=d[i])>=0) i++;
+  const fleet=[0,1,2].map(j=>{ const p=pl[tri[3*i+j]]; return {r:p.r,c:p.c,dir:p.dir}; });
+  for(let j=2;j>0;j--){ const k=Math.random()*(j+1)|0; [fleet[j],fleet[k]]=[fleet[k],fleet[j]]; }   // plane order carries no info
+  return fleet;
+}
+
 // ---------- watch the AI ----------
 const LEVEL_NAME={easy:'Easy',normal:'Normal',hard:'Hard',entropy:'Impossible'};
 const W={fleet:null, level:null, timer:null, speed:700, heat:true, mode:'entropy'};
@@ -976,7 +1043,7 @@ function renderWatch(){
   clearCells(cells);
   for(const row of cells) for(const el of row) el.style.backgroundImage='';
   G.fleets[0].forEach((p,i)=>cellsOf(p).forEach(([r,c],k)=>{ const el=cells[r][c];
-    el.classList.add('plane'); el.style.setProperty('--c',COLORS[i]); if(k===0) el.classList.add('nose'); }));
+    el.classList.add('plane'); el.style.setProperty('--c',COLORS[i]); if(k===0) markNose(el,p.dir); }));
   paintShots(cells,G.shots[1],G.last[1]);
   // what the heatmap shows: Impossible can show entropy or a probability; Hard shows its score
   let heat=plan&&plan.heat, lo='less likely', hi='more likely';
@@ -1051,10 +1118,105 @@ $('vsPC').onclick=()=>openDiff('pc');
 document.querySelectorAll('.diffcard').forEach(b=>b.onclick=()=>{
   if(PICK_FOR==='watch') return startWatch(b.dataset.d);
   DIFF=b.dataset.d; try{ localStorage.setItem('avioane-diff',DIFF); }catch(e){}
+  if(DIFF==='entropy') loadImpossibleWeights();      // fetched while you place your planes
   newGame('pc');
 });
 $('vsWatch').onclick=()=>{ W.fleet=null; newGame('watch'); };
 $('vsPVP').onclick=()=>newGame('pvp');
+
+// ---------- marathon ----------
+// Solo games against hidden random fleets. For each fleet the Impossible AI plays the same fleet in the
+// background (one move per tick); par = its shot count + MR_PAR_EXTRA (players only ever see "par"). A game scores par + 3 − your shots (higher is better), summed over all games;
+// the marathon is won above 3 points per game (beating par overall), drawn at exactly 3, lost below.
+const MR={n:3, games:[], cur:null, gen:0};
+const MR_MAX=18;
+const MR_BASE=3;                                          // points for matching par
+const MR_PAR_EXTRA=4;                                     // par = Impossible AI's shots + this
+const mrPts=g=>MR_BASE+g.par-g.n;
+const fmtPts=p=>(p<0?'−':'')+Math.abs(p);
+const mrDone=()=>MR.games.filter(g=>g.shown);               // finished games whose par has been revealed
+const mrTotal=()=>mrDone().reduce((s,g)=>s+mrPts(g),0);
+function mrStepper(){ $('mrN').textContent=MR.n; $('mrMinus').disabled=MR.n<=1; $('mrPlus').disabled=MR.n>=MR_MAX; }
+$('vsMarathon').onclick=()=>{ G=null; MR.n=3; mrStepper(); show('marathonSetup'); };
+$('mrMinus').onclick=()=>{ MR.n=Math.max(1,MR.n-1); mrStepper(); };
+$('mrPlus').onclick=()=>{ MR.n=Math.min(MR_MAX,MR.n+1); mrStepper(); };
+$('mrStart').onclick=()=>mrBegin();
+const mrCells=makeGrid($('mrBoard'),(r,c)=>mrFire(r,c));
+function mrBegin(){ G=null; MR.gen++; MR.games=[]; mrNext(); }
+function mrQuit(){ MR.gen++; MR.cur=null; MR.games=[]; show('menu'); }
+function mrNext(){
+  const g={fleet:randomFleet(), shots:{}, sunk:[], last:null, n:0, par:null, done:false, shown:false};
+  MR.cur=g; MR.games.push(g); show('marathon'); mrRender(); mrAiPlay(g);
+}
+function mrDead(g){ return new Set(g.sunk.flatMap(i=>cellsOf(g.fleet[i]).map(([r,c])=>r+','+c))); }
+// The Impossible AI plays this fleet move by move; entropyThink reads the global G, so it is swapped in for each move.
+function mrAiPlay(g){
+  const gen=MR.gen, occ=occupancy(g.fleet), sim={shots:{},sunk:[],n:0};
+  const step=()=>{
+    if(gen!==MR.gen) return;                                 // marathon left or restarted
+    const saved=G;
+    try{
+      G={shots:[{},sim.shots], sunk:[[],sim.sunk], fleets:[g.fleet,null]};
+      const t=entropyThink(deadSet(1)), key=t.r+','+t.c, o=occ[key], res=o?(o.nose?'nose':'hit'):'miss';
+      sim.shots[key]=res; sim.n++; if(res==='nose'&&!sim.sunk.includes(o.i)) sim.sunk.push(o.i);
+    } finally { G=saved; }
+    if(sim.sunk.length<MAX) return setTimeout(step,0);
+    g.par=sim.n+MR_PAR_EXTRA; mrRender(); if(g.done) mrFinish(g);
+  };
+  setTimeout(step,50);
+}
+function mrFire(r,c){
+  const g=MR.cur; if(!g||g.done||!visible('marathon')) return;
+  const key=r+','+c; if(g.shots[key]||mrDead(g).has(key)) return;
+  const o=occupancy(g.fleet)[key], res=o?(o.nose?'nose':'hit'):'miss';
+  g.shots[key]=res; g.last=key; g.n++;
+  if(res==='nose'&&!g.sunk.includes(o.i)) g.sunk.push(o.i);
+  feedback(res,true); if(res==='nose'&&g.sunk.length<MAX) toast('✸ Plane down!','ok');
+  if(g.sunk.length===MAX){ g.done=true; mrRender(); setTimeout(()=>mrFinish(g),600); return; }
+  mrRender();
+}
+function mrFinish(g){
+  if(g!==MR.cur||!g.done||g.par==null||g.shown) return;       // waits until par is known
+  g.shown=true; mrRender();
+  const i=MR.games.length, d=g.par-g.n, pts=mrPts(g), last=i>=MR.n, total=mrTotal();
+  const plural=k=>k===1?'shot':'shots';
+  const verdict=d>0?`${d} ${plural(d)} under par.`:d<0?`${-d} ${plural(-d)} over par.`:'Right on par.';
+  if(!last){
+    sfx(d>0?'win':d<0?'lose':'turn');
+    return overlay(`Game ${i} of ${MR.n}: ${fmtPts(pts)} point${Math.abs(pts)===1?'':'s'}`,
+      `You: ${g.n} shots · Par: ${g.par}\n${verdict}\n\nTotal so far: ${fmtPts(total)} points (${MR_BASE*i} = on par)`,
+      'Next game',mrNext,'Quit marathon',mrQuit);
+  }
+  const you=MR.games.reduce((s,x)=>s+x.n,0), parSum=MR.games.reduce((s,x)=>s+x.par,0);
+  const even=MR_BASE*MR.n;
+  sfx(total>even?'win':total<even?'lose':'turn');
+  overlay(total>even?'🏆 You beat par!':total===even?'🤝 Right on par':'💥 Over par – you lost',
+    `Final score: ${fmtPts(total)} points over ${MR.n} game${MR.n>1?'s':''} (${even} = on par)\nYou: ${you} shots · Par: ${parSum}\n\nLast game: ${g.n} shots, par ${g.par} → ${fmtPts(pts)} points`,
+    'Play again',mrBegin,'Back to menu',mrQuit);
+}
+function mrRender(){
+  const g=MR.cur; if(!g) return;
+  const i=MR.games.length, total=mrTotal(), played=mrDone().length;
+  $('mrTitle').textContent=`Game ${i} of ${MR.n}`;
+  $('mrSub').innerHTML=g.done&&g.par==null?'Working out par…'
+    :`<b>${g.n}</b> shot${g.n===1?'':'s'}`+(played?` · <b>${fmtPts(total)}</b> pts`:'');
+  $('mrTop').classList.toggle('mine',!g.done);
+  $('mrPlanes').innerHTML=planePills(g.sunk,false);
+  clearCells(mrCells);
+  g.sunk.forEach(k=>cellsOf(g.fleet[k]).forEach(([r,c],j)=>{ const el=mrCells[r][c];
+    el.classList.add('sunk'); el.style.setProperty('--c',COLORS[k]); if(j===0) markNose(el,g.fleet[k].dir); }));
+  paintShots(mrCells,g.shots,g.last);
+  $('mrBoard').classList.toggle('locked',g.done);
+  let rows='<tr><th>Game</th><th>You</th><th>Par</th><th>Points</th></tr>';
+  for(let k=0;k<MR.n;k++){ const x=MR.games[k], cur=x===g&&!x.shown;
+    const you=x?x.n:'', par=x&&x.shown?x.par:x?'?':'', d=x&&x.shown?x.par-x.n:null, p=x&&x.shown?mrPts(x):null;
+    rows+=`<tr class="${cur?'cur':''}"><td>${k+1}</td><td>${you}</td><td class="${x&&!x.shown?'wait':''}">${par}</td>`+
+          `<td class="${d==null?'':d>0?'good':d<0?'bad':''}">${p==null?'':fmtPts(p)}</td></tr>`; }
+  const shownGames=mrDone();
+  rows+=`<tr class="tot"><td>Total</td><td>${shownGames.reduce((s,x)=>s+x.n,0)||''}</td><td>${shownGames.reduce((s,x)=>s+x.par,0)||''}</td>`+
+        `<td class="${total>MR_BASE*played?'good':total<MR_BASE*played?'bad':''}">${shownGames.length?fmtPts(total):''}</td></tr>`;
+  $('mrCard').innerHTML=rows;
+}
 ['mini','heroPlane'].forEach(id=>{ const mini=$(id);
   for(let y=0;y<4;y++)for(let x=-2;x<=2;x++){
     const i=document.createElement('i'), k=SHAPE.findIndex(([a,b])=>a===x&&b===y);
@@ -1527,10 +1689,19 @@ $('shareLink').onclick=async()=>{
 // ---------- player name ----------
 const cleanName = n => String(n||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,16);
 function myName(){ return cleanName($('nick').value)||'Pilot'; }
+// Kept in localStorage and mirrored in a 1-year cookie, so it survives if either one is cleared.
 (function(){
-  let n=''; try{ n=localStorage.getItem('avioane-name')||''; }catch(e){}
-  $('nick').value=cleanName(n)||('Pilot '+(10+Math.random()*90|0));
-  $('nick').addEventListener('input',()=>{ try{ localStorage.setItem('avioane-name',cleanName($('nick').value)); }catch(e){} });
+  const KEY='avioane-name';
+  const readCookie=()=>{ try{ const m=document.cookie.match(/(?:^|;\s*)avioane-name=([^;]*)/); return m?decodeURIComponent(m[1]):''; }catch(e){ return ''; } };
+  const store=n=>{ if(!n) return;
+    try{ localStorage.setItem(KEY,n); }catch(e){}
+    try{ document.cookie=`${KEY}=${encodeURIComponent(n)}; max-age=31536000; path=/airplanes; SameSite=Lax`; }catch(e){} };
+  const readLocal=()=>{ try{ return localStorage.getItem(KEY)||''; }catch(e){ return ''; } };
+  const saved=()=>cleanName(readLocal())||cleanName(readCookie());
+  const n=saved()||('Pilot '+(10+Math.random()*90|0));
+  $('nick').value=n; store(n);                                  // a generated name is kept too, so it stays the same next visit
+  $('nick').addEventListener('input',()=>store(cleanName($('nick').value)));
+  $('nick').addEventListener('blur',()=>{ if(!cleanName($('nick').value)) $('nick').value=saved()||'Pilot'; });
   $('nick').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
 })();
 
