@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#7b5cff"/></linearGradient></defs>
+  <rect width="64" height="64" rx="15" fill="url(#g)"/>
+  <!-- the game's plane: nose, 5-wide wings, body, 3-wide tail (one cell = 9px, 2px gaps) -->
+  <g fill="#fff">
+    <rect x="27" y="9" width="10" height="10" rx="2.5" fill="#ffd166"/>
+    <rect x="5"  y="21" width="10" height="10" rx="2.5"/><rect x="16" y="21" width="10" height="10" rx="2.5"/>
+    <rect x="27" y="21" width="10" height="10" rx="2.5"/><rect x="38" y="21" width="10" height="10" rx="2.5"/>
+    <rect x="49" y="21" width="10" height="10" rx="2.5"/>
+    <rect x="27" y="33" width="10" height="10" rx="2.5"/>
+    <rect x="16" y="45" width="10" height="10" rx="2.5"/><rect x="27" y="45" width="10" height="10" rx="2.5"/>
+    <rect x="38" y="45" width="10" height="10" rx="2.5"/>
+  </g>
+</svg>

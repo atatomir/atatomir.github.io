@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Airplanes">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Airplanes</title>
 <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -320,7 +321,7 @@
   <header class="top">
     <div class="topl">
       <button class="iconbtn back hidden" id="back" aria-label="Back">‹</button>
-      <h1><span class="logo">✈️</span><span class="name">Airplanes</span></h1>
+      <h1><span class="logo" aria-hidden="true"><svg viewBox="4 8 56 48" width="20" height="17"><g fill="#fff"><rect x="27" y="9" width="10" height="10" rx="2.5" fill="#ffd166"/><rect x="5" y="21" width="10" height="10" rx="2.5"/><rect x="16" y="21" width="10" height="10" rx="2.5"/><rect x="27" y="21" width="10" height="10" rx="2.5"/><rect x="38" y="21" width="10" height="10" rx="2.5"/><rect x="49" y="21" width="10" height="10" rx="2.5"/><rect x="27" y="33" width="10" height="10" rx="2.5"/><rect x="16" y="45" width="10" height="10" rx="2.5"/><rect x="27" y="45" width="10" height="10" rx="2.5"/><rect x="38" y="45" width="10" height="10" rx="2.5"/></g></svg></span><span class="name">Airplanes</span></h1>
     </div>
     <div class="topr">
       <div class="pill hidden" id="net"><span class="dot" id="netDot"></span><span id="netText"></span></div>
@@ -499,8 +500,7 @@ const resWord = res => res==='miss'?'miss':res==='hit'?'hit!':'nose hit – plan
 const buzz = p => { try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} };
 
 // ---------- sound (generated with WebAudio, no files) ----------
-const SND={on:true,ctx:null};
-try{ SND.on=localStorage.getItem('avioane-sound')!=='0'; }catch(e){}
+const SND={on:false,ctx:null};                 // every visit starts muted; 🔇/🔊 toggles for this visit only
 function actx(){
   if(!SND.ctx){ const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; SND.ctx=new C(); }
   if(SND.ctx.state==='suspended') SND.ctx.resume();
@@ -536,7 +536,7 @@ function sfx(kind){
 }
 function feedback(res,mine){ sfx(res); if(res==='nose') buzz(mine?80:[80,50,80]); else if(res==='hit') buzz(mine?30:45); }
 function soundUI(){ $('sound').textContent=SND.on?'🔊':'🔇'; }
-$('sound').onclick=()=>{ SND.on=!SND.on; try{ localStorage.setItem('avioane-sound',SND.on?'1':'0'); }catch(e){} soundUI(); if(SND.on) sfx('tap'); };
+$('sound').onclick=()=>{ SND.on=!SND.on; soundUI(); if(SND.on) sfx('tap'); };
 soundUI();
 function accuracy(shots){ const v=Object.values(shots), h=v.filter(x=>x!=='miss').length; return {n:v.length,h,pct:v.length?Math.round(100*h/v.length):0}; }
 
