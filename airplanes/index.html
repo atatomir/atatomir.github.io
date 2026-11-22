@@ -48,8 +48,8 @@
   /* header */
   .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 14px;min-height:38px}
   .topl,.topr{display:flex;align-items:center;gap:8px;min-width:0}
-  h1{font-size:21px;margin:0;letter-spacing:.2px;white-space:nowrap}
-  h1 .logo{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;margin-right:6px;vertical-align:-6px;font-size:16px;
+  h1{font-size:21px;margin:0;letter-spacing:.2px;white-space:nowrap;display:flex;align-items:center;gap:8px;line-height:1}
+  h1 .logo{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:9px;font-size:16px;line-height:1;
            background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 4px 14px var(--accent-soft)}
   .iconbtn{background:var(--panel);border:1px solid var(--border);border-radius:999px;width:38px;height:38px;padding:0;font-size:17px;
            display:flex;align-items:center;justify-content:center;flex:none;color:var(--text)}
@@ -348,7 +348,7 @@
         <span class="meter" style="--c:var(--hit)"><i class="on"></i><i class="on"></i><i></i></span></span></button>
       <button class="diffcard" data-d="hard"><span class="em">😈</span><span class="tx"><b>Hard</b><small>Works out where your planes can be and hunts the noses. Very tough.</small>
         <span class="meter" style="--c:var(--bad)"><i class="on"></i><i class="on"></i><i class="on"></i></span></span></button>
-      <button class="diffcard" data-d="entropy"><span class="em">💀</span><span class="tx"><b>Impossible</b><small>Tracks every fleet layout still possible and fires where the answer (miss / hit / nose) is least predictable.</small>
+      <button class="diffcard" data-d="entropy"><span class="em">💀</span><span class="tx"><b>Impossible</b><small>Tracks every fleet layout still possible and fires where the answer (miss / hit / nose and which way it faces) is least predictable.</small>
         <span class="meter" style="--c:var(--accent-2)"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></span></button>
     </div>
   </section>
@@ -830,8 +830,9 @@ function smartPick(dead){ const t=smartThink(dead); return [t.r,t.c]; }
 // ---------- entropy AI ----------
 // Keeps every full fleet layout (3 non-overlapping planes) that agrees with everything it knows
 // (misses, hits, nose hits, downed planes), treats those layouts as equally likely, and for each
-// cell computes P(miss), P(hit), P(nose). It fires where the answer is most uncertain:
-//   H(cell) = −Σ p·log2(p)  over the 3 outcomes   (max log2 3 ≈ 1.585 bits)
+// cell computes P(miss), P(hit) and P(nose facing up/right/down/left) – a nose hit downs the plane
+// and reveals it, so its direction is part of the answer. It fires where the answer is most uncertain:
+//   H(cell) = −Σ p·log2(p)  over the 6 outcomes   (max log2 6 ≈ 2.585 bits)
 // Ties go to the higher P(nose); a cell that is certainly a nose is shot right away.
 let EN=null;
 function entropyInit(){                      // built once: all placements + all compatible triples
@@ -881,9 +882,10 @@ function entropyStats(shots,downed){
     cnt[a]++; cnt[b]++; cnt[c]++; total++;
   }
   // planes in a layout never overlap, so per-placement counts add up per cell
-  const nose=new Float64Array(N*N), body=new Float64Array(N*N);
-  for(let a=0;a<P;a++) if(cnt[a]){ const cells=pl[a].cells; nose[cells[0]]+=cnt[a]; for(let k=1;k<10;k++) body[cells[k]]+=cnt[a]; }
-  return {total,nose,body};
+  // noseDir[cell*4+d]: layouts with a nose on that cell facing DIRS[d]; nose[cell] is their sum
+  const nose=new Float64Array(N*N), body=new Float64Array(N*N), noseDir=new Float64Array(N*N*4);
+  for(let a=0;a<P;a++) if(cnt[a]){ const cells=pl[a].cells; nose[cells[0]]+=cnt[a]; noseDir[cells[0]*4+DIRS.indexOf(pl[a].dir)]+=cnt[a]; for(let k=1;k<10;k++) body[cells[k]]+=cnt[a]; }
+  return {total,nose,body,noseDir};
 }
 const entropy = ps => ps.reduce((h,p)=>p>0?h-p*Math.log2(p):h,0);
 function entropyThink(dead){
@@ -894,14 +896,15 @@ function entropyThink(dead){
   for(let i=0;i<N*N;i++){
     const key=(i/N|0)+','+(i%N); if(shots[key]||dead.has(key)) continue;
     const pNose=st.nose[i]/st.total, pHit=st.body[i]/st.total, pMiss=Math.max(0,1-pNose-pHit);
-    const h=H[i]=entropy([pMiss,pHit,pNose]);
+    const pDir=[0,1,2,3].map(d=>st.noseDir[i*4+d]/st.total);
+    const h=H[i]=entropy([pMiss,pHit,...pDir]);
     if(pNose>1-EPS&&sure<0) sure=i;            // a guaranteed kill beats any information
     if(h>bestH+EPS||(h>bestH-EPS&&pNose>bestN+EPS)){ bestH=h; bestN=pNose; best=[i]; }
     else if(h>bestH-EPS&&pNose>bestN-EPS) best.push(i);
   }
   const i=sure>=0?sure:best[Math.random()*best.length|0];
   return {r:i/N|0,c:i%N,kind:'entropy',reason:sure>=0?'sure':'entropy',
-          heat:H.map(h=>h/Math.log2(3)),H,total:st.total,nose:st.nose,body:st.body};
+          heat:H.map(h=>h/Math.log2(6)),H,total:st.total,nose:st.nose,body:st.body,noseDir:st.noseDir};
 }
 function entropyPick(dead){ const t=entropyThink(dead); return [t.r,t.c]; }
 
@@ -955,6 +958,7 @@ function cellExplain(key){
     return `<div class="hd"><span>${isTarget?'Next shot: ':''}${keyName(key)}</span><span>H = ${plan.H[i].toFixed(3)} bits</span></div>
       <div class="pbar"><i style="width:${pm*100}%;--k:var(--miss)"></i><i style="width:${ph*100}%;--k:var(--hit)"></i><i style="width:${pn*100}%;--k:var(--bad)"></i></div>
       <div class="plegend"><span style="--k:var(--miss)">miss ${pct(pm)}</span><span style="--k:var(--hit)">hit ${pct(ph)}</span><span style="--k:var(--bad)">nose ${pct(pn)}</span></div>
+      ${pn>0?`<div class="plegend">nose facing ${DIRS.map((d,k)=>`${DIR_ARROW[d]} ${pct(plan.noseDir[i*4+k]/plan.total)}`).join(' · ')}</div>`:''}
       <div style="margin-top:6px">${isTarget?(plan.reason==='sure'?'Every possible layout puts a nose here – <b>guaranteed kill</b>.':'Highest entropy on the board: the answer here is the <b>least predictable</b>, so it teaches the AI the most.'):`The best cell has H = ${plan.H[plan.r*N+plan.c].toFixed(3)} bits.`}
       <b>${fmt(plan.total)}</b> fleet layouts still possible.</div>`;
   }
@@ -977,7 +981,7 @@ function renderWatch(){
   // what the heatmap shows: Impossible can show entropy or a probability; Hard shows its score
   let heat=plan&&plan.heat, lo='less likely', hi='more likely';
   if(plan&&plan.kind==='entropy'){
-    if(W.mode==='entropy'){ lo='0 bits'; hi='1.585 bits (max)'; }
+    if(W.mode==='entropy'){ lo='0 bits'; hi='2.585 bits (max)'; }
     else {
       const dead=deadSet(1), p=new Float64Array(N*N); let mx=0;
       for(let i=0;i<N*N;i++){ const key=(i/N|0)+','+(i%N); if(G.shots[1][key]||dead.has(key)) continue;
